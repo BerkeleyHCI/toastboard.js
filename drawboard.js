@@ -21,13 +21,24 @@ var chooseColor = function() {
     return colorArray[colorIndex];
 };
 
+var processConnections = function(connectionsArray) {
+    var newConnections = [];
+    var colNum = 0;
+    connectionsArray.forEach(function(cnxn) {
+        newConnections.push({start:cnxn.start,end:cnxn.end,col:colNum});
+        colNum = (colNum + 1) % pinnum;
+    });
+    return newConnections;
+};
+
 var svg = d3.select("#breadboard").append("svg")
     .attr("width", width)
     .attr("height", height)
     .append("g");
 
 var pinPositions = publicPinPositionGrid();
-var connections = [{start:0,end:2,col:0},{start:3,end:4,col:2}];
+var connections = [{start:0,end:2},{start:3,end:4},{start:2,end:6}];
+connections = processConnections(connections);
 
 svg.selectAll("circle")
     .data(pinPositions)
