@@ -1,0 +1,14 @@
+{
+  "name": "toastboard",
+  "version": "0.0.1",
+  "description": "Web client for ToastBoard",
+  "main": "index.js",
+  "author": "Team LaTe",
+  "private": true,
+  "license": "BSD",
+  "dependencies": {
+    "express": "~3.4.8",
+    "ws": "~0.4.32"
+    "socket.io": "latest"
+  }
+}
