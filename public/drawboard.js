@@ -10,7 +10,6 @@ socket.on('info', function (data) {
 // TODO draw connections from power rail to rows
 // TODO make highlighting colors unique to each voltage level
 // TODO associate highlighting colors with wire colors
-// TODO mouseover to see voltages
 // TODO layout and style
 // TODO draw oscillo graph
 // TODO save status (to local storage????)
@@ -181,7 +180,8 @@ var drawBreadboard = function(cnxn) {
       .attr("ry",5)
     //  .attr("stroke-width",3)
       .attr("fill", function(d) { return d.color})
-      .attr("fill-opacity", 0.5);
+      .attr("fill-opacity", 0.5)
+      .append("title").text(function(d) { return d.v.toString() + "V" });
 
 
     svg.selectAll("circle")
