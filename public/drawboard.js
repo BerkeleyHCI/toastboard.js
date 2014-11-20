@@ -6,6 +6,15 @@ socket.on('info', function (data) {
     console.log(data);
 });
 
+// TODO move power rail from left to right
+// TODO draw connections from power rail to rows
+// TODO make highlighting colors unique to each voltage level
+// TODO associate highlighting colors with wire colors
+// TODO mouseover to see voltages
+// TODO layout and style
+// TODO draw oscillo graph
+// TODO save status (to local storage????)
+
 var width=500;
 var height=700;
 
@@ -15,6 +24,7 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
   this.pinnum = pinnum;
   this.rowspacing = rowspacing;
   this.colspacing = colspacing;
+  this.voltageColors = {"0": "gray","3.3":"red"};
 
   var rowPinPositionGrid = function(startX,startY) {
     var positions = [];
@@ -102,8 +112,38 @@ Breadboard.prototype.getRowRect = function(rowIndex) {
   return this.getRectAttr(firstPin,lastPin);
 };
 
+Breadboard.prototype.processVoltages = function(voltages) {
+  var self = this;
+  var processedVoltages = [];
+  voltages.forEach(function(voltage) {
+    var newVoltage = {};
+    if (voltage.r == 0 || voltage.r == 1) {
+      newVoltage = self.getRailRect(voltage.r);
+    } else {
+      newVoltage = self.getRowRect(voltage.r - 2);
+    }
+    newVoltage.r = voltage.r; // retain original info
+    newVoltage.v = voltage.v;
+    newVoltage.color = self.chooseVoltageColor(voltage);
+    processedVoltages.push(newVoltage);
+  });
+  return processedVoltages;
+}
+
+Breadboard.prototype.chooseVoltageColor = function(voltage) {
+  var voltageString = voltage.v.toString();
+  if (voltageString in this.voltageColors) {
+    return this.voltageColors[voltageString];
+  } else {
+    // pick color
+    var color = chooseColor(); // ideally this would be unique though
+    this.voltageColors[voltageString] = color;
+    return color;
+  }
+}
+
 var chooseColor = function() {
-    var colorArray = ["red","orange","yellow","green","blue","purple"];
+    var colorArray = ["orange","yellow","green","blue","purple"];
     var colorIndex = Math.floor(Math.random() * colorArray.length);
     return colorArray[colorIndex];
 };
@@ -120,6 +160,9 @@ var drawBreadboard = function(cnxn) {
 
     var breadboard = new Breadboard(2,24,5,20,15);
     var pinPositions = breadboard.pinPositions;
+
+    var voltages = [{r:0,v:3.3},{r:1,v:0.0},{r:32,v:1.1}];
+    var voltages_attr = breadboard.processVoltages(voltages);
     var cnxn = [{start:0,end:2},{start:3,end:4},{start:2,end:6},{start:15,end:23},{start:30,end:32},{start:3,end:25}];
     var connections = breadboard.choosePins(cnxn);
     console.log(connections[0].startPin[0]);
@@ -127,7 +170,7 @@ var drawBreadboard = function(cnxn) {
     var rectAttr = breadboard.getRowRect(47);
 
     svg.selectAll("rect")
-      .data([rectAttr])
+      .data(voltages_attr)
       .enter()
       .append("rect")
       .attr("x", function(d) { return d.x; })
@@ -137,7 +180,7 @@ var drawBreadboard = function(cnxn) {
       .attr("rx", 5)
       .attr("ry",5)
     //  .attr("stroke-width",3)
-      .attr("fill", "red")
+      .attr("fill", function(d) { return d.color})
       .attr("fill-opacity", 0.5);
 
 
