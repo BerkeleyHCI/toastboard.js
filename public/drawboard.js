@@ -78,6 +78,30 @@ Breadboard.prototype.choosePins = function(cnxn) {
   return newCnxn;
 };
 
+Breadboard.prototype.getRectAttr = function(firstPin,lastPin) {
+  var padding = 8;
+  var x = firstPin[0] - padding;
+  var y = firstPin[1] - padding;
+  var width = (lastPin[0] - firstPin[0]) + (padding*2);
+  var height = (lastPin[1] - firstPin[1]) + (padding*2);
+  return {x: x, y: y, height: height, width: width};
+}
+
+Breadboard.prototype.getRailRect = function(railIndex) {
+  // rails are only 0 or 1
+  var firstPin = this.pinPositions[railIndex*this.rownum];
+  var lastPin = this.pinPositions[railIndex*this.rownum + (this.rownum - 1)];
+  return this.getRectAttr(firstPin,lastPin);
+};
+
+Breadboard.prototype.getRowRect = function(rowIndex) {
+  // rows are numbered 0 through 47
+  var firstPin = this.pinPositions[(this.rownum*this.railcolumn) + (rowIndex*this.pinnum)];
+  var lastPin = this.pinPositions[(this.rownum*this.railcolumn) + (rowIndex*this.pinnum) + (this.pinnum - 1)];
+  console.log("first pin " + firstPin + " last pin " + lastPin);
+  return this.getRectAttr(firstPin,lastPin);
+};
+
 var chooseColor = function() {
     var colorArray = ["red","orange","yellow","green","blue","purple"];
     var colorIndex = Math.floor(Math.random() * colorArray.length);
@@ -94,11 +118,28 @@ var drawBreadboard = function(cnxn) {
         .attr("height", height)
         .append("g");
 
-    var breadboard = new Breadboard(2,24,5,20,25);
+    var breadboard = new Breadboard(2,24,5,20,15);
     var pinPositions = breadboard.pinPositions;
     var cnxn = [{start:0,end:2},{start:3,end:4},{start:2,end:6},{start:15,end:23},{start:30,end:32},{start:3,end:25}];
     var connections = breadboard.choosePins(cnxn);
     console.log(connections[0].startPin[0]);
+
+    var rectAttr = breadboard.getRowRect(47);
+
+    svg.selectAll("rect")
+      .data([rectAttr])
+      .enter()
+      .append("rect")
+      .attr("x", function(d) { return d.x; })
+      .attr("y", function(d) { return d.y; })
+      .attr("height", function(d) { return d.height; })
+      .attr("width", function(d) { return d.width; })
+      .attr("rx", 5)
+      .attr("ry",5)
+    //  .attr("stroke-width",3)
+      .attr("fill", "red")
+      .attr("fill-opacity", 0.5);
+
 
     svg.selectAll("circle")
         .data(pinPositions)
