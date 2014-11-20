@@ -1,3 +1,11 @@
+// connect to the socket server
+var socket = io.connect(); 
+
+// if we get an "info" emit from the socket server then console.log the data we recive
+socket.on('info', function (data) {
+    console.log(data);
+});
+
 $(function() {
 
 var width = 460,
@@ -67,19 +75,6 @@ var drawBreadboard = function(cnxn) {
         .attr("stroke-width",3)
         .attr("stroke",function (d) { return chooseColor(); });
 };
-
-// ws.on('open', function() {
-//   console.log("connection is open");
-// });
-
-ws.on('message',function(data,flag) {
-  console.log("we got a message");
-  var j = JSON.parse(data);
-  console.log(j);
-  if (!(j.cnxn == undefined)) {
-    drawBreadboard(j.cnxn);
-  }
-});
 
   $(document).ready(function() {
     console.log("okay set stuff up")
