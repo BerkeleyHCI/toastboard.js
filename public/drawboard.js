@@ -6,6 +6,7 @@ socket.on('info', function (data) {
     console.log(data);
 });
 
+// TODO how to handle floating voltages? only display selected row?
 // TODO move power rail from left to right
 // TODO draw connections from power rail to rows
 // TODO make highlighting colors unique to each voltage level
@@ -15,7 +16,7 @@ socket.on('info', function (data) {
 // TODO save status (to local storage????)
 
 var width=500;
-var height=700;
+var height=600;
 
 function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
   this.railcolumn = railcolumn;
@@ -69,7 +70,7 @@ Breadboard.prototype.choosePins = function(cnxn) {
   var row2PinNum = 0;
   var pin = 0, pin2 = 0;
   cnxn.forEach(function(connection) {
-    // TODO: special case rail pins
+    // TODO: special case rail to row connections
     if (connection.start <= 23 && connection.end <= 23) {
       pin = row1PinNum;
       pin2 = row1PinNum;
@@ -107,7 +108,6 @@ Breadboard.prototype.getRowRect = function(rowIndex) {
   // rows are numbered 0 through 47
   var firstPin = this.pinPositions[(this.rownum*this.railcolumn) + (rowIndex*this.pinnum)];
   var lastPin = this.pinPositions[(this.rownum*this.railcolumn) + (rowIndex*this.pinnum) + (this.pinnum - 1)];
-  console.log("first pin " + firstPin + " last pin " + lastPin);
   return this.getRectAttr(firstPin,lastPin);
 };
 
@@ -134,7 +134,6 @@ Breadboard.prototype.chooseVoltageColor = function(voltage) {
   if (voltageString in this.voltageColors) {
     return this.voltageColors[voltageString];
   } else {
-    // pick color
     var color = chooseColor(); // ideally this would be unique though
     this.voltageColors[voltageString] = color;
     return color;
@@ -160,13 +159,10 @@ var drawBreadboard = function(cnxn) {
     var breadboard = new Breadboard(2,24,5,20,15);
     var pinPositions = breadboard.pinPositions;
 
-    var voltages = [{r:0,v:3.3},{r:1,v:0.0},{r:32,v:1.1}];
+    var voltages = [{r:0,v:3.3},{r:1,v:0.0},{r:32,v:1.1},{r:34,v:1.1},{r:2,v:3.3},{r:4,v:3.3},{r:8,v:3.3},{r:17,v:0.0},{r:25,v:0.0}];
     var voltages_attr = breadboard.processVoltages(voltages);
     var cnxn = [{start:0,end:2},{start:3,end:4},{start:2,end:6},{start:15,end:23},{start:30,end:32},{start:3,end:25}];
     var connections = breadboard.choosePins(cnxn);
-    console.log(connections[0].startPin[0]);
-
-    var rectAttr = breadboard.getRowRect(47);
 
     svg.selectAll("rect")
       .data(voltages_attr)
@@ -178,11 +174,9 @@ var drawBreadboard = function(cnxn) {
       .attr("width", function(d) { return d.width; })
       .attr("rx", 5)
       .attr("ry",5)
-    //  .attr("stroke-width",3)
       .attr("fill", function(d) { return d.color})
       .attr("fill-opacity", 0.5)
       .append("title").text(function(d) { return d.v.toString() + "V" });
-
 
     svg.selectAll("circle")
         .data(pinPositions)

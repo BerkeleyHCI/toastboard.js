@@ -1,3 +1,10 @@
 #breadboard {
-  align: center;
+  padding: 20px;
+  background-color: #FFF;
+  width: 310px;
+  height: 430px;
+}
+
+.rightside {
+  padding: 20px;
 }
