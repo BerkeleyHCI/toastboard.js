@@ -8,12 +8,14 @@ socket.on('info', function (data) {
 
 // TODO how to handle floating voltages? only display selected row?
 // TODO move power rail from left to right
-// TODO draw connections from power rail to rows
+// TODO draw connections from power rail to rows (?)
 // TODO make highlighting colors unique to each voltage level
 // TODO associate highlighting colors with wire colors
 // TODO layout and style
 // TODO draw oscillo graph
 // TODO save status (to local storage????)
+// TODO bend wire drawings to see if they read better?
+// TODO if we don't really use jquery for anything, rip it out
 
 var width=500;
 var height=600;

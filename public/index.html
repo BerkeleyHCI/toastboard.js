@@ -9,6 +9,7 @@
     <script src="/socket.io/socket.io.js"></script>
 
 <script type="text/javascript" src="drawboard.js"></script>
+<script type="text/javascript" src="graph.js"></script>
 <body>
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="container"><div class="navbar-header"><a href="#" class="navbar-brand">ToastBoard</a></div></div>
@@ -24,6 +25,9 @@
 <div class="col-xs-6">
   <div class="rightside">
     <p>Selected row: Row 32, 1.1V</p>
+    <div id="graph-div">
+      <svg width="500" height="300" id="graphviz" />
+    </div>
   </div>
 </div>
 </div>
