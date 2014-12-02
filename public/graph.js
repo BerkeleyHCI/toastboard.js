@@ -4,8 +4,9 @@ Graph = function() {
 
 function drawGraph() {
   var readings = [{second:1,voltage:1.1},{second:2,voltage:1.5},{second:3,voltage:1.6},{second:4,voltage:1.7},{second:5,voltage:1.6},
-                 {second:6,voltage:1.4},{second:7,voltage:1.4},{second:8,voltage:0.8}];
+                 {second:6,voltage:1.4},{second:7,voltage:1.4},{second:8,voltage:1.1}];
 
+// note this selects svg node not div like drawboard. kind of weird
   var vis = d3.select('#graphviz'),
     WIDTH = 500,
     HEIGHT = 300,

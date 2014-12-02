@@ -6,16 +6,23 @@ socket.on('info', function (data) {
     console.log(data);
 });
 
-// TODO how to handle floating voltages? only display selected row?
 // TODO move power rail from left to right
 // TODO draw connections from power rail to rows (?)
-// TODO make highlighting colors unique to each voltage level
 // TODO associate highlighting colors with wire colors
-// TODO layout and style
 // TODO draw oscillo graph
 // TODO save status (to local storage????)
 // TODO bend wire drawings to see if they read better?
 // TODO if we don't really use jquery for anything, rip it out
+// TODO get timestamp from websocket when data was received
+// TODO put indicator by selected row
+
+// new format for json
+// 0-47 = rows
+// vddval (note that there's no way to tell is ground is plugged in)
+// selected
+
+// all 0-47 either have real data or f
+var fakejson = "{\"vddval\":3.3,\"selected\":0,\"rows\":[{\"0\":3.3},{\"1\":\"f\"}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0},{\"41\":\"f\"}, {\"42\":\"f\"},{\"43\":2.0}]}";
 
 var width=500;
 var height=600;
@@ -26,17 +33,21 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
   this.pinnum = pinnum;
   this.rowspacing = rowspacing;
   this.colspacing = colspacing;
-  this.voltageColors = {"0": "gray","3.3":"red"};
-
+  this.groundColor = "gray";
+  this.vddColor = "red";
+  this.selectedRow = null;
+  this.vdd = null;
+  this.voltageAttr = null;
+  this.connections = null;
   var rowPinPositionGrid = function(startX,startY) {
-    var positions = [];
-    for (var y=0;y<rownum;y++) {
-        for(var x=0;x<pinnum;x++) {
-            positions.push([x*rowspacing+startX,y*colspacing+startY]);
-        }
+  var positions = [];
+  for (var y=0;y<rownum;y++) {
+    for(var x=0;x<pinnum;x++) {
+      positions.push([x*rowspacing+startX,y*colspacing+startY]);
     }
-    return positions;
-  };
+  }
+  return positions;
+};
 
   var railPinPositionGrid = function(startX,startY) {
     var positions = [];
@@ -54,6 +65,89 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
     this.pinPositions = pinPositions;
 
 };
+
+Breadboard.prototype.processJson = function(json) {
+  var parsed = JSON.parse(json);
+  this.selectedRow = parsed.selected;
+  if (parsed.vddvall != "f") {
+  this.vdd = parsed.vddval;
+  }
+  var hash = this.hashVoltages(parsed.rows);
+  this.voltageAttr = this.hashToVoltageAttr(hash);
+  this.connections = this.hashToCnxn(hash);
+};
+
+Breadboard.prototype.hashVoltages = function(rowVals) {
+    var hash = {}
+    rowVals.forEach(function(row) {
+      var key = Object.keys(row)[0];
+      var val = row[key];
+      if (key != "f") { // remove floating rows
+        if (hash.hasOwnProperty(val)) {
+          hash[val].push(key);
+        } else {
+          hash[val] = [key];
+        }
+      }
+    });
+    return hash;
+  };
+
+Breadboard.prototype.hashToCnxn = function(hash) {
+  var self = this;
+  var cnxn = [];
+  Object.keys(hash).forEach(function(hashKey) {
+    var connected_rows = hash[hashKey];
+    var top_row = connected_rows[0];
+    connected_rows.slice(1).forEach(function(row) {
+      cnxn.push({start:top_row,end:row});
+    });
+  });
+  return this.choosePins(cnxn);
+};
+
+Breadboard.prototype.hashToVoltageAttr = function(hash) {
+  var colorArray = ["orange","yellow","green","blue","purple","brown","blueviolet","cornflowerblue","crimson",
+"forestgreen","deeppink","indigo","lightseagreen","mediumorchid","orangered","yellowgreen","gold","teal",
+"firebrick","midnightblue"];
+  var self = this;
+  var voltageAttr = [];
+  Object.keys(hash).forEach(function(hashKey) {
+    var color;
+    if (hashKey == 0) {
+      color = self.groundColor;
+    } else if (hashKey == self.vdd) {
+      color = self.vddColor;
+    } else {
+      var colorIndex = Math.floor(Math.random() * colorArray.length);
+      color = colorArray[colorIndex];
+      colorArray.splice(colorIndex,1);
+    }
+    hash[hashKey].forEach(function(row) {
+      var newVoltage = self.getRowRect(row);
+      newVoltage.r = row;
+      newVoltage.v = hashKey;
+      newVoltage.color = color
+      voltageAttr.push(newVoltage);
+    });
+  });
+      // manually add power and ground rails
+  if (this.vdd) { // check that power is not floating
+    pwrVoltage = self.getRailRect(0);
+    pwrVoltage.r = 0;
+    pwrVoltage.v = 3.3;
+    pwrVoltage.color = self.vddColor;
+    voltageAttr.push(pwrVoltage);
+  }
+  // can't tell if ground is connected, so always display
+  grdVoltage = self.getRailRect(1);
+  grdVoltage.r = 1;
+  grdVoltage.v = 0;
+  grdVoltage.color = self.groundColor;
+  voltageAttr.push(grdVoltage);
+  return voltageAttr;
+};
+
 
 //row pins count across
 Breadboard.prototype.getRowPin = function(rownumber,pinnumber) {
@@ -113,35 +207,6 @@ Breadboard.prototype.getRowRect = function(rowIndex) {
   return this.getRectAttr(firstPin,lastPin);
 };
 
-Breadboard.prototype.processVoltages = function(voltages) {
-  var self = this;
-  var processedVoltages = [];
-  voltages.forEach(function(voltage) {
-    var newVoltage = {};
-    if (voltage.r == 0 || voltage.r == 1) {
-      newVoltage = self.getRailRect(voltage.r);
-    } else {
-      newVoltage = self.getRowRect(voltage.r - 2);
-    }
-    newVoltage.r = voltage.r; // retain original info
-    newVoltage.v = voltage.v;
-    newVoltage.color = self.chooseVoltageColor(voltage);
-    processedVoltages.push(newVoltage);
-  });
-  return processedVoltages;
-}
-
-Breadboard.prototype.chooseVoltageColor = function(voltage) {
-  var voltageString = voltage.v.toString();
-  if (voltageString in this.voltageColors) {
-    return this.voltageColors[voltageString];
-  } else {
-    var color = chooseColor(); // ideally this would be unique though
-    this.voltageColors[voltageString] = color;
-    return color;
-  }
-}
-
 var chooseColor = function() {
     var colorArray = ["orange","yellow","green","blue","purple"];
     var colorIndex = Math.floor(Math.random() * colorArray.length);
@@ -159,15 +224,11 @@ var drawBreadboard = function(cnxn) {
         .append("g");
 
     var breadboard = new Breadboard(2,24,5,20,15);
-    var pinPositions = breadboard.pinPositions;
 
-    var voltages = [{r:0,v:3.3},{r:1,v:0.0},{r:32,v:1.1},{r:34,v:1.1},{r:2,v:3.3},{r:4,v:3.3},{r:8,v:3.3},{r:17,v:0.0},{r:25,v:0.0}];
-    var voltages_attr = breadboard.processVoltages(voltages);
-    var cnxn = [{start:0,end:2},{start:3,end:4},{start:2,end:6},{start:15,end:23},{start:30,end:32},{start:3,end:25}];
-    var connections = breadboard.choosePins(cnxn);
+    breadboard.processJson(fakejson);
 
     svg.selectAll("rect")
-      .data(voltages_attr)
+      .data(breadboard.voltageAttr)
       .enter()
       .append("rect")
       .attr("x", function(d) { return d.x; })
@@ -181,7 +242,7 @@ var drawBreadboard = function(cnxn) {
       .append("title").text(function(d) { return d.v.toString() + "V" });
 
     svg.selectAll("circle")
-        .data(pinPositions)
+        .data(breadboard.pinPositions)
         .enter()
         .append("circle")
         .attr("cx", function(d) { return d[0];} )
@@ -190,7 +251,7 @@ var drawBreadboard = function(cnxn) {
     .style("fill",function(d) { return "gray";});
 
     svg.selectAll("line")
-        .data(connections)
+        .data(breadboard.connections)
         .enter()
         .append("line")
         .attr("x1",function(d) { return d.startPin[0]; })
