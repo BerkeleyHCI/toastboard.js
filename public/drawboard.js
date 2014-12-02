@@ -1,9 +1,10 @@
 // connect to the socket server
 var socket = io.connect(); 
 
-// if we get an "info" emit from the socket server then console.log the data we recive
+// if we get an "info" emit from the socket server then console.log the data we receive
 socket.on('info', function (data) {
-    console.log(data);
+    var json = JSON.parse("\"" + data + "\"");
+    drawBreadboard(json);
 });
 
 // TODO move power rail from left to right
@@ -26,6 +27,7 @@ var fakejson = "{\"vddval\":3.3,\"selected\":0,\"rows\":[{\"0\":3.3},{\"1\":\"f\
 
 var width=500;
 var height=600;
+
 
 function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
   this.railcolumn = railcolumn;
@@ -67,12 +69,13 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
 };
 
 Breadboard.prototype.processJson = function(json) {
-  var parsed = JSON.parse(json);
-  this.selectedRow = parsed.selected;
-  if (parsed.vddvall != "f") {
-  this.vdd = parsed.vddval;
+  //var parsed = JSON.parse(json);
+  this.selectedRow = json.selected;
+  if (json.vddvall != "f") {
+  this.vdd = json.vddval;
   }
-  var hash = this.hashVoltages(parsed.rows);
+  console.log(json["rows"]);
+  var hash = this.hashVoltages(json.rows);
   this.voltageAttr = this.hashToVoltageAttr(hash);
   this.connections = this.hashToCnxn(hash);
 };
@@ -217,7 +220,16 @@ var conflict = function(cnxn1,cnxn2) {
     return (cnxn2.start <= cnxn1.start) || (cnxn2.end >= cnxn1.end);
 };
 
-var drawBreadboard = function(cnxn) {
+var getTimeStampString = function() {
+  var now = new Date();
+  var date = [ now.getMonth() + 1, now.getDate(), now.getFullYear() ];
+  var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
+  return date.join("/") + " " + time.join(":")
+};
+
+var drawBreadboard = function(json) {
+    var timestring = getTimeStampString();
+    $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
     var svg = d3.select("#breadboard").append("svg")
         .attr("width", width)
         .attr("height", height)
@@ -225,8 +237,8 @@ var drawBreadboard = function(cnxn) {
 
     var breadboard = new Breadboard(2,24,5,20,15);
 
-    breadboard.processJson(fakejson);
-
+    breadboard.processJson(JSON.parse(json));
+    console.log("and now .. we draw!");
     svg.selectAll("rect")
       .data(breadboard.voltageAttr)
       .enter()
@@ -263,5 +275,5 @@ var drawBreadboard = function(cnxn) {
 };
 
 $(document).ready(function() {
-  drawBreadboard([]);
+  // drawBreadboard([]);
 });
