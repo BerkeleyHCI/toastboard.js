@@ -23,9 +23,9 @@ socket.on('info', function (data) {
 // selected
 
 // all 0-47 either have real data or f
-var fakejson = "{\"vddval\":3.3,\"selected\":0,\"rows\":[{\"0\":3.3},{\"1\":\"f\"}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0},{\"41\":\"f\"}, {\"42\":\"f\"},{\"43\":2.0}]}";
+var fakejson = "{\"vddval\":3.3,\"selected\":0,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
 
-var width=500;
+var width=400;
 var height=600;
 
 
@@ -41,6 +41,7 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
   this.vdd = null;
   this.voltageAttr = null;
   this.connections = null;
+  this.labels = null;
   var rowPinPositionGrid = function(startX,startY) {
   var positions = [];
   for (var y=0;y<rownum;y++) {
@@ -61,23 +62,22 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
   };
 
     var pinPositions = railPinPositionGrid(10,20);
-    pinPositions = pinPositions.concat(rowPinPositionGrid(60,20));
-    pinPositions = pinPositions.concat(rowPinPositionGrid(180,20));
+    pinPositions = pinPositions.concat(rowPinPositionGrid(80,20));
+    pinPositions = pinPositions.concat(rowPinPositionGrid(200,20));
 
     this.pinPositions = pinPositions;
 
 };
 
 Breadboard.prototype.processJson = function(json) {
-  //var parsed = JSON.parse(json);
   this.selectedRow = json.selected;
   if (json.vddvall != "f") {
   this.vdd = json.vddval;
   }
-  console.log(json["rows"]);
   var hash = this.hashVoltages(json.rows);
   this.voltageAttr = this.hashToVoltageAttr(hash);
   this.connections = this.hashToCnxn(hash);
+  this.labels = this.hashToLabels(json.rows);
 };
 
 Breadboard.prototype.hashVoltages = function(rowVals) {
@@ -107,6 +107,18 @@ Breadboard.prototype.hashToCnxn = function(hash) {
     });
   });
   return this.choosePins(cnxn);
+};
+
+Breadboard.prototype.hashToLabels = function(hash) {
+  var self = this;
+  var labels = [];
+  hash.forEach(function(row) {
+    var key = Object.keys(row)[0];
+    var entry =  self.getRowTextCoord(key)
+    entry.label = row[key].toFixed(1) + "V";
+    labels.push(entry);
+  });
+  return labels;
 };
 
 Breadboard.prototype.hashToVoltageAttr = function(hash) {
@@ -156,6 +168,16 @@ Breadboard.prototype.hashToVoltageAttr = function(hash) {
 Breadboard.prototype.getRowPin = function(rownumber,pinnumber) {
   return this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum) + pinnumber];
 };
+
+Breadboard.prototype.getRowTextCoord = function(rownumber) {
+  if (rownumber<24) {
+    pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum)];
+    return {x:pins[0] - 40,y:pins[1]};
+  } else {
+    pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum) + 4];
+    return {x:pins[0] + 15,y:pins[1]};
+  }
+}
 
 //rail pins count down
 Breadboard.prototype.getRailPin = function(railnumber,pinnumber) {
@@ -230,14 +252,32 @@ var getTimeStampString = function() {
 var drawBreadboard = function(json) {
     var timestring = getTimeStampString();
     $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
+
+    var breadboard = new Breadboard(2,24,5,20,15);
+
+    breadboard.processJson(JSON.parse(fakejson));
+
     var svg = d3.select("#breadboard").append("svg")
         .attr("width", width)
         .attr("height", height)
         .append("g");
 
-    var breadboard = new Breadboard(2,24,5,20,15);
+    svg.selectAll("text")
+      .data(breadboard.labels)
+      .enter()
+      .append("text")
+      .attr("x", function(d) { return d.x; })
+      .attr("y", function(d) { return d.y; })
+      .attr("dy", ".30em")
+      .text(function(d) { return d.label; });
 
-    breadboard.processJson(JSON.parse(json));
+    svg.append("text")
+      .attr("x",1)
+      .attr("y",390)
+      .attr("dy",".30em")
+      .text("VDD: " + breadboard.vdd.toFixed(1) + "V");
+
+
     console.log("and now .. we draw!");
     svg.selectAll("rect")
       .data(breadboard.voltageAttr)
@@ -275,5 +315,5 @@ var drawBreadboard = function(json) {
 };
 
 $(document).ready(function() {
-  // drawBreadboard([]);
+  drawBreadboard([]);
 });
