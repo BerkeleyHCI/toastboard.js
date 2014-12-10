@@ -15,11 +15,6 @@ socket.on('info', function (data) {
 // TODO if we don't really use jquery for anything, rip it out
 // TODO put indicator by selected row
 
-// new format for json
-// 0-47 = rows
-// vddval (note that there's no way to tell is ground is plugged in)
-// selected
-
 // all 0-47 either have real data or f
 var fakejson = "{\"vddval\":3.3,\"selected\":0,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
 
@@ -60,7 +55,7 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
   };
 
     var pinPositions = railPinPositionGrid(300,20);
-    pinPositions = pinPositions.concat(rowPinPositionGrid(40,20));
+    pinPositions = pinPositions.concat(rowPinPositionGrid(45,20));
     pinPositions = pinPositions.concat(rowPinPositionGrid(160,20));
 
     this.pinPositions = pinPositions;
@@ -170,7 +165,7 @@ Breadboard.prototype.getRowPin = function(rownumber,pinnumber) {
 Breadboard.prototype.getRowTextCoord = function(rownumber) {
   if (rownumber<24) {
     pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum)];
-    return {x:pins[0] - 40,y:pins[1]};
+    return {x:pins[0] - 45,y:pins[1]};
   } else {
     pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum) + 4];
     return {x:pins[0] + 15,y:pins[1]};
