@@ -23,6 +23,7 @@ var height=600;
 
 
 function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
+  this.drawCallback = null;
   this.railcolumn = railcolumn;
   this.rownum = rownum;
   this.pinnum = pinnum;
@@ -63,6 +64,9 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
 };
 
 Breadboard.prototype.processJson = function(json) {
+  if (!json.hasOwnProperty("vddval")) {
+    return false;
+  }
   this.selectedRow = json.selected;
   if (json.vddvall != "f") {
   this.vdd = json.vddval;
@@ -71,6 +75,7 @@ Breadboard.prototype.processJson = function(json) {
   this.voltageAttr = this.hashToVoltageAttr(hash);
   this.connections = this.hashToCnxn(hash);
   this.labels = this.hashToLabels(json.rows);
+  return true;
 };
 
 Breadboard.prototype.hashVoltages = function(rowVals) {
@@ -232,12 +237,6 @@ Breadboard.prototype.getRowRect = function(rowIndex) {
   return this.getRectAttr(firstPin,lastPin);
 };
 
-var chooseColor = function() {
-    var colorArray = ["orange","yellow","green","blue","purple"];
-    var colorIndex = Math.floor(Math.random() * colorArray.length);
-    return colorArray[colorIndex];
-};
-
 var conflict = function(cnxn1,cnxn2) {
     return (cnxn2.start <= cnxn1.start) || (cnxn2.end >= cnxn1.end);
 };
@@ -249,22 +248,34 @@ var getTimeStampString = function() {
   return date.join("/") + " " + time.join(":")
 };
 
-var drawBreadboard = function(json,breadboard) {
+Breadboard.prototype.drawBreadboard = function(json) {
+  // always refresh pin positions
   d3.select("svg")
     .remove();
+
+  var svg = d3.select("#breadboard").append("svg")
+  .attr("width", width)
+  .attr("height", height)
+  .append("g");
+
+  svg.selectAll("circle")
+  .data(this.pinPositions)
+  .enter()
+  .append("circle")
+  .attr("cx", function(d) { return d[0];} )
+  .attr("cy", function(d) { return d[1];} )
+  .attr("r", 2.5)
+  .style("fill",function(d) { return "gray";});
+
+  var hasData = this.processJson(json);
+  // if we have real json data, draw all other information
+  if (hasData) {
 
     var timestring = getTimeStampString();
     $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
 
-    breadboard.processJson(json);
-
-    var svg = d3.select("#breadboard").append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .append("g");
-
     svg.selectAll("text")
-      .data(breadboard.labels)
+      .data(this.labels)
       .enter()
       .append("text")
       .attr("x", function(d) { return d.x; })
@@ -276,11 +287,10 @@ var drawBreadboard = function(json,breadboard) {
       .attr("x",260)
       .attr("y",390)
       .attr("dy",".30em")
-      .text("VDD: " + breadboard.vdd.toFixed(1) + "V");
+      .text("VDD: " + this.vdd.toFixed(1) + "V");
 
-    console.log("and now .. we draw!");
     svg.selectAll("rect")
-      .data(breadboard.voltageAttr)
+      .data(this.voltageAttr)
       .enter()
       .append("rect")
       .attr("x", function(d) { return d.x; })
@@ -293,17 +303,8 @@ var drawBreadboard = function(json,breadboard) {
       .attr("fill-opacity", 0.5)
       .append("title").text(function(d) { return d.v.toString() + "V" });
 
-    svg.selectAll("circle")
-        .data(breadboard.pinPositions)
-        .enter()
-        .append("circle")
-        .attr("cx", function(d) { return d[0];} )
-        .attr("cy", function(d) { return d[1];} )
-        .attr("r", 2.5)
-    .style("fill",function(d) { return "gray";});
-
     svg.selectAll("line")
-        .data(breadboard.connections)
+        .data(this.connections)
         .enter()
         .append("line")
         .attr("x1",function(d) { return d.startPin[0]; })
@@ -312,6 +313,10 @@ var drawBreadboard = function(json,breadboard) {
         .attr("y2",function(d) { return d.endPin[1]; })
         .attr("stroke-width",3)
         .attr("stroke",function (d) { return d.color; });
+  }
+  if (this.drawCallback) {
+    this.drawCallback();
+  }
 };
 
 var Component = function(breadboard, wirenum, startRow, startPinNum, endRow, endPinNum) {
@@ -323,10 +328,6 @@ var Component = function(breadboard, wirenum, startRow, startPinNum, endRow, end
   this.endRow = endRow;
   this.endPinNum = endPinNum;
   this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
-};
-
-Component.prototype.getRectCoord = function() {
-
 };
 
 Component.prototype.draw = function() {
@@ -347,23 +348,11 @@ Component.prototype.draw = function() {
     .attr("height",this.endPin[1] - this.startPin[1] - 20)
     .attr("fill","black");
 
-
-      // .append("rect")
-      // .attr("x", function(d) { return d.x; })
-      // .attr("y", function(d) { return d.y; })
-      // .attr("height", function(d) { return d.height; })
-      // .attr("width", function(d) { return d.width; })
-      // .attr("rx", 5)
-      // .attr("ry",5)
-      // .attr("fill", function(d) { return d.color})
-      // .attr("fill-opacity", 0.5)
-      // .append("title").text(function(d) { return d.v.toString() + "V" });
-
 };
 
 $(document).ready(function() {
-  var myBreadboard = new Breadboard(2,24,5,20,15);
-  drawBreadboard(JSON.parse(fakejson),myBreadboard);
-  var myComponent = new Component(myBreadboard,2,32,2,40,2);
-  myComponent.draw();
+  // var myBreadboard = new Breadboard(2,24,5,20,15);
+  // drawBreadboard(JSON.parse(fakejson),myBreadboard);
+  // var myComponent = new Component(myBreadboard,2,32,2,40,2);
+  // myComponent.draw();
 });
