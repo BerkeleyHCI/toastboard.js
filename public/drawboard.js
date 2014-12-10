@@ -3,18 +3,16 @@ var socket = io.connect();
 
 // if we get an "info" emit from the socket server then console.log the data we receive
 socket.on('info', function (data) {
-    var json = JSON.parse("\"" + data + "\"");
-    drawBreadboard(json);
+  var json = JSON.parse(data);
+  drawBreadboard(json);
 });
 
-// TODO move power rail from left to right
 // TODO draw connections from power rail to rows (?)
 // TODO associate highlighting colors with wire colors
 // TODO draw oscillo graph
 // TODO save status (to local storage????)
 // TODO bend wire drawings to see if they read better?
 // TODO if we don't really use jquery for anything, rip it out
-// TODO get timestamp from websocket when data was received
 // TODO put indicator by selected row
 
 // new format for json
@@ -61,9 +59,9 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
     return positions;
   };
 
-    var pinPositions = railPinPositionGrid(10,20);
-    pinPositions = pinPositions.concat(rowPinPositionGrid(80,20));
-    pinPositions = pinPositions.concat(rowPinPositionGrid(200,20));
+    var pinPositions = railPinPositionGrid(300,20);
+    pinPositions = pinPositions.concat(rowPinPositionGrid(40,20));
+    pinPositions = pinPositions.concat(rowPinPositionGrid(160,20));
 
     this.pinPositions = pinPositions;
 
@@ -257,12 +255,15 @@ var getTimeStampString = function() {
 };
 
 var drawBreadboard = function(json) {
+  d3.select("svg")
+    .remove();
+
     var timestring = getTimeStampString();
     $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
 
     var breadboard = new Breadboard(2,24,5,20,15);
 
-    breadboard.processJson(JSON.parse(fakejson));
+    breadboard.processJson(json);
 
     var svg = d3.select("#breadboard").append("svg")
         .attr("width", width)
@@ -279,11 +280,10 @@ var drawBreadboard = function(json) {
       .text(function(d) { return d.label; });
 
     svg.append("text")
-      .attr("x",1)
+      .attr("x",260)
       .attr("y",390)
       .attr("dy",".30em")
       .text("VDD: " + breadboard.vdd.toFixed(1) + "V");
-
 
     console.log("and now .. we draw!");
     svg.selectAll("rect")
@@ -322,5 +322,5 @@ var drawBreadboard = function(json) {
 };
 
 $(document).ready(function() {
-  drawBreadboard([]);
+  drawBreadboard(JSON.parse(fakejson));
 });
