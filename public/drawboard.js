@@ -3,6 +3,7 @@ var socket = io.connect();
 
 // if we get an "info" emit from the socket server then console.log the data we receive
 socket.on('info', function (data) {
+  console.log("got data from websocket");
   var json = JSON.parse(data);
   drawBreadboard(json);
 });
@@ -317,7 +318,7 @@ Breadboard.prototype.drawBreadboard = function(json) {
       .text(function(d) { return d.label; });
 
     svg.append("text")
-      .attr("x",260)
+      .attr("x",280)
       .attr("y",390)
       .attr("dy",".30em")
       .text("VDD: " + this.vdd.toFixed(1) + "V");
@@ -351,12 +352,3 @@ Breadboard.prototype.drawBreadboard = function(json) {
     this.drawCallback();
   }
 };
-
-
-
-$(document).ready(function() {
-  // var myBreadboard = new Breadboard(2,24,5,20,15);
-  // drawBreadboard(JSON.parse(fakejson),myBreadboard);
-  // var myComponent = new Component(myBreadboard,2,32,2,40,2);
-  // myComponent.draw();
-});
