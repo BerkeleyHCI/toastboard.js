@@ -119,10 +119,10 @@ Diode.prototype.calcPoints = function() {
   var triangleHeight = 15;
   var fullHeight = this.endPin[1] - this.startPin[1];
   this.verticalLineHeight = (fullHeight - triangleHeight) / 2;
-  this.triangleData = [{x:this.startPin[0],y:this.startPin[1]+this.verticalLineHeight},
-                      {x:this.startPin[0]-10,y:this.startPin[1]+this.verticalLineHeight+triangleHeight},
-                      {x:this.startPin[0]+10,y:this.startPin[1]+this.verticalLineHeight+triangleHeight},
-                      {x:this.startPin[0],y:this.startPin[1]+this.verticalLineHeight}];
+  this.triangleData = [{x:this.startPin[0],y:this.endPin[1]-this.verticalLineHeight},
+                      {x:this.startPin[0]-10,y:this.endPin[1]-this.verticalLineHeight-triangleHeight},
+                      {x:this.startPin[0]+10,y:this.endPin[1]-this.verticalLineHeight-triangleHeight},
+                      {x:this.startPin[0],y:this.endPin[1]-this.verticalLineHeight}];
   console.log(this.triangleData);
 };
 
@@ -147,18 +147,18 @@ Diode.prototype.draw = function() {
     .attr("y2",this.startPin[1] + this.verticalLineHeight)
     .attr("stroke-width",3)
     .attr("stroke","black");
-  svg.append("line")
-    .attr("x1",this.startPin[0] - (this.diodeWidth/2))
-    .attr("y1",this.startPin[1] + this.verticalLineHeight)
-    .attr("x2",this.startPin[0] + (this.diodeWidth/2))
-    .attr("y2",this.startPin[1] + this.verticalLineHeight)
-    .attr("stroke-width",3)
-    .attr("stroke","black");
   svg.append("path")
     .attr("d", lineFunction(this.triangleData))
     .attr("stroke", "black")
     .attr("stroke-width", 3)
     .attr("fill", "none");
+  svg.append("line")
+    .attr("x1",this.startPin[0] - (this.diodeWidth/2))
+    .attr("y1",this.endPin[1] - this.verticalLineHeight)
+    .attr("x2",this.startPin[0] + (this.diodeWidth/2))
+    .attr("y2",this.endPin[1] - this.verticalLineHeight)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
   svg.append("line")
     .attr("x1",this.endPin[0])
     .attr("y1",this.endPin[1] - this.verticalLineHeight)

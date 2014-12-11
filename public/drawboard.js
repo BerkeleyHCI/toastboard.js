@@ -122,8 +122,8 @@ Breadboard.prototype.hashToLabels = function(hash) {
 Breadboard.prototype.numbering = function() {
   var self = this;
   var numbering = [];
-  for (var i=0;i<48;i++) {
-    var entry = self.getInnerRowTextCoord(i);
+  for (var i=1;i<49;i++) {
+    var entry = self.getInnerRowTextCoord(i-1);
     entry.label = i.toString();
     numbering.push(entry);
   };
