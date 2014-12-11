@@ -18,7 +18,7 @@ socket.on('info', function (data) {
 // all 0-47 either have real data or f
 var fakejson = "{\"vddval\":3.3,\"selected\":0,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
 
-var width=400;
+var width=450;
 var height=600;
 
 
@@ -55,9 +55,9 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
     return positions;
   };
 
-    var pinPositions = railPinPositionGrid(300,20);
+    var pinPositions = railPinPositionGrid(320,20);
     pinPositions = pinPositions.concat(rowPinPositionGrid(45,20));
-    pinPositions = pinPositions.concat(rowPinPositionGrid(160,20));
+    pinPositions = pinPositions.concat(rowPinPositionGrid(180,20));
 
     this.pinPositions = pinPositions;
 
@@ -119,6 +119,17 @@ Breadboard.prototype.hashToLabels = function(hash) {
   return labels;
 };
 
+Breadboard.prototype.numbering = function() {
+  var self = this;
+  var numbering = [];
+  for (var i=0;i<48;i++) {
+    var entry = self.getInnerRowTextCoord(i);
+    entry.label = i.toString();
+    numbering.push(entry);
+  };
+  return numbering;
+};
+
 Breadboard.prototype.hashToVoltageAttr = function(hash) {
   var colorArray = ["orange","yellow","green","blue","purple","brown","blueviolet","cornflowerblue","crimson",
 "forestgreen","deeppink","indigo","lightseagreen","mediumorchid","orangered","yellowgreen","gold","teal",
@@ -174,6 +185,16 @@ Breadboard.prototype.getRowTextCoord = function(rownumber) {
   } else {
     pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum) + 4];
     return {x:pins[0] + 15,y:pins[1]};
+  }
+}
+
+Breadboard.prototype.getInnerRowTextCoord = function(rownumber) {
+  if (rownumber<24) {
+    pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum) + 4];
+    return {x:pins[0] + 10,y:pins[1]};
+  } else {
+    pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum)];
+    return {x:pins[0] - 20,y:pins[1]};
   }
 }
 
@@ -267,6 +288,18 @@ Breadboard.prototype.drawBreadboard = function(json) {
   .attr("r", 2.5)
   .style("fill",function(d) { return "gray";});
 
+  var numbers = this.numbering();
+  console.log(numbers);
+  svg.selectAll(".numbers")
+    .data(numbers)
+    .enter()
+    .append("text")
+    .attr("x",function(d) { return d.x; })
+    .attr("y",function(d) { return d.y; })
+    .attr("dy",".30em")
+    .attr("font-size","0.7em")
+    .text(function(d) { return d.label; });
+
   var hasData = this.processJson(json);
   // if we have real json data, draw all other information
   if (hasData) {
@@ -274,7 +307,7 @@ Breadboard.prototype.drawBreadboard = function(json) {
     var timestring = getTimeStampString();
     $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
 
-    svg.selectAll("text")
+    svg.selectAll(".label")
       .data(this.labels)
       .enter()
       .append("text")
