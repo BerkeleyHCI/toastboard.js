@@ -98,7 +98,76 @@ Resistor.prototype.draw = function() {
   var svg = d3.select("svg");
   svg.append("path")
     .attr("d", lineFunction(this.lineData))
-    .attr("stroke", "blue")
-    .attr("stroke-width", 2)
+    .attr("stroke", "black")
+    .attr("stroke-width", 3)
     .attr("fill", "none");
+};
+
+var Diode = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
+  this.breadboard = breadboard;
+  this.startRow = startRow;
+  this.startPinNum = startPinNum;
+  this.startPin = this.breadboard.getRowPin(this.startRow,this.startPinNum);
+  this.endRow = endRow;
+  this.endPinNum = endPinNum;
+  this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
+  this.diodeWidth = 20;
+  this.calcPoints();
+};
+
+Diode.prototype.calcPoints = function() {
+  var triangleHeight = 15;
+  var fullHeight = this.endPin[1] - this.startPin[1];
+  this.verticalLineHeight = (fullHeight - triangleHeight) / 2;
+  this.triangleData = [{x:this.startPin[0],y:this.startPin[1]+this.verticalLineHeight},
+                      {x:this.startPin[0]-10,y:this.startPin[1]+this.verticalLineHeight+triangleHeight},
+                      {x:this.startPin[0]+10,y:this.startPin[1]+this.verticalLineHeight+triangleHeight},
+                      {x:this.startPin[0],y:this.startPin[1]+this.verticalLineHeight}];
+  console.log(this.triangleData);
+};
+
+Diode.prototype.draw = function() {
+  var lineFunction = d3.svg.line()
+                       .x(function(d) { return d.x; })
+                       .y(function(d) { return d.y; })
+                       .interpolate("linear");
+
+  var svg = d3.select("svg");
+  // svg.append("line")
+  //   .attr("x1",this.startPin[0])
+  //   .attr("y1",this.startPin[1])
+  //   .attr("x2",this.endPin[0])
+  //   .attr("y2",this.endPin[1])
+  //   .attr("stroke-width",3)
+  //   .attr("stroke","black");
+  svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1])
+    .attr("x2",this.startPin[0])
+    .attr("y2",this.startPin[1] + this.verticalLineHeight)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  svg.append("line")
+    .attr("x1",this.startPin[0] - (this.diodeWidth/2))
+    .attr("y1",this.startPin[1] + this.verticalLineHeight)
+    .attr("x2",this.startPin[0] + (this.diodeWidth/2))
+    .attr("y2",this.startPin[1] + this.verticalLineHeight)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  svg.append("path")
+    .attr("d", lineFunction(this.triangleData))
+    .attr("stroke", "black")
+    .attr("stroke-width", 3)
+    .attr("fill", "none");
+  svg.append("line")
+    .attr("x1",this.endPin[0])
+    .attr("y1",this.endPin[1] - this.verticalLineHeight)
+    .attr("x2",this.endPin[0])
+    .attr("y2",this.endPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  // append vertical line
+  // append horizontal line
+  // append centered triangle
+  // append vertical line
 };

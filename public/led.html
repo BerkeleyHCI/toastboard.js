@@ -16,7 +16,7 @@
   <div class="container"><div class="navbar-header"><a href="index.html" class="navbar-brand">ToastBoard</a>
   <ul class="nav navbar-nav">
     <li class="active"><a href="led.html">Simple LED</a></li>
-    <li><a href="#resistor">Split Resistor</a></li>
+    <li><a href="#voltage">Voltage Divider</a></li>
     <li><a href="#sensor">Sensor</a></li>
   </ul>
   </div></div>
@@ -43,7 +43,7 @@
   $(document).ready(function() {
     var myBreadboard = new Breadboard(2,24,5,20,15);
     myBreadboard.drawCallback = function() {
-      var led = new Component(myBreadboard,2,32,3,35,3);
+      var led = new Diode(myBreadboard,32,3,35,3);
       led.draw();
       var resistor = new Resistor(myBreadboard,38,3,42,3);
       resistor.draw();
