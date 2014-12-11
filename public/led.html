@@ -9,10 +9,11 @@
     <script src="/socket.io/socket.io.js"></script>
 
 <script type="text/javascript" src="drawboard.js"></script>
+<script type="text/javascript" src="component.js"></script>
 <script type="text/javascript" src="graph.js"></script>
 <body>
 <div class="navbar navbar-inverse navbar-fixed-top">
-  <div class="container"><div class="navbar-header"><a href="#" class="navbar-brand">ToastBoard</a>
+  <div class="container"><div class="navbar-header"><a href="index.html" class="navbar-brand">ToastBoard</a>
   <ul class="nav navbar-nav">
     <li class="active"><a href="led.html">Simple LED</a></li>
     <li><a href="#resistor">Split Resistor</a></li>
@@ -44,7 +45,7 @@
     myBreadboard.drawCallback = function() {
       var led = new Component(myBreadboard,2,32,3,35,3);
       led.draw();
-      var resistor = new Component(myBreadboard,2,38,3,42,3);
+      var resistor = new Resistor(myBreadboard,38,3,42,3);
       resistor.draw();
     };
     myBreadboard.drawBreadboard({});
