@@ -1,12 +1,12 @@
-// connect to the socket server
-var socket = io.connect(); 
+// // connect to the socket server
+// var socket = io.connect(); 
 
-// if we get an "info" emit from the socket server then console.log the data we receive
-socket.on('info', function (data) {
-  console.log("got data from websocket");
-  var json = JSON.parse(data);
-  drawBreadboard(json);
-});
+// // if we get an "info" emit from the socket server then console.log the data we receive
+// socket.on('info', function (data) {
+//   console.log("got data from websocket");
+//   var json = JSON.parse(data);
+//   drawBreadboard(json);
+// });
 
 // TODO draw connections from power rail to rows (?)
 // TODO associate highlighting colors with wire colors
@@ -17,7 +17,7 @@ socket.on('info', function (data) {
 // TODO put indicator by selected row
 
 // all 0-47 either have real data or f
-var fakejson = "{\"vddval\":3.3,\"selected\":0,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
+var fakejson = "{\"vddval\":3.3,\"selected\":41,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
 
 var width=450;
 var height=600;
@@ -271,13 +271,15 @@ var getTimeStampString = function() {
 };
 
 Breadboard.prototype.drawBreadboard = function(json) {
+  console.log("called into drawBreadboard");
   // always refresh pin positions
-  d3.select("svg")
+  d3.select("#board")
     .remove();
 
   var svg = d3.select("#breadboard").append("svg")
   .attr("width", width)
   .attr("height", height)
+  .attr("id","board")
   .append("g");
 
   svg.selectAll("circle")
@@ -304,7 +306,7 @@ Breadboard.prototype.drawBreadboard = function(json) {
   var hasData = this.processJson(json);
   // if we have real json data, draw all other information
   if (hasData) {
-
+    console.log("we got real data");
     var timestring = getTimeStampString();
     $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
 
@@ -347,8 +349,13 @@ Breadboard.prototype.drawBreadboard = function(json) {
         .attr("y2",function(d) { return d.endPin[1]; })
         .attr("stroke-width",3)
         .attr("stroke",function (d) { return d.color; });
+
+    $("#selected-row").html("<p>Selected Row: " + json.selected);
+  } else {
+    console.log("no real data");
   }
   if (this.drawCallback) {
     this.drawCallback();
   }
 };
+

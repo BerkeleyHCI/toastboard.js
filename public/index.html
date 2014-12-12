@@ -21,17 +21,20 @@
   </ul>
   </div></div>
 </div>
+<div class="container" style="height:50px" />
 <div class="container theme-showcase">
   <div class="jumbotron">
     <div class="row">
     <div class="col-xs-6">
 <div id="breadboard">
+  <svg width="500" height="300" id="board" />
 </div>
 <div id="timestamp"></div>
 </div>
 <div class="col-xs-6">
   <div class="rightside">
-    <p>Selected row: Row 32, 1.1V</p>
+        <div id="selected-row"></div>
+    <!-- <p>Selected row: Row 32, 1.1V</p> -->
     <div id="graph-div">
       <svg width="500" height="300" id="graphviz" />
     </div>
@@ -41,9 +44,20 @@
 </div>
 
 <script type="text/javascript">
+var socket = io.connect(); 
+var myBreadboard = new Breadboard(2,24,5,20,15);
+// if we get an "info" emit from the socket server then console.log the data we receive
+socket.on('info', function (data) {
+  console.log("got data from websocket inside html page");
+  var json = JSON.parse(data);
+  console.log("should redraw board now????");
+  console.log(json);
+  myBreadboard.drawBreadboard(json);
+  console.log("drew it!");
+});
   $(document).ready(function() {
-  var myBreadboard = new Breadboard(2,24,5,20,15);
   myBreadboard.drawBreadboard(JSON.parse(fakejson));
+  drawGraph([1.4,1.5,1.6,1.8,1.8,1.8,1.7,1.4,1.4,1.4,1.4,1.4]);
   });
 </script>
 

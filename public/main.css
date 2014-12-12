@@ -2,15 +2,29 @@ a.navbar-brand {
   font-size: 24px;
 }
 
+.navbar {
+  margin-bottom: 20px;
+}
+
 #breadboard {
   padding: 20px;
   background-color: #FFF;
+  border-radius: 15px;
   width: 375px;
   height: 430px;
+  margin-top: 40px;
 }
 
 .rightside {
   padding: 20px;
+  background: #FFF;
+  margin-top: 40px;
+  border-radius: 15px;
+}
+
+#graphviz {
+  width: 500px;
+  height: 300px;
 }
 
 .axis path,
