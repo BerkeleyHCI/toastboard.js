@@ -133,13 +133,6 @@ Diode.prototype.draw = function() {
                        .interpolate("linear");
 
   var svg = d3.select("svg");
-  // svg.append("line")
-  //   .attr("x1",this.startPin[0])
-  //   .attr("y1",this.startPin[1])
-  //   .attr("x2",this.endPin[0])
-  //   .attr("y2",this.endPin[1])
-  //   .attr("stroke-width",3)
-  //   .attr("stroke","black");
   svg.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1])
@@ -166,8 +159,60 @@ Diode.prototype.draw = function() {
     .attr("y2",this.endPin[1])
     .attr("stroke-width",3)
     .attr("stroke","black");
-  // append vertical line
-  // append horizontal line
-  // append centered triangle
-  // append vertical line
+};
+
+var Sensor = function(breadboard,startRow) {
+  this.breadboard = breadboard;
+  this.startRow = startRow;
+  this.pins = [];
+    this.squareData = null;
+  var self = this;
+  for (var i=0;i<7;i++) {
+    self.pins.push(breadboard.getRowPin(startRow+i,4))
+  };
+  this.calcPoints();
+
+};
+
+Sensor.prototype.calcPoints = function() {
+  var squareData = [{x:this.pins[0][0]-10,y:this.pins[0][1]-10},
+                    {x:this.pins[0][0]-100,y:this.pins[0][1]-10},
+                    {x:this.pins[0][0]-100,y:this.pins[0][1]+100},
+                    {x:this.pins[0][0]-10,y:this.pins[0][1]+100},
+                    {x:this.pins[0][0]-10,y:this.pins[0][1]-10}];
+  console.log(squareData);
+  this.squareData = squareData;
+};
+
+Sensor.prototype.draw = function() {
+  var lineFunction = d3.svg.line()
+                     .x(function(d) { return d.x; })
+                     .y(function(d) { return d.y; })
+                     .interpolate("linear");
+  console.log("sensor is drawing");
+  var svg = d3.select("#board");
+  var self = this;
+  for (var i=0;i<7;i++) {
+    svg.append("line")
+      .attr("x1",self.pins[i][0]-10)
+      .attr("y1",self.pins[i][1])
+      .attr("x2",self.pins[i][0])
+      .attr("y2",self.pins[i][1])
+      .attr("stroke-width",3)
+      .attr("stroke","black");
+  }
+    svg.append("path")
+    .attr("d", lineFunction(this.squareData))
+    .attr("stroke", "black")
+    .attr("stroke-width", 3)
+    .attr("fill", "white");
+
+  svg.append("circle")
+  .attr("cx", this.pins[0][0]-55 )
+  .attr("cy", this.pins[0][1]+45 )
+  .attr("r", 30)
+  .attr("stroke","black")
+  .attr("stroke-width",3)
+  .attr("fill","none");
+
 };

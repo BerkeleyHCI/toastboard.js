@@ -15,9 +15,9 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="container"><div class="navbar-header"><a href="index.html" class="navbar-brand">ToastBoard</a>
   <ul class="nav navbar-nav">
-    <li class="active"><a href="led.html">Simple LED</a></li>
-    <li><a href="#voltage">Voltage Divider</a></li>
-    <li><a href="#sensor">Sensor</a></li>
+    <li><a href="led.html">Simple LED</a></li>
+    <li class="active"><a href="voltage.html">Voltage Divider</a></li>
+    <li><a href="sensor.html">Sensor</a></li>
   </ul>
   </div></div>
 </div>
@@ -31,6 +31,7 @@
 </div>
 <div class="col-xs-6">
   <div class="rightside">
+        <div id="selected-row"></div>
     <!-- <p>Selected row: Row 32, 1.1V</p> -->
     <div id="graph-div">
       <svg width="500" height="300" id="graphviz" />
@@ -40,9 +41,26 @@
 </div>
 </div>
 <script type="text/javascript">
+var socket = io.connect(); 
+var sensorBreadboard = new Breadboard(2,24,5,20,15);
+sensorBreadboard.drawCallback = function() {
+  var sensor = new Sensor(sensorBreadboard,30);
+  sensor.draw();
+  };
+
+// if we get an "info" emit from the socket server then console.log the data we receive
+socket.on('info', function (data) {
+  console.log("got data from websocket inside html page");
+  var json = JSON.parse(data);
+  console.log("should redraw board now????");
+  console.log(json);
+  sensorBreadboard.drawBreadboard(json);
+  drawGraph(json.oscillo);
+  console.log("drew it!");
+});
+
   $(document).ready(function() {
-    var myBreadboard = new Breadboard(2,24,5,20,15);
-    myBreadboard.drawBreadboard({});
+    sensorBreadboard.drawBreadboard([]);
   });
 </script>
 
