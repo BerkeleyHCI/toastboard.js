@@ -168,7 +168,7 @@ var Sensor = function(breadboard,startRow) {
     this.squareData = null;
   var self = this;
   for (var i=0;i<7;i++) {
-    self.pins.push(breadboard.getRowPin(startRow+i,4))
+    self.pins.push(breadboard.getRowPin(startRow+i,3))
   };
   this.calcPoints();
 

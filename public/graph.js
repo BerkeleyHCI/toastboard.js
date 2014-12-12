@@ -17,6 +17,9 @@ function drawGraph(readings) {
   d3.select("#graphpath").remove();
   // var readings = [{second:1,voltage:1.1},{second:2,voltage:1.5},{second:3,voltage:1.6},{second:4,voltage:1.7},{second:5,voltage:1.6},
   //                {second:6,voltage:1.4},{second:7,voltage:1.4},{second:8,voltage:1.1}];
+  if (readings.length > 4) {
+    console.log("we draw truncated graph");
+    readings = readings.slice(3);
   var data = processReadings(readings);
 
 // note this selects svg node not div like drawboard. kind of weird
@@ -48,7 +51,7 @@ function drawGraph(readings) {
       .ticks(5)
       .tickSize(5)
       .orient('left')
-      .tickFormat(function(d) { return d.toFixed(2) + "V";});
+      .tickFormat(function(d) { return d.toFixed(3) + "V";});
 
 
   vis.append('svg:g')
@@ -79,9 +82,8 @@ var lineFunc = d3.svg.line()
   .attr('stroke', 'blue')
   .attr('stroke-width', 2)
   .attr('fill', 'none');
-
+} else {
+  console.log("we draw no graph");
+}
 };
 
-$(document).ready(function() {
-  drawGraph([]);
-});
