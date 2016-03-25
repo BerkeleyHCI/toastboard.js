@@ -17,13 +17,15 @@
 // TODO put indicator by selected row
 
 // all 0-47 either have real data or f
-var fakejson = "{\"vddval\":3.3,\"selected\":41,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
 
 var width=450;
 var height=600;
 
 
 function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
+  this.rowData = {};
+  this.receivedLeft = false;
+  this.receivedRight = false;
   this.drawCallback = null;
   this.railcolumn = railcolumn;
   this.rownum = rownum;
@@ -65,18 +67,49 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
 };
 
 Breadboard.prototype.processJson = function(json) {
-  if (!json.hasOwnProperty("vddval")) {
+  if (json.rowsLeft) {
+    this.receivedLeft = true;
+    // reset data
+    this.rowData = [];
+    for (i=0;i<24;i++) {
+      if (json.rowsLeft[i] != 'f') {
+        var newRow = {};
+        var index = "" + i; // WAT
+        newRow[index] = json.rowsLeft[i];
+        this.rowData.push(newRow);
+      }
+    }
+    console.log("handled left side");
+    console.log(this.rowData);
+  } else if (json.rowsRight) {
+    this.receivedRight = true;
+    for (i=0;i<24;i++) {
+      if (json.rowsRight[i] != 'f') {
+        var newRow = {};
+        var int_index = i + 24;
+        var index = "" + int_index; // again WAT
+        newRow[index] = json.rowsRight[i];
+        this.rowData.push(newRow);      
+      }
+    }
+    // hardcode these 2 values for now
+    this.selectedRow = 0;
+    this.vdd = 3.3;
+    console.log(this.rowData);
+    var hash = this.hashVoltages(this.rowData);
+    console.log(hash);
+    this.voltageAttr = this.hashToVoltageAttr(hash);
+    this.connections = this.hashToCnxn(hash);
+    this.labels = this.hashToLabels(this.rowData);
+  }
+  // make sure we have both sides
+  if (this.receivedLeft && this.receivedRight) {
+    this.receivedLeft = false;
+    this.receivedRight = false;
+    return true;
+  } else {
     return false;
   }
-  this.selectedRow = json.selected;
-  if (json.vddvall != "f") {
-  this.vdd = json.vddval;
-  }
-  var hash = this.hashVoltages(json.rows);
-  this.voltageAttr = this.hashToVoltageAttr(hash);
-  this.connections = this.hashToCnxn(hash);
-  this.labels = this.hashToLabels(json.rows);
-  return true;
 };
 
 Breadboard.prototype.hashVoltages = function(rowVals) {
@@ -272,6 +305,11 @@ var getTimeStampString = function() {
 
 Breadboard.prototype.drawBreadboard = function(json) {
   console.log("called into drawBreadboard");
+  var hasData = this.processJson(json);
+
+  if (hasData) {
+    // we've received both sides & can redraw
+
   // always refresh pin positions
   d3.select("#board")
     .remove();
@@ -303,10 +341,6 @@ Breadboard.prototype.drawBreadboard = function(json) {
     .attr("font-size","0.7em")
     .text(function(d) { return d.label; });
 
-  var hasData = this.processJson(json);
-  // if we have real json data, draw all other information
-  if (hasData) {
-    console.log("we got real data");
     var timestring = getTimeStampString();
     $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
 
@@ -351,11 +385,12 @@ Breadboard.prototype.drawBreadboard = function(json) {
         .attr("stroke",function (d) { return d.color; });
 
     $("#selected-row").html("<p>Selected Row: " + json.selected);
+    if (this.drawCallback) {
+      this.drawCallback();
+    }
   } else {
     console.log("no real data");
   }
-  if (this.drawCallback) {
-    this.drawCallback();
-  }
+
 };
 
