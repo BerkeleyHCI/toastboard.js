@@ -38,3 +38,7 @@ a.navbar-brand {
     font-family: sans-serif;
     font-size: 11px;
 }
+
+.btn {
+  margin: 10px;
+}

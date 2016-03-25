@@ -72,7 +72,7 @@ Breadboard.prototype.processJson = function(json) {
     // reset data
     this.rowData = [];
     for (i=0;i<24;i++) {
-      if (json.rowsLeft[i] != 'f') {
+      if (json.rowsLeft[i] != "f") {
         var newRow = {};
         var index = "" + i; // WAT
         newRow[index] = json.rowsLeft[i];
@@ -84,7 +84,7 @@ Breadboard.prototype.processJson = function(json) {
   } else if (json.rowsRight) {
     this.receivedRight = true;
     for (i=0;i<24;i++) {
-      if (json.rowsRight[i] != 'f') {
+      if (json.rowsRight[i] != "f") {
         var newRow = {};
         var int_index = i + 24;
         var index = "" + int_index; // again WAT
@@ -144,6 +144,8 @@ Breadboard.prototype.hashToCnxn = function(hash) {
 Breadboard.prototype.hashToLabels = function(hash) {
   var self = this;
   var labels = [];
+  console.log("checking labels problem");
+  console.log(hash);
   hash.forEach(function(row) {
     var key = Object.keys(row)[0];
     var entry =  self.getRowTextCoord(key)
@@ -301,6 +303,38 @@ var getTimeStampString = function() {
   var date = [ now.getMonth() + 1, now.getDate(), now.getFullYear() ];
   var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
   return date.join("/") + " " + time.join(":")
+};
+
+Breadboard.prototype.drawEmptyBreadboard = function() {
+  d3.select("#board")
+    .remove();
+
+  var svg = d3.select("#breadboard").append("svg")
+  .attr("width", width)
+  .attr("height", height)
+  .attr("id","board")
+  .append("g");
+
+  svg.selectAll("circle")
+  .data(this.pinPositions)
+  .enter()
+  .append("circle")
+  .attr("cx", function(d) { return d[0];} )
+  .attr("cy", function(d) { return d[1];} )
+  .attr("r", 2.5)
+  .style("fill",function(d) { return "gray";});
+
+    var numbers = this.numbering();
+  console.log(numbers);
+  svg.selectAll(".numbers")
+    .data(numbers)
+    .enter()
+    .append("text")
+    .attr("x",function(d) { return d.x; })
+    .attr("y",function(d) { return d.y; })
+    .attr("dy",".30em")
+    .attr("font-size","0.7em")
+    .text(function(d) { return d.label; });
 };
 
 Breadboard.prototype.drawBreadboard = function(json) {

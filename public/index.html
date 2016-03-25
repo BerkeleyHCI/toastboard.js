@@ -26,19 +26,26 @@
   <div class="jumbotron">
     <div class="row">
     <div class="col-xs-6">
+    <div class="controls" style="margin: 15px">
+    <!--
+    <button type="button" class="btn btn-secondary">Get Toastboard Data</button>
+    <button type="button" class="btn btn-secondary">Clear board</button> -->
+    </div>
 <div id="breadboard">
   <svg width="500" height="300" id="board" />
 </div>
 <div id="timestamp"></div>
 </div>
 <div class="col-xs-6">
+<!--
   <div class="rightside">
-        <div id="selected-row"></div>
+        <div id="selected-row"></div> -->
     <!-- <p>Selected row: Row 32, 1.1V</p> -->
+    <!--
     <div id="graph-div">
       <svg width="500" height="300" id="graphviz" />
     </div>
-  </div>
+  </div> -->
 </div>
 </div>
 </div>
@@ -50,6 +57,7 @@ var myBreadboard = new Breadboard(2,24,5,20,15);
 // if we get an "info" emit from the socket server then console.log the data we receive
 socket.on('info', function (data) {
   console.log("got data from websocket inside html page");
+  console.log(data);
   var json = JSON.parse(data);
   console.log("should redraw board now????");
   console.log(json);
@@ -57,12 +65,32 @@ socket.on('info', function (data) {
   console.log("drew it!");
 });
   $(document).ready(function() {
+    // draw buttons nicely
+    /*
+    var getDataButton = document.createElement("button");
+    getDataButton.innerHTML = "Get Data";
+    getDataButton.className = "btn btn-secondary";
+    getDataButton.addEventListener("click", function() {
+      console.log("client asks for data");
+      socket.emit("getData");
+    });
+    */
+    var clearBoardButton = document.createElement("button");
+    clearBoardButton.innerHTML = "Clear Board";
+    clearBoardButton.className = "btn btn-secondary";
+    clearBoardButton.addEventListener("click", function() {
+      myBreadboard.drawEmptyBreadboard();
+    });
+
+    var controlsDiv = document.getElementsByClassName("controls")[0];
+   // controlsDiv.appendChild(getDataButton);
+    controlsDiv.appendChild(clearBoardButton);
   //var fakejson = "{\"vddval\":3.3,\"selected\":41,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
   var fakeLeft = "{\"rowsLeft\":[3.3,\"f\",3.3,\"f\",\"f\",\"f\",3.3,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",0.0,\"f\",\"f\",\"f\",\"f\",\"f\",0.0]}";
   var fakeRight = "{\"rowsRight\":[\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",1.1,\"f\",1.1,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",2.0,\"f\",\"f\",2.0,\"f\",\"f\",\"f\",\"f\"]}";
   myBreadboard.drawBreadboard(JSON.parse(fakeLeft));
   myBreadboard.drawBreadboard(JSON.parse(fakeRight));
-  drawGraph([1.4,1.5,1.6,1.8,1.8,1.8,1.7,1.4,1.4,1.4,1.4,1.4]);
+//  drawGraph([1.4,1.5,1.6,1.8,1.8,1.8,1.7,1.4,1.4,1.4,1.4,1.4]);
   });
 </script>
 
