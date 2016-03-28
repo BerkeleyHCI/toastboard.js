@@ -160,6 +160,9 @@ Breadboard.prototype.numbering = function() {
   var numbering = [];
   for (var i=1;i<49;i++) {
     var entry = self.getInnerRowTextCoord(i-1);
+    if (i > 24){
+     row_ind=i-24;
+    }
     entry.label = i.toString();
     numbering.push(entry);
   };
