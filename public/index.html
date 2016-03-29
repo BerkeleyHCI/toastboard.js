@@ -3,7 +3,7 @@
     <title>ToastBoard&mdash;The Breader Breadboard</title>
     <link href="main.css" rel="stylesheet" type="text/css">
     <link href="bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="bookstrap-theme.min.css" rel="stylesheet" type="text/css">
+    <link href="bootstrap-theme.min.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="d3.v3.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -52,6 +52,7 @@
 
 <script type="text/javascript">
 var socket = io.connect(); 
+//var socket2 = io.();
 var myBreadboard = new Breadboard(2,24,5,20,15);
 
 // if we get an "info" emit from the socket server then console.log the data we receive
@@ -59,22 +60,22 @@ socket.on('info', function (data) {
   console.log("got data from websocket inside html page");
   console.log(data);
   var json = JSON.parse(data);
-  console.log("should redraw board now????");
   console.log(json);
   myBreadboard.drawBreadboard(json);
   console.log("drew it!");
 });
+
   $(document).ready(function() {
     // draw buttons nicely
-    /*
+    
     var getDataButton = document.createElement("button");
     getDataButton.innerHTML = "Get Data";
     getDataButton.className = "btn btn-secondary";
     getDataButton.addEventListener("click", function() {
       console.log("client asks for data");
-      socket.emit("getData");
+      socket.emit("start","hello");
     });
-    */
+    
     var clearBoardButton = document.createElement("button");
     clearBoardButton.innerHTML = "Clear Board";
     clearBoardButton.className = "btn btn-secondary";
@@ -83,11 +84,11 @@ socket.on('info', function (data) {
     });
 
     var controlsDiv = document.getElementsByClassName("controls")[0];
-   // controlsDiv.appendChild(getDataButton);
+    controlsDiv.appendChild(getDataButton);
     controlsDiv.appendChild(clearBoardButton);
   //var fakejson = "{\"vddval\":3.3,\"selected\":41,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
-  var fakeLeft = "{\"rowsLeft\":[3.3,\"f\",3.3,\"f\",\"f\",\"f\",3.3,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",0.0,\"f\",\"f\",\"f\",\"f\",\"f\",0.0]}";
-  var fakeRight = "{\"rowsRight\":[\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",1.1,\"f\",1.1,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",2.0,\"f\",\"f\",2.0,\"f\",\"f\",\"f\",\"f\"]}";
+  var fakeLeft = "{\"rowsLeft\":[\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"]}";
+  var fakeRight = "{\"rowsRight\":[\"f\",\"f\",\"f\",\"f\",3.2,\"f\",\"f\",\"f\",\"f\",\"f\",1.45,\"f\",\"f\",0.0,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"]}";
   myBreadboard.drawBreadboard(JSON.parse(fakeLeft));
   myBreadboard.drawBreadboard(JSON.parse(fakeRight));
 //  drawGraph([1.4,1.5,1.6,1.8,1.8,1.8,1.7,1.4,1.4,1.4,1.4,1.4]);

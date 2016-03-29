@@ -17,16 +17,20 @@ var ws = new WebSocket('ws://10.0.1.15');
 
 io.sockets.on('connection', function (socket) {
     console.log('A new user connected!');
-    ws.on("open",function() {
+      ws.on("open",function() {
       console.log("websocket connected");
-      ws.send("start");
     });
 
     ws.on("message",function(data,flag) {
       console.log("got data from websocket");
-  // when we get stuff from websocket, sling it over io socket to client
+      // when we get stuff from websocket, sling it over io socket to client
       socket.emit('info', data);
     });
+
+    socket.on("start",function(data,flag) {
+      console.log("clicked the get data button");
+      ws.send("start");
+    })
 
 });
 
