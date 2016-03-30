@@ -374,7 +374,7 @@ var getTimeStampString = function() {
 
 var getRowTextCoord = function(rownumber,breadboard) {
   if (rownumber<24) {
-    pins = this.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum)];
+    pins = breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum)];
     return {x:pins[0] - 45,y:pins[1]};
   } else {
     pins = breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum) + 4];
