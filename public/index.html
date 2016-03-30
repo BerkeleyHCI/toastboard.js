@@ -52,7 +52,12 @@
 
 <script type="text/javascript">
 var socket = io.connect(); 
-//var socket2 = io.();
+var getTimeStampString = function() {
+  var now = new Date();
+  var date = [ now.getMonth() + 1, now.getDate(), now.getFullYear() ];
+  var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
+  return date.join("/") + " " + time.join(":")
+};
 var myBreadboard = new Breadboard(2,24,5,20,15);
 
 // if we get an "info" emit from the socket server then console.log the data we receive
@@ -62,7 +67,8 @@ socket.on('info', function (data) {
   var json = JSON.parse(data);
   console.log(json);
   myBreadboard.drawBreadboard(json);
-  console.log("drew it!");
+  var timestring = getTimeStampString();
+  $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
 });
 
   $(document).ready(function() {

@@ -257,9 +257,6 @@ Breadboard.prototype.drawBreadboard = function(json) {
     .attr("font-size","0.7em")
     .text(function(d) { return d.label; });
 
-    var timestring = getTimeStampString();
-    $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
-
     svg.selectAll(".label")
       .data(this.labels)
       .enter()
@@ -300,7 +297,6 @@ Breadboard.prototype.drawBreadboard = function(json) {
         .attr("stroke-width",3)
         .attr("stroke",function (d) { return d.color; });
 
-    $("#selected-row").html("<p>Selected Row: " + json.selected);
     if (this.drawCallback) {
       this.drawCallback();
     }
