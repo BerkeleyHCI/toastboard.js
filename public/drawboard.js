@@ -102,32 +102,6 @@ Breadboard.prototype.processJson = function(json) {
   }
 };
 
-Breadboard.prototype.hashToLabels = function(hash) {
-  var self = this;
-  var labels = [];
-  hash.forEach(function(row) {
-    var key = Object.keys(row)[0];
-    var entry =  getRowTextCoord(key,self)
-    entry.label = row[key].toFixed(1) + "V";
-    labels.push(entry);
-  });
-  return labels;
-};
-
-var numbering = function(breadboard) {
-  var self = this;
-  var numbering = [];
-  for (var i=1;i<49;i++) {
-    var entry = getInnerRowTextCoord(i-1,breadboard);
-    if (i > 24){
-     row_ind=i-24;
-    }
-    entry.label = i.toString();
-    numbering.push(entry);
-  };
-  return numbering;
-};
-
 Breadboard.prototype.drawEmptyBreadboard = function() {
   var self = this;
   d3.select("#board")
@@ -175,7 +149,7 @@ Breadboard.prototype.drawBreadboard = function(json) {
     console.log(hash);
     this.voltageAttr = hashToVoltageAttr(hash,self);
     this.connections = hashToCnxn(hash);
-    this.labels = this.hashToLabels(this.rowData);
+    this.labels = hashToLabels(this.rowData,self);
 
     var svg = this.drawEmptyBreadboard();
 
@@ -383,6 +357,31 @@ var hashToVoltageAttr = function(hash,breadboard) {
   return voltageAttr;
 };
 
+var numbering = function(breadboard) {
+  var self = this;
+  var numbering = [];
+  for (var i=1;i<49;i++) {
+    var entry = getInnerRowTextCoord(i-1,breadboard);
+    if (i > 24){
+     row_ind=i-24;
+    }
+    entry.label = i.toString();
+    numbering.push(entry);
+  };
+  return numbering;
+};
+
+var hashToLabels = function(hash,breadboard) {
+  var self = this;
+  var labels = [];
+  hash.forEach(function(row) {
+    var key = Object.keys(row)[0];
+    var entry =  getRowTextCoord(key,breadboard)
+    entry.label = row[key].toFixed(1) + "V";
+    labels.push(entry);
+  });
+  return labels;
+};
 
 // why is this here
 var conflict = function(cnxn1,cnxn2) {
