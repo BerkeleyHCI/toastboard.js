@@ -21,12 +21,12 @@
 var width=450;
 var height=600;
 
-
+// which of these fields do we actually need?
 function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
   this.rowData = {};
   this.receivedLeft = false;
   this.receivedRight = false;
-  this.drawCallback = null;
+  this.drawCallback = null; // what is this callback thing for?
   this.railcolumn = railcolumn;
   this.rownum = rownum;
   this.pinnum = pinnum;
@@ -34,11 +34,21 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
   this.colspacing = colspacing;
   this.groundColor = "gray";
   this.vddColor = "red";
-  this.selectedRow = null;
+  // this.selectedRow = null;
   this.vdd = null;
   this.voltageAttr = null;
   this.connections = null;
   this.labels = null;
+
+  var railPinPositionGrid = function(startX,startY) {
+    var positions = [];
+    for (var x=0;x<railcolumn;x++) {
+      for (var y=0;y<rownum;y++)
+        positions.push([x*15+startX,y*colspacing+startY]);
+      }
+    return positions;
+  };
+
   var rowPinPositionGrid = function(startX,startY) {
   var positions = [];
   for (var y=0;y<rownum;y++) {
@@ -49,20 +59,11 @@ function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
   return positions;
 };
 
-  var railPinPositionGrid = function(startX,startY) {
-    var positions = [];
-    for (var x=0;x<railcolumn;x++) {
-        for (var y=0;y<rownum;y++)
-            positions.push([x*15+startX,y*colspacing+startY]);
-    }
-    return positions;
-  };
+  var pinPositions = railPinPositionGrid(320,20);
+  pinPositions = pinPositions.concat(rowPinPositionGrid(45,20));
+  pinPositions = pinPositions.concat(rowPinPositionGrid(180,20));
 
-    var pinPositions = railPinPositionGrid(320,20);
-    pinPositions = pinPositions.concat(rowPinPositionGrid(45,20));
-    pinPositions = pinPositions.concat(rowPinPositionGrid(180,20));
-
-    this.pinPositions = pinPositions;
+  this.pinPositions = pinPositions;
 
 };
 
@@ -93,13 +94,13 @@ Breadboard.prototype.processJson = function(json) {
       }
     }
     // hardcode these 2 values for now
-    this.selectedRow = 0;
+    // this.selectedRow = 0;
     this.vdd = 3.3;
     console.log(this.rowData);
-    var hash = this.hashVoltages(this.rowData);
+    var hash = hashVoltages(this.rowData);
     console.log(hash);
     this.voltageAttr = this.hashToVoltageAttr(hash);
-    this.connections = this.hashToCnxn(hash);
+    this.connections = hashToCnxn(hash);
     this.labels = this.hashToLabels(this.rowData);
   }
   // make sure we have both sides
@@ -112,43 +113,12 @@ Breadboard.prototype.processJson = function(json) {
   }
 };
 
-Breadboard.prototype.hashVoltages = function(rowVals) {
-    var hash = {}
-    rowVals.forEach(function(row) {
-      var key = Object.keys(row)[0];
-      var val = row[key];
-      if (key != "f") { // remove floating rows
-        if (hash.hasOwnProperty(val)) {
-          hash[val].push(key);
-        } else {
-          hash[val] = [key];
-        }
-      }
-    });
-    return hash;
-  };
-
-Breadboard.prototype.hashToCnxn = function(hash) {
-  var self = this;
-  var cnxn = [];
-  Object.keys(hash).forEach(function(hashKey) {
-    var connected_rows = hash[hashKey];
-    var top_row = connected_rows[0];
-    connected_rows.slice(1).forEach(function(row) {
-      cnxn.push({start:top_row,end:row});
-    });
-  });
-  return this.choosePins(cnxn);
-};
-
 Breadboard.prototype.hashToLabels = function(hash) {
   var self = this;
   var labels = [];
-  console.log("checking labels problem");
-  console.log(hash);
   hash.forEach(function(row) {
     var key = Object.keys(row)[0];
-    var entry =  self.getRowTextCoord(key)
+    var entry =  getRowTextCoord(key,self)
     entry.label = row[key].toFixed(1) + "V";
     labels.push(entry);
   });
@@ -159,7 +129,7 @@ Breadboard.prototype.numbering = function() {
   var self = this;
   var numbering = [];
   for (var i=1;i<49;i++) {
-    var entry = self.getInnerRowTextCoord(i-1);
+    var entry = getInnerRowTextCoord(i-1,self);
     if (i > 24){
      row_ind=i-24;
     }
@@ -187,7 +157,7 @@ Breadboard.prototype.hashToVoltageAttr = function(hash) {
       colorArray.splice(colorIndex,1);
     }
     hash[hashKey].forEach(function(row) {
-      var newVoltage = self.getRowRect(row);
+      var newVoltage = getRowRect(row,self);
       newVoltage.r = row;
       newVoltage.v = hashKey;
       newVoltage.color = color
@@ -196,14 +166,14 @@ Breadboard.prototype.hashToVoltageAttr = function(hash) {
   });
       // manually add power and ground rails
   if (this.vdd) { // check that power is not floating
-    pwrVoltage = self.getRailRect(0);
+    pwrVoltage = getRailRect(0,self);
     pwrVoltage.r = 0;
     pwrVoltage.v = 3.3;
     pwrVoltage.color = self.vddColor;
     voltageAttr.push(pwrVoltage);
   }
   // can't tell if ground is connected, so always display
-  grdVoltage = self.getRailRect(1);
+  grdVoltage = getRailRect(1,self);
   grdVoltage.r = 1;
   grdVoltage.v = 0;
   grdVoltage.color = self.groundColor;
@@ -212,101 +182,10 @@ Breadboard.prototype.hashToVoltageAttr = function(hash) {
 };
 
 
-//row pins count across
-Breadboard.prototype.getRowPin = function(rownumber,pinnumber) {
-  return this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum) + pinnumber];
-};
 
-Breadboard.prototype.getRowTextCoord = function(rownumber) {
-  if (rownumber<24) {
-    pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum)];
-    return {x:pins[0] - 45,y:pins[1]};
-  } else {
-    pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum) + 4];
-    return {x:pins[0] + 15,y:pins[1]};
-  }
-}
 
-Breadboard.prototype.getInnerRowTextCoord = function(rownumber) {
-  if (rownumber<24) {
-    pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum) + 4];
-    return {x:pins[0] + 10,y:pins[1]};
-  } else {
-    pins = this.pinPositions[(this.railcolumn*this.rownum) + (rownumber*this.pinnum)];
-    return {x:pins[0] - 20,y:pins[1]};
-  }
-}
 
-//rail pins count down
-Breadboard.prototype.getRailPin = function(railnumber,pinnumber) {
-  return 0; //this.pinPositions[];
-};
 
-Breadboard.prototype.choosePins = function(cnxn) {
-  var colorArray = ["orange","yellow","green","blue","purple","brown","blueviolet","cornflowerblue","crimson",
-"forestgreen","deeppink","indigo","lightseagreen","mediumorchid","orangered","yellowgreen","gold","teal",
-"firebrick","midnightblue"];
-  var self = this;
-  var newCnxn = [];
-  var row1PinNum = 0;
-  var row2PinNum = 0;
-  var pin = 0, pin2 = 0;
-  var color = null;
-  cnxn.forEach(function(connection) {
-    // TODO: special case rail to row connections
-    if (connection.start <= 23 && connection.end <= 23) {
-      pin = row1PinNum;
-      pin2 = row1PinNum;
-      row1PinNum++;
-    } else if (connection.start > 23 && connection.end > 23) {
-      pin = row2PinNum;
-      pin2 = row2PinNum;
-      row2PinNum++
-    } else {
-      pin = 4;
-      pin2 = 0;
-    }
-    var colorIndex = Math.floor(Math.random() * colorArray.length);
-    color = colorArray[colorIndex];
-    colorArray.splice(colorIndex,1);
-    newCnxn.push({startPin: self.getRowPin(connection.start,pin),endPin: self.getRowPin(connection.end,pin2),color:color});
-  });
-  return newCnxn;
-};
-
-Breadboard.prototype.getRectAttr = function(firstPin,lastPin) {
-  var padding = 8;
-  var x = firstPin[0] - padding;
-  var y = firstPin[1] - padding;
-  var width = (lastPin[0] - firstPin[0]) + (padding*2);
-  var height = (lastPin[1] - firstPin[1]) + (padding*2);
-  return {x: x, y: y, height: height, width: width};
-}
-
-Breadboard.prototype.getRailRect = function(railIndex) {
-  // rails are only 0 or 1
-  var firstPin = this.pinPositions[railIndex*this.rownum];
-  var lastPin = this.pinPositions[railIndex*this.rownum + (this.rownum - 1)];
-  return this.getRectAttr(firstPin,lastPin);
-};
-
-Breadboard.prototype.getRowRect = function(rowIndex) {
-  // rows are numbered 0 through 47
-  var firstPin = this.pinPositions[(this.rownum*this.railcolumn) + (rowIndex*this.pinnum)];
-  var lastPin = this.pinPositions[(this.rownum*this.railcolumn) + (rowIndex*this.pinnum) + (this.pinnum - 1)];
-  return this.getRectAttr(firstPin,lastPin);
-};
-
-var conflict = function(cnxn1,cnxn2) {
-    return (cnxn2.start <= cnxn1.start) || (cnxn2.end >= cnxn1.end);
-};
-
-var getTimeStampString = function() {
-  var now = new Date();
-  var date = [ now.getMonth() + 1, now.getDate(), now.getFullYear() ];
-  var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
-  return date.join("/") + " " + time.join(":")
-};
 
 Breadboard.prototype.drawEmptyBreadboard = function() {
   d3.select("#board")
@@ -429,5 +308,133 @@ Breadboard.prototype.drawBreadboard = function(json) {
     console.log("no real data");
   }
 
+};
+
+var hashVoltages = function(rowVals) {
+  var hash = {}
+  rowVals.forEach(function(row) {
+    var key = Object.keys(row)[0];
+    var val = row[key];
+    if (key != "f") { // remove floating rows
+      if (hash.hasOwnProperty(val)) {
+        hash[val].push(key);
+      } else {
+        hash[val] = [key];
+      }
+    }
+  });
+  return hash;
+};
+
+var hashToCnxn = function(hash) {
+  var cnxn = [];
+  Object.keys(hash).forEach(function(hashKey) {
+    var connected_rows = hash[hashKey];
+    var top_row = connected_rows[0];
+    connected_rows.slice(1).forEach(function(row) {
+      cnxn.push({start:top_row,end:row});
+    });
+  });
+  return choosePins(cnxn);
+};
+
+var choosePins = function(cnxn) {
+  var colorArray = ["orange","yellow","green","blue","purple","brown","blueviolet","cornflowerblue","crimson",
+"forestgreen","deeppink","indigo","lightseagreen","mediumorchid","orangered","yellowgreen","gold","teal",
+"firebrick","midnightblue"];
+  var newCnxn = [];
+  var row1PinNum = 0;
+  var row2PinNum = 0;
+  var pin = 0, pin2 = 0;
+  var color = null;
+  cnxn.forEach(function(connection) {
+    // TODO: special case rail to row connections
+    if (connection.start <= 23 && connection.end <= 23) {
+      pin = row1PinNum;
+      pin2 = row1PinNum;
+      row1PinNum++;
+    } else if (connection.start > 23 && connection.end > 23) {
+      pin = row2PinNum;
+      pin2 = row2PinNum;
+      row2PinNum++
+    } else {
+      pin = 4;
+      pin2 = 0;
+    }
+    var colorIndex = Math.floor(Math.random() * colorArray.length);
+    color = colorArray[colorIndex];
+    colorArray.splice(colorIndex,1);
+    newCnxn.push({startPin: getRowPin(connection.start,pin,self),endPin: getRowPin(connection.end,pin2,self),color:color});
+  });
+  return newCnxn;
+};
+
+var getTimeStampString = function() {
+  var now = new Date();
+  var date = [ now.getMonth() + 1, now.getDate(), now.getFullYear() ];
+  var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
+  return date.join("/") + " " + time.join(":")
+};
+
+var getRowTextCoord = function(rownumber,breadboard) {
+  if (rownumber<24) {
+    pins = this.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum)];
+    return {x:pins[0] - 45,y:pins[1]};
+  } else {
+    pins = breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum) + 4];
+    return {x:pins[0] + 15,y:pins[1]};
+  }
+}
+
+var getInnerRowTextCoord = function(rownumber,breadboard) {
+  if (rownumber<24) {
+    pins = breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum) + 4];
+    return {x:pins[0] + 10,y:pins[1]};
+  } else {
+    pins = breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum)];
+    return {x:pins[0] - 20,y:pins[1]};
+  }
+};
+
+//row pins count across
+var getRowPin = function(rownumber,pinnumber,breadboard) {
+  return breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum) + pinnumber];
+};
+
+var getRectAttr = function(firstPin,lastPin) {
+  var padding = 8;
+  var x = firstPin[0] - padding;
+  var y = firstPin[1] - padding;
+  var width = (lastPin[0] - firstPin[0]) + (padding*2);
+  var height = (lastPin[1] - firstPin[1]) + (padding*2);
+  return {x: x, y: y, height: height, width: width};
+};
+
+var getRailRect = function(railIndex,breadboard) {
+  // rails are only 0 or 1
+  var firstPin = breadboard.pinPositions[railIndex*breadboard.rownum];
+  var lastPin = breadboard.pinPositions[railIndex*breadboard.rownum + (breadboard.rownum - 1)];
+  return getRectAttr(firstPin,lastPin);
+};
+
+var getRowRect = function(rowIndex,breadboard) {
+  // rows are numbered 0 through 47
+  var firstPin = breadboard.pinPositions[(breadboard.rownum*breadboard.railcolumn) + (rowIndex*breadboard.pinnum)];
+  var lastPin = breadboard.pinPositions[(breadboard.rownum*breadboard.railcolumn) + 
+    (rowIndex*breadboard.pinnum) + (breadboard.pinnum - 1)];
+  return getRectAttr(firstPin,lastPin);
+};
+
+
+
+
+// why is this here
+var conflict = function(cnxn1,cnxn2) {
+    return (cnxn2.start <= cnxn1.start) || (cnxn2.end >= cnxn1.end);
+};
+
+// this is not needed either?
+var getRailPin = function(railnumber,pinnumber) {
+  return 0; //this.pinPositions[];
 };
 
