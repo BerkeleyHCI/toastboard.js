@@ -13,29 +13,27 @@
 // TODO draw oscillo graph
 // TODO save status (to local storage????)
 // TODO bend wire drawings to see if they read better?
-// TODO if we don't really use jquery for anything, rip it out
-// TODO put indicator by selected row
 
 // all 0-47 either have real data or f
 
 var width=450;
 var height=600;
+var railcolumn = 2;
+var rownum = 24;
+var pinnum = 5;
+var rowspacing = 20;
+var colspacing = 15;
 
-// which of these fields do we actually need?
-function Breadboard(railcolumn,rownum,pinnum,rowspacing,colspacing) {
+var vdd = 3.3;
+var vddColor = "red";
+var groundColor = "gray";
+
+function Breadboard() {
   this.rowData = {};
   this.receivedLeft = false;
   this.receivedRight = false;
   this.drawCallback = null; // what is this callback thing for?
-  this.railcolumn = railcolumn;
-  this.rownum = rownum;
-  this.pinnum = pinnum;
-  this.rowspacing = rowspacing;
-  this.colspacing = colspacing;
-  this.groundColor = "gray";
-  this.vddColor = "red";
-  // this.selectedRow = null;
-  this.vdd = null;
+
   this.voltageAttr = null;
   this.connections = null;
   this.labels = null;
@@ -95,7 +93,7 @@ Breadboard.prototype.processJson = function(json) {
     }
     // hardcode these 2 values for now
     // this.selectedRow = 0;
-    this.vdd = 3.3;
+
     console.log(this.rowData);
     var hash = hashVoltages(this.rowData);
     console.log(hash);
@@ -149,8 +147,8 @@ Breadboard.prototype.hashToVoltageAttr = function(hash) {
     var color;
     if (hashKey == 0) {
       color = self.groundColor;
-    } else if (hashKey == self.vdd) {
-      color = self.vddColor;
+    } else if (hashKey == vdd) {
+      color = vddColor;
     } else {
       var colorIndex = Math.floor(Math.random() * colorArray.length);
       color = colorArray[colorIndex];
@@ -164,19 +162,19 @@ Breadboard.prototype.hashToVoltageAttr = function(hash) {
       voltageAttr.push(newVoltage);
     });
   });
-      // manually add power and ground rails
-  if (this.vdd) { // check that power is not floating
-    pwrVoltage = getRailRect(0,self);
-    pwrVoltage.r = 0;
-    pwrVoltage.v = 3.3;
-    pwrVoltage.color = self.vddColor;
-    voltageAttr.push(pwrVoltage);
-  }
+
+  // manually add power and ground rails
+  pwrVoltage = getRailRect(0,self);
+  pwrVoltage.r = 0;
+  pwrVoltage.v = 3.3;
+  pwrVoltage.color = vddColor;
+  voltageAttr.push(pwrVoltage);
+
   // can't tell if ground is connected, so always display
   grdVoltage = getRailRect(1,self);
   grdVoltage.r = 1;
   grdVoltage.v = 0;
-  grdVoltage.color = self.groundColor;
+  grdVoltage.color = groundColor;
   voltageAttr.push(grdVoltage);
   return voltageAttr;
 };
@@ -270,7 +268,7 @@ Breadboard.prototype.drawBreadboard = function(json) {
       .attr("x",280)
       .attr("y",390)
       .attr("dy",".30em")
-      .text("VDD: " + this.vdd.toFixed(1) + "V");
+      .text("VDD: " + vdd.toFixed(1) + "V");
 
     svg.selectAll("rect")
       .data(this.voltageAttr)
@@ -374,27 +372,27 @@ var getTimeStampString = function() {
 
 var getRowTextCoord = function(rownumber,breadboard) {
   if (rownumber<24) {
-    pins = breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum)];
+    pins = breadboard.pinPositions[(railcolumn*rownum) + (rownumber*pinnum)];
     return {x:pins[0] - 45,y:pins[1]};
   } else {
-    pins = breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum) + 4];
+    pins = breadboard.pinPositions[(railcolumn*rownum) + (rownumber*pinnum) + 4];
     return {x:pins[0] + 15,y:pins[1]};
   }
 }
 
 var getInnerRowTextCoord = function(rownumber,breadboard) {
   if (rownumber<24) {
-    pins = breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum) + 4];
+    pins = breadboard.pinPositions[(railcolumn*rownum) + (rownumber*pinnum) + 4];
     return {x:pins[0] + 10,y:pins[1]};
   } else {
-    pins = breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum)];
+    pins = breadboard.pinPositions[(railcolumn*rownum) + (rownumber*pinnum)];
     return {x:pins[0] - 20,y:pins[1]};
   }
 };
 
 //row pins count across
 var getRowPin = function(rownumber,pinnumber,breadboard) {
-  return breadboard.pinPositions[(breadboard.railcolumn*breadboard.rownum) + (rownumber*breadboard.pinnum) + pinnumber];
+  return breadboard.pinPositions[(railcolumn*rownum) + (rownumber*pinnum) + pinnumber];
 };
 
 var getRectAttr = function(firstPin,lastPin) {
@@ -408,16 +406,15 @@ var getRectAttr = function(firstPin,lastPin) {
 
 var getRailRect = function(railIndex,breadboard) {
   // rails are only 0 or 1
-  var firstPin = breadboard.pinPositions[railIndex*breadboard.rownum];
-  var lastPin = breadboard.pinPositions[railIndex*breadboard.rownum + (breadboard.rownum - 1)];
+  var firstPin = breadboard.pinPositions[railIndex*rownum];
+  var lastPin = breadboard.pinPositions[railIndex*rownum + (rownum - 1)];
   return getRectAttr(firstPin,lastPin);
 };
 
 var getRowRect = function(rowIndex,breadboard) {
   // rows are numbered 0 through 47
-  var firstPin = breadboard.pinPositions[(breadboard.rownum*breadboard.railcolumn) + (rowIndex*breadboard.pinnum)];
-  var lastPin = breadboard.pinPositions[(breadboard.rownum*breadboard.railcolumn) + 
-    (rowIndex*breadboard.pinnum) + (breadboard.pinnum - 1)];
+  var firstPin = breadboard.pinPositions[(rownum*railcolumn) + (rowIndex*pinnum)];
+  var lastPin = breadboard.pinPositions[(rownum*railcolumn) + (rowIndex*pinnum) + (pinnum - 1)];
   return getRectAttr(firstPin,lastPin);
 };
 

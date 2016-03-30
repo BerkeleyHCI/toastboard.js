@@ -58,7 +58,7 @@ var getTimeStampString = function() {
   var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
   return date.join("/") + " " + time.join(":")
 };
-var myBreadboard = new Breadboard(2,24,5,20,15);
+var myBreadboard = new Breadboard();
 
 // if we get an "info" emit from the socket server then console.log the data we receive
 socket.on('info', function (data) {

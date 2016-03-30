@@ -42,7 +42,7 @@
 </div>
 <script type="text/javascript">
 var socket = io.connect(); 
-var sensorBreadboard = new Breadboard(2,24,5,20,15);
+var sensorBreadboard = new Breadboard();
 sensorBreadboard.drawCallback = function() {
   var sensor = new Sensor(sensorBreadboard,30);
   sensor.draw();
