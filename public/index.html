@@ -94,10 +94,8 @@ socket.on('info', function (data) {
     controlsDiv.appendChild(getDataButton);
     controlsDiv.appendChild(clearBoardButton);
   //var fakejson = "{\"vddval\":3.3,\"selected\":41,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
-  var fakeLeft = "{\"rowsLeft\":[2.3,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"]}";
-  var fakeRight = "{\"rowsRight\":[\"f\",\"f\",\"f\",\"f\",3.2,\"f\",\"f\",\"f\",\"f\",\"f\",1.45,\"f\",\"f\",0.0,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"]}";
-  myBreadboard.drawBreadboard(JSON.parse(fakeLeft));
-  myBreadboard.drawBreadboard(JSON.parse(fakeRight));
+  var fakeJson = "{\"rowsLeft\":[2.3,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"], \"rowsRight\":[\"f\",\"f\",\"f\",\"f\",3.2,\"f\",\"f\",\"f\",\"f\",\"f\",1.45,\"f\",\"f\",0.0,\"f\",\"f\",0.0,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"]}";
+  myBreadboard.drawBreadboard(JSON.parse(fakeJson));
 //  drawGraph([1.4,1.5,1.6,1.8,1.8,1.8,1.7,1.4,1.4,1.4,1.4,1.4]);
   });
 </script>
