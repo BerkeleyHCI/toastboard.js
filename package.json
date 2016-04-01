@@ -10,5 +10,8 @@
     "express": "~3.4.8",
     "ws": "~0.4.32",
     "socket.io": "latest"
+  },
+  "devDependencies": {
+    "serialport": "^2.0.6"
   }
 }
