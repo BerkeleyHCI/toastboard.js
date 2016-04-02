@@ -32,16 +32,24 @@
 
   <div class="rightside">
   <form class="form-horizontal">
-  <select id="newcomponent" name="newcomponent" multiple="multiple">
+  <div class="form-group">
+  <select id="newcomponent" name="newcomponent" class="form-control">
   <option value="wire">Wire</option>
   <option value="diode">Diode</option>
   <option value="resistor">Resistor</option>
   <option value="component">Component</option>
   </select>
+  </div>
+  <div class="form-group">
   <input type="text" id="startrow" class="input-small" placeholder="Start Row"/>
+  <input type="text" id="startpin" class="input-small" placeholder="Start Pin"/>
+  </div>
+  <div class="form-group">
   <input type="text" id="endrow" class="input-small" placeholder="End Row" />
-  <!-- <button type="Add" class="btn">Add</button> -->
-  <input type="submit">
+  <input type="text" id="endpin" class="input-small" placeholder="End Pin" />
+  </div>
+  <button type="submit" class="btn">Add</button>
+  <!-- <input type="submit"> -->
   </form>
     </div>
   </div> 
