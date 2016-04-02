@@ -28,6 +28,29 @@ Component.prototype.draw = function() {
     .attr("fill","black");
 
 };
+
+var Wire = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
+  this.breadboard = breadboard;
+  this.startRow = startRow;
+  this.startPinNum = startPinNum;
+  this.startPin = this.breadboard.getRowPin(this.startRow,this.startPinNum);
+  this.endRow = endRow;
+  this.endPinNum = endPinNum;
+  this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
+};
+
+Wire.prototype.draw = function() {
+  var svg = d3.select("svg");
+
+  svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1])
+    .attr("x2",this.endPin[0])
+    .attr("y2",this.endPin[1])
+    .attr("stroke-width",4)
+    .attr("stroke","black");
+};
+
 // should subclass these in OOP-ish style, but whatever....
 var Resistor = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.breadboard = breadboard;

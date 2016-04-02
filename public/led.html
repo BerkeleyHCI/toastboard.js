@@ -9,16 +9,14 @@
     <script src="/socket.io/socket.io.js"></script>
 
 <script type="text/javascript" src="toastboard.js/drawboard.js"></script>
+<script type="text/javascript" src="toastboard.js/component.js"></script>
+<script type="text/javascript" src="toastboard.js/graph.js"></script>
 
-
-<script type="text/javascript" src="component.js"></script>
-<script type="text/javascript" src="graph.js"></script><body>
+<body>
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="container"><div class="navbar-header"><a href="index.html" class="navbar-brand">ToastBoard</a>
   <ul class="nav navbar-nav">
-    <li class="active"><a href="led.html">Simple LED</a></li>
-    <li><a href="voltage.html">Voltage Divider</a></li>
-    <li><a href="sensor.html">Sensor</a></li>
+    <li class="active"><a href="led.html">Components</a></li>
   </ul>
   </div></div>
 </div>
@@ -72,6 +70,8 @@ socket.on('info', function (data) {
     resistor.draw();
     var sensor = new Sensor(ledBreadboard,25);
     sensor.draw();
+    var wire = new Wire(ledBreadboard,2,2,5,2);
+    wire.draw();
   });
 </script>
 
