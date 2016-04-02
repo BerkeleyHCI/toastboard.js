@@ -343,12 +343,15 @@ var hashToVoltageAttr = function(hash,breadboard) {
 var numbering = function(breadboard) {
   var self = this;
   var numbering = [];
+  var row_ind;
   for (var i=1;i<49;i++) {
     var entry = getInnerRowTextCoord(i-1,breadboard);
     if (i > 24){
      row_ind=i-24;
+    } else {
+      row_ind = i;
     }
-    entry.label = i.toString();
+    entry.label = row_ind.toString();
     numbering.push(entry);
   };
   return numbering;
