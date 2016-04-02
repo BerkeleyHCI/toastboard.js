@@ -3,15 +3,16 @@
     <title>ToastBoard&mdash;The Breader Breadboard</title>
     <link href="main.css" rel="stylesheet" type="text/css">
     <link href="bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="bookstrap-theme.min.css" rel="stylesheet" type="text/css">
+    <link href="bootstrap-theme.min.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="d3.v3.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
-<script type="text/javascript" src="drawboard.js"></script>
+<script type="text/javascript" src="toastboard.js/drawboard.js"></script>
+
+
 <script type="text/javascript" src="component.js"></script>
-<script type="text/javascript" src="graph.js"></script>
-<body>
+<script type="text/javascript" src="graph.js"></script><body>
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="container"><div class="navbar-header"><a href="index.html" class="navbar-brand">ToastBoard</a>
   <ul class="nav navbar-nav">
@@ -30,13 +31,14 @@
 <div id="timestamp"></div>
 </div>
 <div class="col-xs-6">
+<!--
   <div class="rightside">
         <div id="selected-row"></div>
-    <!-- <p>Selected row: Row 32, 1.1V</p> -->
-    <div id="graph-div">
-      <svg width="500" height="300" id="graphviz" />
+    <p>Selected row: Row 32, 1.1V</p>
+   <div id="graph-div">
+      <svg width="500" height="300" id="graphviz" /> 
     </div>
-  </div>
+  </div> -->
 </div>
 </div>
 </div>
@@ -57,12 +59,19 @@ socket.on('info', function (data) {
   console.log("should redraw board now????");
   console.log(json);
   ledBreadboard.drawBreadboard(json);
-  drawGraph(json.oscillo);
-  console.log("drew it!");
+ // drawGraph(json.oscillo);
+  console.log("drew it!");  
 });
 
   $(document).ready(function() {
-    ledBreadboard.drawBreadboard([]);
+    //ledBreadboard.drawBreadboard([]);
+    ledBreadboard.drawEmptyBreadboard();
+        var led = new Diode(ledBreadboard,32,3,35,3);
+    led.draw();
+    var resistor = new Resistor(ledBreadboard,38,3,42,3);
+    resistor.draw();
+    var sensor = new Sensor(ledBreadboard,25);
+    sensor.draw();
   });
 </script>
 

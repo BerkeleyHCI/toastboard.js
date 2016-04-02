@@ -15,13 +15,13 @@ app.use(express.static(__dirname + '/public'));
 
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort;
-
+/*
 var serialPort = new SerialPort("/dev/cu.usbserial-cc3101B",  {
     baudrate: 9600,
     parser: serialport.parsers.readline("\n")
 });
-
-io.sockets.on("connection",openSocket);
+*/
+// io.sockets.on("connection",openSocket);
 
 function openSocket(socket) {
   socket.on("start",function(data,flag) {
