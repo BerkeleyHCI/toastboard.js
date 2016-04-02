@@ -1,6 +1,5 @@
-var Component = function(breadboard, wirenum, startRow, startPinNum, endRow, endPinNum) {
+var Component = function(breadboard, startRow, startPinNum, endRow, endPinNum) {
   this.breadboard = breadboard;
-  this.wirenum = wirenum;
   this.startRow = startRow;
   this.startPinNum = startPinNum;
   this.startPin = this.breadboard.getRowPin(this.startRow,this.startPinNum);
