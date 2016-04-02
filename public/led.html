@@ -64,14 +64,24 @@ socket.on('info', function (data) {
   $(document).ready(function() {
     //ledBreadboard.drawBreadboard([]);
     ledBreadboard.drawEmptyBreadboard();
-        var led = new Diode(ledBreadboard,32,3,35,3);
-    led.draw();
-    var resistor = new Resistor(ledBreadboard,38,3,42,3);
-    resistor.draw();
     var sensor = new Sensor(ledBreadboard,25);
     sensor.draw();
+
+    var led = new Diode(ledBreadboard,32,3,38,3);
+    led.draw();
+
+    var resistor = new Resistor(ledBreadboard,20,0,47,1);
+    resistor.draw();
+
     var wire = new Wire(ledBreadboard,2,2,5,2);
     wire.draw();
+    var wire2 = new Wire(ledBreadboard,15,3,18,4);
+    wire2.draw();
+    var wire3 =  new Wire(ledBreadboard,14,4,41,0);
+    wire3.draw();
+
+    var component = new Component(ledBreadboard,0,7,0,13,0);
+    component.draw();
   });
 </script>
 

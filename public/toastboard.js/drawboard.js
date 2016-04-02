@@ -164,7 +164,7 @@ Breadboard.prototype.drawBreadboard = function(json) {
       .attr("fill", function(d) { return d.color})
       .attr("fill-opacity", 0.5)
       .append("title").text(function(d) { return d.v.toString() + "V" });
-
+/*
     svg.selectAll("line")
         .data(this.connections)
         .enter()
@@ -175,7 +175,7 @@ Breadboard.prototype.drawBreadboard = function(json) {
         .attr("y2",function(d) { return d.endPin[1]; })
         .attr("stroke-width",3)
         .attr("stroke",function (d) { return d.color; });
-
+*/
     if (this.drawCallback) {
       this.drawCallback();
     }
