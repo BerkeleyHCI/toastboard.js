@@ -28,7 +28,7 @@ function openSocket(socket) {
     if ( error ) {
       console.log("no serial port");
     } else {
-      socket.on("start",function(data,flag) {
+      socket.on("d",function(data,flag) {
         console.log("web client requested data");
         serialPort.write("start\n", function(err,res) {
           if (err !== undefined) {
@@ -40,11 +40,35 @@ function openSocket(socket) {
         });
       });
 
+      socket.on("s",function(data,flag) {
+        console.log("web client requested continuous scan");
+        serialPort.write("s\n", function(err,res) {
+          if (err !== undefined) {
+            console.log("error on writing to serial " + err);
+          }
+          if (res !== undefined) {
+            console.log("successfully wrote " + res + " characters");
+          }
+        });
+
+      socket.on("t",function(data,flag) {
+        console.log("web client requests stop continuous scan");
+        serialPort.write("t\n", function(err, res) {
+          if (err !== undefined) {
+            console.log("error on writing to serial " + err);
+          }
+          if (res !== undefined) {
+            console.log("successfully wrote " + res + " characters");
+          }
+        })
+      });
+
       serialPort.on("data", function(data) {
         console.log("data from board");
         console.log(data);
         socket.emit("info",data);
       });
+    });
     }
   });
 };

@@ -75,11 +75,36 @@ socket.on('info', function (data) {
     // draw buttons nicely
     
     var getDataButton = document.createElement("button");
-    getDataButton.innerHTML = "Get Data";
+    getDataButton.id = "scanOnce";
+    getDataButton.innerHTML = "Scan once";
     getDataButton.className = "btn btn-secondary";
     getDataButton.addEventListener("click", function() {
       console.log("client asks for data");
-      socket.emit("start","hello");
+      socket.emit("d","hello");
+    });
+
+    var continuousButton = document.createElement("button");
+    continuousButton.id = "scanCon";
+    continuousButton.innerHTML = "Scan continuously";
+    continuousButton.className = "btn btn-secondary";
+    continuousButton.addEventListener("click", function() {
+      console.log("client asks for continuous scan");
+      socket.emit("s","hello");
+      $("#scanOnce").toggle();
+      $("#scanCon").toggle();
+      $("#stopScan").toggle();
+    });
+
+    var stopButton = document.createElement("button");
+    stopButton.id = "stopScan";
+    stopButton.innerHTML = "Stop scan";
+    stopButton.className = "btn btn-secondary";
+    stopButton.addEventListener("click", function() {
+      console.log("client says stop scan");
+      socket.emit("t","data");
+      $("#scanOnce").toggle();
+      $("#scanCon").toggle();
+      $("#stopScan").toggle();
     });
 
     var clearBoardButton = document.createElement("button");
@@ -92,7 +117,11 @@ socket.on('info', function (data) {
     var controlsDiv = document.getElementsByClassName("controls")[0];
     controlsDiv.appendChild(getDataButton);
     controlsDiv.appendChild(clearBoardButton);
-  //var fakejson = "{\"vddval\":3.3,\"selected\":41,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
+    controlsDiv.appendChild(continuousButton);
+    controlsDiv.appendChild(stopButton);
+    $("#stopScan").toggle();
+  //var fake
+  json = "{\"vddval\":3.3,\"selected\":41,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
   var fakeJson = "{\"rowsLeft\":[2.3,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"], \"rowsRight\":[\"f\",\"f\",\"f\",\"f\",3.2,\"f\",\"f\",\"f\",\"f\",\"f\",1.45,\"f\",\"f\",0.0,\"f\",\"f\",0.0,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"]}";
   myBreadboard.drawBreadboard(JSON.parse(fakeJson));
 //  drawGraph([1.4,1.5,1.6,1.8,1.8,1.8,1.7,1.4,1.4,1.4,1.4,1.4]);
