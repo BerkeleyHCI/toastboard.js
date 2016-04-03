@@ -65,6 +65,18 @@ function openSocket(socket) {
         });
       });
 
+      socket.on("o",function(data,flag) {
+        console.log("asking for graph of row " + data);
+        serialPort.write("O: " + data + "\n", function(err,res) {
+          if (err !== undefined) {
+            console.log("error on writing to serial " + err);
+          }
+          if (res !== undefined) {
+            console.log("successfully wrote " + res + " characters");
+          }
+        });
+      });
+
       serialPort.on("data", function(data) {
         console.log("data from board");
         console.log(data);

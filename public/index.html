@@ -33,19 +33,24 @@
     </div>
 <div id="breadboard">
   <svg width="500" height="300" id="board" />
+
 </div>
+  <div id="clearButtonDiv"></div>
 <div id="timestamp"></div>
 </div>
 <div class="col-xs-6">
-<!--
+
   <div class="rightside">
-        <div id="selected-row"></div> -->
-    <!-- <p>Selected row: Row 32, 1.1V</p> -->
-    <!--
+  
+        <div id="selected-row"></div>
+
+     <p>Selected row: Row 32, 1.1V</p>
+     
     <div id="graph-div">
-      <svg width="500" height="300" id="graphviz" />
+      <svg width="500" height="300" id="graphviz"></svg>
     </div>
-  </div> -->
+    
+  </div>
 </div>
 </div>
 </div>
@@ -93,6 +98,7 @@ socket.on('info', function (data) {
       $("#scanOnce").toggle();
       $("#scanCon").toggle();
       $("#stopScan").toggle();
+      $("#oscillo").toggle();
     });
 
     var stopButton = document.createElement("button");
@@ -105,6 +111,7 @@ socket.on('info', function (data) {
       $("#scanOnce").toggle();
       $("#scanCon").toggle();
       $("#stopScan").toggle();
+      $("#oscillo").toggle();
     });
 
     var clearBoardButton = document.createElement("button");
@@ -114,17 +121,33 @@ socket.on('info', function (data) {
       myBreadboard.drawEmptyBreadboard();
     });
 
+    var oscilloButton = document.createElement("button");
+    oscilloButton.innerHTML = "Graph row";
+    oscilloButton.className = "btn btn-secondary";
+    oscilloButton.id = "oscillo";
+    oscilloButton.addEventListener("click", function() {
+      socket.emit("o",23); // hardcoded to row 23
+      $("#scanOnce").toggle();
+      $("#scanCon").toggle();
+      $("#stopScan").toggle();
+      $("#oscillo").toggle();
+    });
+
     var controlsDiv = document.getElementsByClassName("controls")[0];
     controlsDiv.appendChild(getDataButton);
-    controlsDiv.appendChild(clearBoardButton);
     controlsDiv.appendChild(continuousButton);
+    controlsDiv.appendChild(oscilloButton);
     controlsDiv.appendChild(stopButton);
+
+    var belowBoardDiv = document.getElementById("clearButtonDiv");
+    belowBoardDiv.appendChild(clearBoardButton);
+
     $("#stopScan").toggle();
   //var fake
   json = "{\"vddval\":3.3,\"selected\":41,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
   var fakeJson = "{\"rowsLeft\":[2.3,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"], \"rowsRight\":[\"f\",\"f\",\"f\",\"f\",3.2,\"f\",\"f\",\"f\",\"f\",\"f\",1.45,\"f\",\"f\",0.0,\"f\",\"f\",0.0,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"]}";
   myBreadboard.drawBreadboard(JSON.parse(fakeJson));
-//  drawGraph([1.4,1.5,1.6,1.8,1.8,1.8,1.7,1.4,1.4,1.4,1.4,1.4]);
+  drawGraph([1.4,1.5,1.6,1.8,1.8,1.8,1.7,1.4,1.4,1.4,1.4,1.4]);
   });
 </script>
 
