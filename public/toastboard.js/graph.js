@@ -1,26 +1,45 @@
 Graph = function() {
-
+  this.readings = [];
+  this.voltageData = [];
+  this.row;
+  this.side;
 };
 
-function processReadings(readings) {
-  var data = [];
-  readings.forEach(function(voltage,i) {
-    data.push({voltage:voltage,second:i*0.05});
-  });
-  console.log(data);
-  return data;
+Graph.prototype.clear = function() {
+  this.readings = [];
+  this.voltageData = [];
 }
 
-function drawGraph(readings) {
+Graph.prototype.addData = function(data) {
+  var self = this;
+  console.log(this.readings);
+  data.forEach(function(d) {
+    self.readings.push(d);
+  });
+};
+
+Graph.prototype.processReadings = function() {
+  var self = this;
+  this.readings.forEach(function(voltage,i) {
+    self.voltageData.push({voltage:voltage,second:i*0.004}); // remember that we need to match this to reality
+  });
+};
+
+Graph.prototype.drawGraph = function() {
+
+//  d3.select("#graphviz").remove();
   d3.select("#graphxaxis").remove();
   d3.select("#graphyaxis").remove();
   d3.select("#graphpath").remove();
   // var readings = [{second:1,voltage:1.1},{second:2,voltage:1.5},{second:3,voltage:1.6},{second:4,voltage:1.7},{second:5,voltage:1.6},
   //                {second:6,voltage:1.4},{second:7,voltage:1.4},{second:8,voltage:1.1}];
-  if (readings.length > 4) {
-    console.log("we draw truncated graph");
-    readings = readings.slice(3);
-  var data = processReadings(readings);
+
+  this.processReadings();
+
+  var data = this.voltageData;
+
+  if (data.length > 4) {
+    // wait til we have enough to look at
 
 // note this selects svg node not div like drawboard. kind of weird
   var vis = d3.select('#graphviz'),
@@ -82,8 +101,10 @@ var lineFunc = d3.svg.line()
   .attr('stroke', 'blue')
   .attr('stroke-width', 2)
   .attr('fill', 'none');
+
 } else {
-  console.log("we draw no graph");
+  console.log("not enough to graph yet");
 }
+
 };
 

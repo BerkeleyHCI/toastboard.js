@@ -27,9 +27,22 @@
     <div class="row">
     <div class="col-xs-6">
     <div class="controls" style="margin: 15px">
-    <!--
-    <button type="button" class="btn btn-secondary">Get Toastboard Data</button>
-    <button type="button" class="btn btn-secondary">Clear board</button> -->
+    <button type="button" class="btn btn-secondary" id="scanOnce">Scan once</button>
+    <button type="button" class="btn btn-secondary" id="scanCon">Scan continuously</button>
+    <button type="button" class="btn btn-secondary" id="stopScan">Stop scan</button>
+    <form class="form-inline" id="graphForm">
+    <div class="form-group">
+    <div class="input-group">
+      <div class="input-group-addon">Row</div>
+      <input type="text" class="form-control" id="rowToGraph" placeholder="Number">
+      <select class="form-control" id="sideToGraph">
+        <option>Left</option>
+        <option>Right</option>
+      </select>
+      </div>
+      </div>
+      <button type="submit" class="btn btn-secondary">Graph row</button>
+    </form>
     </div>
 <div id="breadboard">
   <svg width="500" height="300" id="board" />
@@ -57,13 +70,29 @@
 
 <script type="text/javascript">
 var socket = io.connect(); 
+
 var getTimeStampString = function() {
   var now = new Date();
   var date = [ now.getMonth() + 1, now.getDate(), now.getFullYear() ];
   var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
   return date.join("/") + " " + time.join(":")
 };
+
+var fullRowToRowAndSide = function(row) {
+  var r;
+  var s;
+  if (row < 24) {
+    r = row + 1;
+    s = "Left";
+  } else {
+    r = row - 23;
+    s = "Right";
+  }
+  return [r,s];
+};
+
 var myBreadboard = new Breadboard();
+var myGraph = new Graph();
 
 // if we get an "info" emit from the socket server then console.log the data we receive
 socket.on('info', function (data) {
@@ -72,8 +101,11 @@ socket.on('info', function (data) {
   var json = JSON.parse(data);
   console.log(json);
   if (json.oscillo) {
-    drawGraph(json.oscillo.data);
-    $("#selected-row").html("<p>Selected row " + json.oscillo.row + "<\p>");
+    var rands = fullRowToRowAndSide(json.oscillo.row);
+    $("#graphviz").html("");
+    myGraph.addData(json.oscillo.data);
+    $("#selected-row").html("<p>Selected row " + rands[0] + " " + rands[1] + "<\p>");
+    myGraph.drawGraph();
   } else if (json.rowsLeft) {
     myBreadboard.drawBreadboard(json);
     var timestring = getTimeStampString();
@@ -82,10 +114,18 @@ socket.on('info', function (data) {
 
 });
 
+var flipButtonStatus = function() {
+  $("#scanOnce").toggle();
+  $("#scanCon").toggle();
+  $("#stopScan").toggle();
+  $("#oscillo").toggle();
+  $("#graphForm").toggle();
+};
+
   $(document).ready(function() {
     // draw buttons nicely
     
-    var getDataButton = document.createElement("button");
+    var getDataButton = document.getElementById("scanOnce");
     getDataButton.id = "scanOnce";
     getDataButton.innerHTML = "Scan once";
     getDataButton.className = "btn btn-secondary";
@@ -94,30 +134,24 @@ socket.on('info', function (data) {
       socket.emit("d","hello");
     });
 
-    var continuousButton = document.createElement("button");
+    var continuousButton = document.getElementById("scanCon");
     continuousButton.id = "scanCon";
     continuousButton.innerHTML = "Scan continuously";
     continuousButton.className = "btn btn-secondary";
     continuousButton.addEventListener("click", function() {
       console.log("client asks for continuous scan");
       socket.emit("s","hello");
-      $("#scanOnce").toggle();
-      $("#scanCon").toggle();
-      $("#stopScan").toggle();
-      $("#oscillo").toggle();
+      flipButtonStatus();
     });
 
-    var stopButton = document.createElement("button");
+    var stopButton = document.getElementById("stopScan");
     stopButton.id = "stopScan";
     stopButton.innerHTML = "Stop scan";
     stopButton.className = "btn btn-secondary";
     stopButton.addEventListener("click", function() {
       console.log("client says stop scan");
       socket.emit("t","data");
-      $("#scanOnce").toggle();
-      $("#scanCon").toggle();
-      $("#stopScan").toggle();
-      $("#oscillo").toggle();
+      flipButtonStatus();
     });
 
     var clearBoardButton = document.createElement("button");
@@ -127,22 +161,29 @@ socket.on('info', function (data) {
       myBreadboard.drawEmptyBreadboard();
     });
 
-    var oscilloButton = document.createElement("button");
-    oscilloButton.innerHTML = "Graph row";
-    oscilloButton.className = "btn btn-secondary";
-    oscilloButton.id = "oscillo";
-    oscilloButton.addEventListener("click", function() {
-      socket.emit("o",23); // hardcoded to row 23
-      $("#scanOnce").toggle();
-      $("#scanCon").toggle();
-      $("#stopScan").toggle();
-      $("#oscillo").toggle();
+    $("#graphForm").submit(function(e) {
+      e.preventDefault();
+      var row = $("input#rowToGraph").val();
+      var side = $("#sideToGraph").val();
+      var rowString = "";
+      row -= 1;
+      if (side == "Right") {
+        row +=24;
+      }
+      if (row < 10) {
+        rowString = "0" + row;
+      } else {
+        rowString = "" + row;
+      }
+      console.log("graph row " + rowString + " on side " + side);
+      flipButtonStatus();
+      myGraph.clear();
+      socket.emit("o",rowString);
     });
 
     var controlsDiv = document.getElementsByClassName("controls")[0];
     controlsDiv.appendChild(getDataButton);
     controlsDiv.appendChild(continuousButton);
-    controlsDiv.appendChild(oscilloButton);
     controlsDiv.appendChild(stopButton);
 
     var belowBoardDiv = document.getElementById("clearButtonDiv");
@@ -153,7 +194,7 @@ socket.on('info', function (data) {
   json = "{\"vddval\":3.3,\"selected\":41,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
   var fakeJson = "{\"rowsLeft\":[2.3,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"], \"rowsRight\":[\"f\",\"f\",\"f\",\"f\",3.2,\"f\",\"f\",\"f\",\"f\",\"f\",1.45,\"f\",\"f\",0.0,\"f\",\"f\",0.0,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"]}";
   myBreadboard.drawBreadboard(JSON.parse(fakeJson));
-  drawGraph([1.4,1.5,1.6,1.8,1.8,1.8,1.7,1.4,1.4,1.4,1.4,1.4]);
+
   });
 </script>
 
