@@ -44,7 +44,7 @@
   
         <div id="selected-row"></div>
 
-     <p>Selected row: Row 32, 1.1V</p>
+
      
     <div id="graph-div">
       <svg width="500" height="300" id="graphviz"></svg>
@@ -71,9 +71,15 @@ socket.on('info', function (data) {
   console.log(data);
   var json = JSON.parse(data);
   console.log(json);
-  myBreadboard.drawBreadboard(json);
-  var timestring = getTimeStampString();
-  $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
+  if (json.oscillo) {
+    drawGraph(json.oscillo.data);
+    $("#selected-row").html("<p>Selected row " + json.oscillo.row + "<\p>");
+  } else if (json.rowsLeft) {
+    myBreadboard.drawBreadboard(json);
+    var timestring = getTimeStampString();
+    $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
+  }
+
 });
 
   $(document).ready(function() {
