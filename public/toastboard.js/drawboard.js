@@ -56,7 +56,7 @@ Breadboard.prototype.processJson = function(json) {
       if (json.rowsLeft[i] != "f") {
         var newRow = {};
         var index = "" + i; // WAT
-        newRow[index] = json.rowsLeft[i];
+        newRow[index] = thresholdVoltage(json.rowsLeft[i]);
         this.rowData.push(newRow);
       }
     }
@@ -70,7 +70,7 @@ Breadboard.prototype.processJson = function(json) {
         var newRow = {};
         var int_index = i + 24;
         var index = "" + int_index; // again WAT
-        newRow[index] = json.rowsRight[i];
+        newRow[index] = thresholdVoltage(json.rowsRight[i]);
         this.rowData.push(newRow);      
       }
     }
@@ -82,6 +82,16 @@ Breadboard.prototype.processJson = function(json) {
     return true;
   } else {
     return false;
+  }
+};
+
+var thresholdVoltage = function(voltage) {
+  if (voltage < 0.100) {
+    return 0.0;
+  } else if (voltage > 3.0) {
+    return 3.3;
+  } else {
+    return voltage;
   }
 };
 
