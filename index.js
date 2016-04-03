@@ -67,7 +67,7 @@ function openSocket(socket) {
 
       socket.on("o",function(data,flag) {
         console.log("asking for graph of row " + data);
-        serialPort.write("O: " + data + "\n", function(err,res) {
+        serialPort.write("o," + data + "\n", function(err,res) {
           if (err !== undefined) {
             console.log("error on writing to serial " + err);
           }
