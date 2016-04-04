@@ -309,13 +309,40 @@ var getRowRect = function(rowIndex,breadboard) {
   return getRectAttr(firstPin,lastPin);
 };
 
+var getVoltageColor = function(voltage) {
+  var color;
+  if (voltage >= 3.1) {
+    color = "red";
+  } else if (voltage >= 2.6) {
+    color = "firebrick";
+  } else if (voltage >= 2.3) {
+    color = "orangered";
+  } else if (voltage >= 2.0) {
+    color = "gold";
+  } else if (voltage >= 1.6) {
+    color = "forestgreen";
+  } else if (voltage >= 1.3) {
+    color = "teal";
+  } else if (voltage >= 1.0) {
+    color = "cornflowerblue";
+  } else if (voltage >= 0.6) {
+    color = "midnightblue";
+  } else if (voltage >= 0.3) {
+    color = "indigo"; 
+  } else if (voltage >= 0.1) {
+    color = "purple";
+  } else {
+    color = "gray";
+  }
+  return color;
+}
+
 var hashToVoltageAttr = function(hash,breadboard) {
-  var colorArray = ["orange","yellow","green","blue","purple","brown","blueviolet","cornflowerblue","crimson",
-"forestgreen","deeppink","indigo","lightseagreen","mediumorchid","orangered","yellowgreen","gold","teal",
-"firebrick","midnightblue"];
+
   //var self = this;
   var voltageAttr = [];
   Object.keys(hash).forEach(function(hashKey) {
+    /*
     var color;
     if (hashKey == 0) {
       color = groundColor;
@@ -326,11 +353,12 @@ var hashToVoltageAttr = function(hash,breadboard) {
       color = colorArray[colorIndex];
       colorArray.splice(colorIndex,1);
     }
+    */
     hash[hashKey].forEach(function(row) {
       var newVoltage = getRowRect(row,breadboard);
       newVoltage.r = row;
       newVoltage.v = hashKey;
-      newVoltage.color = color
+      newVoltage.color = getVoltageColor(hashKey);
       voltageAttr.push(newVoltage);
     });
   });
