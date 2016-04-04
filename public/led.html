@@ -90,6 +90,13 @@ socket.on('info', function (data) {
   console.log("drew it!");  
 });
 
+var saveComponent = function(comp) {
+  var jstate = sessionStorage.getItem("boardstate");
+  var state = JSON.parse(jstate);
+  state.components.push(comp.serialize());
+  sessionStorage.setItem("boardstate",JSON.stringify(state));
+}
+
 $("form").submit(function(e) {
   e.preventDefault();
   console.log("okay form submitted");
@@ -108,41 +115,26 @@ $("form").submit(function(e) {
   if (component_type == "resistor") {
     var r = new Resistor(ledBreadboard,startrow,0,endrow,0);
     r.draw();
+    saveComponent(r);
   } else if (component_type == "diode") {
     var d = new Diode(ledBreadboard,startrow,0,endrow,0);
     d.draw();
+    saveComponent(d);
   } else if (component_type == "wire") {
     var w = new Wire(ledBreadboard,startrow,0,endrow,0);
     w.draw();
+    saveComponent(w);
   } else if (component_type == "component") {
     var c = new Component(ledBreadboard,startrow,0,endrow,0);
     c.draw();
+    saveComponent(c);
   }
 });
 
   $(document).ready(function() {
     //ledBreadboard.drawBreadboard([]);
     ledBreadboard.drawEmptyBreadboard();
-    /*
-    var sensor = new Sensor(ledBreadboard,25);
-    sensor.draw();
-
-    var led = new Diode(ledBreadboard,32,3,38,3);
-    led.draw();
-
-    var resistor = new Resistor(ledBreadboard,20,0,47,1);
-    resistor.draw();
-
-    var wire = new Wire(ledBreadboard,2,2,5,2);
-    wire.draw();
-    var wire2 = new Wire(ledBreadboard,15,3,18,4);
-    wire2.draw();
-    var wire3 =  new Wire(ledBreadboard,14,4,41,0);
-    wire3.draw();
-
-    var component = new Component(ledBreadboard,0,7,0,13,0);
-    component.draw();
-    */
+    sessionStorage.setItem("boardstate",JSON.stringify({"components":[]}));
   });
 </script>
 

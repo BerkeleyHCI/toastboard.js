@@ -28,6 +28,21 @@ Component.prototype.draw = function() {
 
 };
 
+Component.prototype.getId = function() {
+  return "cr" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+}
+
+Component.prototype.serialize = function() {
+  var c = {};
+  c["id"] = this.getId();
+  c["type"] = "component";
+  c["startRow"] = this.startRow;
+  c["startPinNum"] = this.startPinNum;
+  c["endRow"] = this.endRow;
+  c["endPinNum"] = this.endPinNum;
+  return JSON.stringify(c);
+}
+
 var Wire = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.breadboard = breadboard;
   this.startRow = startRow;
@@ -49,6 +64,21 @@ Wire.prototype.draw = function() {
     .attr("stroke-width",4)
     .attr("stroke","black");
 };
+
+Wire.prototype.getId = function() {
+  return "wr" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+}
+
+Wire.prototype.serialize = function() {
+  var c = {};
+  c["id"] = this.getId();
+  c["type"] = "wire";
+  c["startRow"] = this.startRow;
+  c["startPinNum"] = this.startPinNum;
+  c["endRow"] = this.endRow;
+  c["endPinNum"] = this.endPinNum;
+  return JSON.stringify(c);
+}
 
 // should subclass these in OOP-ish style, but whatever....
 var Resistor = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
@@ -125,6 +155,21 @@ Resistor.prototype.draw = function() {
     .attr("fill", "none");
 };
 
+Resistor.prototype.getId = function() {
+  return "rr" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+}
+
+Resistor.prototype.serialize = function() {
+  var c = {};
+  c["id"] = this.getId();
+  c["type"] = "resistor";
+  c["startRow"] = this.startRow;
+  c["startPinNum"] = this.startPinNum;
+  c["endRow"] = this.endRow;
+  c["endPinNum"] = this.endPinNum;
+  return JSON.stringify(c);
+}
+
 var Diode = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.breadboard = breadboard;
   this.startRow = startRow;
@@ -182,6 +227,21 @@ Diode.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke","black");
 };
+
+Diode.prototype.getId = function() {
+  return "dr" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+}
+
+Diode.prototype.serialize = function() {
+  var c = {};
+  c["id"] = this.getId();
+  c["type"] = "diode";
+  c["startRow"] = this.startRow;
+  c["startPinNum"] = this.startPinNum;
+  c["endRow"] = this.endRow;
+  c["endPinNum"] = this.endPinNum;
+  return JSON.stringify(c);
+}
 
 var Sensor = function(breadboard,startRow) {
   this.breadboard = breadboard;
