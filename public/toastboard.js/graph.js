@@ -10,31 +10,16 @@ Graph.prototype.clear = function() {
   this.voltageData = [];
 }
 
-Graph.prototype.addData = function(data) {
-  var self = this;
-  console.log(this.readings);
-  data.forEach(function(d) {
-    self.readings.push(d);
-  });
-};
-
-Graph.prototype.processReadings = function() {
-  var self = this;
-  this.readings.forEach(function(voltage,i) {
-    self.voltageData.push({voltage:voltage,second:i*0.004}); // remember that we need to match this to reality
-  });
+Graph.prototype.addData = function(reading) {
+  this.readings.push(reading.data); // probably not needed
+  this.voltageData.push({voltage:reading.data[0],second:reading.time[0]})
 };
 
 Graph.prototype.drawGraph = function() {
 
-//  d3.select("#graphviz").remove();
   d3.select("#graphxaxis").remove();
   d3.select("#graphyaxis").remove();
   d3.select("#graphpath").remove();
-  // var readings = [{second:1,voltage:1.1},{second:2,voltage:1.5},{second:3,voltage:1.6},{second:4,voltage:1.7},{second:5,voltage:1.6},
-  //                {second:6,voltage:1.4},{second:7,voltage:1.4},{second:8,voltage:1.1}];
-
-  this.processReadings();
 
   var data = this.voltageData;
 
@@ -56,21 +41,25 @@ Graph.prototype.drawGraph = function() {
     }), d3.max(data, function(d) {
       return d.second;
     })]),
-    yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(data, function(d) {
+  // put voltages on absolute 0.0 - 3.3 range for now
+  /*
+  yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(data, function(d) {
       return d.voltage;
     }), d3.max(data, function(d) {
       return d.voltage;
     })]),
-    xAxis = d3.svg.axis()
+    */
+  yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0.0,3.3]),
+  xAxis = d3.svg.axis()
       .scale(xRange)
       .tickSize(5)
-      .tickFormat(function(d) { return d + "s";}),
-    yAxis = d3.svg.axis()
+      .tickFormat(function(d) { return d + "ms";}),
+  yAxis = d3.svg.axis()
       .scale(yRange)
       .ticks(5)
       .tickSize(5)
       .orient('left')
-      .tickFormat(function(d) { return d.toFixed(3) + "V";});
+      .tickFormat(function(d) { return d.toFixed(1) + "V";});
 
 
   vis.append('svg:g')
@@ -79,7 +68,7 @@ Graph.prototype.drawGraph = function() {
   .attr("id","graphxaxis")
   .call(xAxis);
  
-vis.append('svg:g')
+  vis.append('svg:g')
   .attr('class', 'y axis')
   .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
   .attr("id","graphyaxis")

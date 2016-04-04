@@ -26,6 +26,7 @@
   <div class="jumbotron">
     <div class="row">
     <div class="col-xs-6">
+    
     <div class="controls" style="margin: 15px">
     <button type="button" class="btn btn-secondary" id="scanOnce">Scan once</button>
     <button type="button" class="btn btn-secondary" id="scanCon">Scan continuously</button>
@@ -44,12 +45,13 @@
       <button type="submit" class="btn btn-secondary">Graph row</button>
     </form>
     </div>
+
 <div id="breadboard">
   <svg width="500" height="300" id="board" />
 
 </div>
   <div id="clearButtonDiv"></div>
-<div id="timestamp"></div>
+<div id="timestamp"></div> 
 </div>
 <div class="col-xs-6">
 
@@ -103,7 +105,7 @@ socket.on('info', function (data) {
   if (json.oscillo) {
     var rands = fullRowToRowAndSide(json.oscillo.row);
     $("#graphviz").html("");
-    myGraph.addData(json.oscillo.data);
+    myGraph.addData(json.oscillo);
     $("#selected-row").html("<p>Selected row " + rands[0] + " " + rands[1] + "<\p>");
     myGraph.drawGraph();
   } else if (json.rowsLeft) {
@@ -190,10 +192,46 @@ var flipButtonStatus = function() {
     belowBoardDiv.appendChild(clearBoardButton);
 
     $("#stopScan").toggle();
-  //var fake
-  json = "{\"vddval\":3.3,\"selected\":41,\"rows\":[{\"0\":3.3}, {\"2\":3.3}, {\"6\":3.3}, {\"17\":0},{\"23\":0}, {\"30\":1.1},{\"32\":1.1},{\"40\":2.0}, {\"43\":2.0}]}";
+
   var fakeJson = "{\"rowsLeft\":[2.3,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"], \"rowsRight\":[\"f\",\"f\",\"f\",\"f\",3.2,\"f\",\"f\",\"f\",\"f\",\"f\",1.45,\"f\",\"f\",0.0,\"f\",\"f\",0.0,\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"]}";
   myBreadboard.drawBreadboard(JSON.parse(fakeJson));
+/*
+  var a = ['{"oscillo": { "data": [0.2], "time": [4] }}',
+   '{"oscillo": { "data": [0.2], "time": [5 ]}}',
+   '{"oscillo": { "data": [0.25], "time": [6]}}',
+   '{"oscillo": { "data": [0.2], "time": [8 ]}}',
+   '{"oscillo": { "data": [0.7], "time": [9 ]}}',
+   '{"oscillo": { "data": [0.7], "time": [12] }}',
+   '{"oscillo": { "data": [0.7], "time": [14] }}',
+   '{"oscillo": { "data": [0.8], "time": [15] }}',
+   '{"oscillo": { "data": [0.7], "time": [16] }}',
+   '{"oscillo": { "data": [0.7], "time": [18] }}',
+   '{"oscillo": { "data": [0.5], "time": [19] }}',
+   '{"oscillo": { "data": [0.9], "time": [21] }}',
+   '{"oscillo": { "data": [1.0], "time": [22] }}',
+   '{"oscillo": { "data": [1.0], "time": [25] }}',
+   '{"oscillo": { "data": [1.0], "time": [26] }}',
+   '{"oscillo": { "data": [1.2], "time": [27] }}',
+   '{"oscillo": { "data": [1.1], "time": [30] }}',
+   '{"oscillo": { "data": [1.2], "time": [31] }}',
+   '{"oscillo": { "data": [1.5], "time": [32] }}',
+   '{"oscillo": { "data": [2.0], "time": [33] }}',
+   '{"oscillo": { "data": [2.0], "time": [35] }}',
+   '{"oscillo": { "data": [1.8], "time": [36] }}',
+   '{"oscillo": { "data": [1.8], "time": [37] }}',
+   '{"oscillo": { "data": [1.0], "time": [38] }}',
+   '{"oscillo": { "data": [0.7], "time": [39] }}',
+   '{"oscillo": { "data": [0.5], "time": [40] }}'];
+
+   a.forEach(function(d) {
+    var j = JSON.parse(d);
+    myGraph.addData(j.oscillo);
+   });
+   console.log("fake graph info");
+   console.log(myGraph.voltageData);
+   myGraph.drawGraph();
+*/
+
 
   });
 </script>
