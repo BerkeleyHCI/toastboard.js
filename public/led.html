@@ -93,6 +93,19 @@ socket.on('info', function (data) {
 });
 */
 
+var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,endpin) {
+  if (component_type == "resistor") {
+    var c = new Resistor(breadboard,startrow,startpin,endrow,endpin);
+  } else if (component_type == "diode") {
+    var c = new Diode(breadboard,startrow,startpin,endrow,endpin);
+  } else if (component_type == "wire") {
+    var c = new Wire(breadboard,startrow,startpin,endrow,endpin);
+  } else if (component_type == "component") {
+    var c = new Component(breadboard,startrow,startpin,endrow,endpin);
+  }
+  return c;
+};
+
 var saveComponent = function(comp) {
   var jstate = sessionStorage.getItem("boardstate");
   var state = JSON.parse(jstate);
@@ -123,33 +136,22 @@ $("form").submit(function(e) {
     endrow += 24;
   }
   if (action == "add") {
-    if (component_type == "resistor") {
-      var r = new Resistor(ledBreadboard,startrow,startpin,endrow,endpin);
-      r.draw();
-      saveComponent(r);
-    } else if (component_type == "diode") {
-      var d = new Diode(ledBreadboard,startrow,startpin,endrow,endpin);
-      d.draw();
-      saveComponent(d);
-    } else if (component_type == "wire") {
-      var w = new Wire(ledBreadboard,startrow,startpin,endrow,endpin);
-      w.draw();
-      saveComponent(w);
-    } else if (component_type == "component") {
-      var c = new Component(ledBreadboard,startrow,startpin,endrow,endpin);
-      c.draw();
-      saveComponent(c);
-    }
+    var c = makeComponent(ledBreadboard,component_type,startrow,startpin,endrow,endpin);
+    c.draw();
+    saveComponent(c);
   } else if (action == "delete") {
     var removeId = makeComponentId(component_type,startrow,startpin,endrow,endpin);
     console.log("we will delete " + removeId);
     var jboardstate = sessionStorage.getItem("boardstate");
     var boardstate = JSON.parse(jboardstate);
     var newcomp = [];
+    ledBreadboard.drawEmptyBreadboard();
     boardstate.components.forEach(function(d) {
       var c = JSON.parse(d);
       if (c.id != removeId) {
         newcomp.push(d);
+        var cobj = makeComponent(ledBreadboard,c.type,c.startRow,c.startPinNum,c.endRow,c.endPinNum);
+        cobj.draw();
       }
     });
     boardstate.components = newcomp;
