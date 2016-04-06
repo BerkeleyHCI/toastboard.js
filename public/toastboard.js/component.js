@@ -1,3 +1,28 @@
+var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,endpin) {
+  if (component_type == "resistor") {
+    var c = new Resistor(breadboard,startrow,startpin,endrow,endpin);
+  } else if (component_type == "diode") {
+    var c = new Diode(breadboard,startrow,startpin,endrow,endpin);
+  } else if (component_type == "wire") {
+    var c = new Wire(breadboard,startrow,startpin,endrow,endpin);
+  } else if (component_type == "component") {
+    var c = new Component(breadboard,startrow,startpin,endrow,endpin);
+  }
+  return c;
+};
+
+var saveComponent = function(comp) {
+  var jstate = sessionStorage.getItem("boardstate");
+  var state = JSON.parse(jstate);
+  state.components.push(comp.serialize());
+  sessionStorage.setItem("boardstate",JSON.stringify(state));
+};
+
+var makeComponentId = function(type,startrow,startpin,endrow,endpin) {
+  return type[0] + "r" + startrow + "p" + startpin + "r" + endrow + "p" + endpin;
+};
+
+
 var Component = function(breadboard, startRow, startPinNum, endRow, endPinNum) {
   this.breadboard = breadboard;
   this.startRow = startRow;
