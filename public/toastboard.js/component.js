@@ -242,8 +242,11 @@ Resistor.prototype.serialize = function() {
 }
 
 Resistor.prototype.test = function(voltages) {
-  return null;
-}
+  if (voltages[this.startRow] == voltages[this.endRow]) {
+    return "There is no current through the resistor connected to rows " + getDisplayRow(this.startRow,this.startPinNum) +
+      " and " + getDisplayRow(this.endRow,this.endPinNum);
+  }
+};
 
 var Diode = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.breadboard = breadboard;
