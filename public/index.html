@@ -153,6 +153,7 @@ socket.on('info', function (data) {
     myGraph.drawGraph();
   } else if (json.rowsLeft) {
     myBreadboard.drawBreadboard(json);
+    redrawComponents(myBreadboard);
     var timestring = getTimeStampString();
     $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
   }
@@ -275,20 +276,11 @@ var enableGraphingForm = function() {
       } else if (action == "delete") {
         var removeId = makeComponentId(component_type,startrow,startpin,endrow,endpin);
         console.log("we will delete " + removeId);
-        var boardstate = JSON.parse(sessionStorage.getItem("boardstate"));
-        var newcomp = [];
+
         var svg = myBreadboard.drawEmptyBreadboard();
         myBreadboard.redrawBoard(svg);
-        boardstate.components.forEach(function(d) {
-          var c = JSON.parse(d);
-            if (c.id != removeId) {
-              newcomp.push(d);
-              var cobj = makeComponent(myBreadboard,c.type,c.startRow,c.startPinNum,c.endRow,c.endPinNum);
-              cobj.draw();
-            }
-        });
-        boardstate.components = newcomp;
-        sessionStorage.setItem("boardstate",JSON.stringify(boardstate));
+        redrawComponents(myBreadboard,removeId);
+
       }
     });
 

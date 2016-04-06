@@ -22,6 +22,20 @@ var makeComponentId = function(type,startrow,startpin,endrow,endpin) {
   return type[0] + "r" + startrow + "p" + startpin + "r" + endrow + "p" + endpin;
 };
 
+var redrawComponents = function(breadboard,removeId) {
+  var boardstate = JSON.parse(sessionStorage.getItem("boardstate"));
+  var newcomp = [];
+  boardstate.components.forEach(function(d) {
+    var c = JSON.parse(d);
+    if (c.id != removeId) {
+      newcomp.push(d);
+      var cobj = makeComponent(breadboard,c.type,c.startRow,c.startPinNum,c.endRow,c.endPinNum);
+      cobj.draw();
+    }
+  });
+  boardstate.components = newcomp;
+  sessionStorage.setItem("boardstate",JSON.stringify(boardstate));
+};
 
 var Component = function(breadboard, startRow, startPinNum, endRow, endPinNum) {
   this.breadboard = breadboard;
