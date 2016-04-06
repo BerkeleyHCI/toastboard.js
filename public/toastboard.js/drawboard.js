@@ -16,6 +16,7 @@ function Breadboard() {
   this.receivedRight = false;
   this.drawCallback = null; // what is this callback thing for?
 
+  this.rawVoltages = [];
   this.voltageAttr = null;
   this.connections = null;
   this.labels = null;
@@ -56,12 +57,14 @@ Breadboard.prototype.processJson = function(json) {
       if (json.rowsLeft[i] != "f") {
         var newRow = {};
         var index = "" + i; // WAT
-        newRow[index] = thresholdVoltage(json.rowsLeft[i]);
+        var v = thresholdVoltage(json.rowsLeft[i]);
+        newRow[index] = v;
+        this.rawVoltages[i] = v;
         this.rowData.push(newRow);
+      } else {
+        this.rawVoltages[i] = json.rowsLeft[i];
       }
     }
-    console.log("handled left side");
-    console.log(this.rowData);
   }
   if (json.rowsRight) {
     this.receivedRight = true;
@@ -70,19 +73,14 @@ Breadboard.prototype.processJson = function(json) {
         var newRow = {};
         var int_index = i + 24;
         var index = "" + int_index; // again WAT
-        newRow[index] = thresholdVoltage(json.rowsRight[i]);
+        var v = thresholdVoltage(json.rowsRight[i]);
+        this.rawVoltages[int_index] = v;
+        newRow[index] = v;
         this.rowData.push(newRow);      
       }
     }
   }
-  // make sure we have both sides
-  if (this.receivedLeft && this.receivedRight) {
-    this.receivedLeft = false;
-    this.receivedRight = false;
-    return true;
-  } else {
-    return false;
-  }
+  return true;
 };
 
 var thresholdVoltage = function(voltage) {

@@ -101,7 +101,7 @@
     <button type="button" class="btn btn-secondary" id="stopScan">Stop scan</button>
 
     </div>
-
+<div id="failedTests"></div>
 <div id="breadboard">
   <svg width="500" height="300" id="board" />
 
@@ -180,6 +180,12 @@ socket.on('info', function (data) {
   } else if (json.rowsLeft) {
     myBreadboard.drawBreadboard(json);
     redrawComponents(myBreadboard);
+    var failedTests = testComponents(myBreadboard);
+    $("#failedTests").html("");
+    failedTests.forEach(function(msg) {
+      console.log(msg)
+      $("#failedTests").append("<h6>" + msg + "</h6>");
+    });
     var timestring = getTimeStampString();
     $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
   }
@@ -286,8 +292,7 @@ var enableGraphingForm = function() {
       var endrow = ($("input#endrow").val() - 1);
       var endpin = ($("#endPinNum").val() - 1);
       var component_type = $("#newcomponent").val();
-     // var startside = $("#startSide").val();
-     // var endside = $("#endSide").val();
+
       console.log(component_type + " start side " + startrow + " " + startpin + " end side " + endrow + " " + endpin);
       if (startpin > 4) {
         startrow += 24;

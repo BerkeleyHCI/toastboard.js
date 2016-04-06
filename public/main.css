@@ -22,6 +22,10 @@ a.navbar-brand {
   border-radius: 15px;
 }
 
+#failedTests {
+  color: red;
+}
+
 #graphviz {
   width: 500px;
   height: 300px;

@@ -37,6 +37,26 @@ var redrawComponents = function(breadboard,removeId) {
   sessionStorage.setItem("boardstate",JSON.stringify(boardstate));
 };
 
+var testComponents = function(breadboard) {
+  var boardstate = JSON.parse(sessionStorage.getItem("boardstate"));
+  var failedTests = [];
+  boardstate.components.forEach(function(d) {
+    var c = JSON.parse(d);
+    var cobj = makeComponent(breadboard,c.type,c.startRow,c.startPinNum,c.endRow,c.endPinNum);
+    var msg = cobj.test(breadboard.rawVoltages);
+    if (msg) failedTests.push(msg)
+  });
+  return failedTests;
+}
+
+var getDisplayRow = function(rownum,pinnum) {
+  if (pinnum > 4) {
+    return rownum + 24 + 1;
+  } else {
+    return rownum + 1;
+  }
+}
+
 var Component = function(breadboard, startRow, startPinNum, endRow, endPinNum) {
   this.breadboard = breadboard;
   this.startRow = startRow;
@@ -82,6 +102,10 @@ Component.prototype.serialize = function() {
   return JSON.stringify(c);
 }
 
+Component.prototype.test = function(voltages) {
+  return null;
+}
+
 var Wire = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.breadboard = breadboard;
   this.startRow = startRow;
@@ -118,6 +142,14 @@ Wire.prototype.serialize = function() {
   c["endPinNum"] = this.endPinNum;
   return JSON.stringify(c);
 }
+
+Wire.prototype.test = function(voltages) {
+  //var self = this;
+  if (voltages[this.startRow] != voltages[this.endRow]) {
+    return "The voltage at row " + getDisplayRow(this.startRow,this.startPinNum)
+     + " is not the same as the voltage at row " + getDisplayRow(this.endRow,this.endPinNum) + ".";
+  }
+};
 
 // should subclass these in OOP-ish style, but whatever....
 var Resistor = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
@@ -209,6 +241,10 @@ Resistor.prototype.serialize = function() {
   return JSON.stringify(c);
 }
 
+Resistor.prototype.test = function(voltages) {
+  return null;
+}
+
 var Diode = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.breadboard = breadboard;
   this.startRow = startRow;
@@ -280,6 +316,11 @@ Diode.prototype.serialize = function() {
   c["endRow"] = this.endRow;
   c["endPinNum"] = this.endPinNum;
   return JSON.stringify(c);
+}
+
+
+Diode.prototype.test = function(voltages) {
+  return null;
 }
 
 var Sensor = function(breadboard,startRow) {
