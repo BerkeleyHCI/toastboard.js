@@ -130,6 +130,53 @@ Breadboard.prototype.drawEmptyBreadboard = function() {
   return svg;
 };
 
+Breadboard.prototype.redrawBoard = function(svg) {
+  // this.labels and this.voltageAttr are fully populated
+  svg.selectAll(".label")
+    .data(this.labels)
+    .enter()
+    .append("text")
+    .attr("x", function(d) { return d.x; })
+    .attr("y", function(d) { return d.y; })
+    .attr("dy", ".30em")
+    .text(function(d) { return d.label; });
+
+  svg.append("text")
+    .attr("x",280)
+    .attr("y",390)
+    .attr("dy",".30em")
+    .text("VDD: " + vdd.toFixed(1) + "V");
+
+  svg.selectAll("rect")
+    .data(this.voltageAttr)
+    .enter()
+    .append("rect")
+    .attr("x", function(d) { return d.x; })
+    .attr("y", function(d) { return d.y; })
+    .attr("height", function(d) { return d.height; })
+    .attr("width", function(d) { return d.width; })
+    .attr("rx", 5)
+    .attr("ry",5)
+    .attr("fill", function(d) { return d.color})
+    .attr("fill-opacity", 0.5)
+    .append("title").text(function(d) { return d.v.toString() + "V" });
+
+    // we used to automatically draw wires
+    /*
+    svg.selectAll("line")
+        .data(this.connections)
+        .enter()
+        .append("line")
+        .attr("x1",function(d) { return d.startPin[0]; })
+        .attr("y1",function(d) { return d.startPin[1]; })
+        .attr("x2",function(d) { return d.endPin[0]; })
+        .attr("y2",function(d) { return d.endPin[1]; })
+        .attr("stroke-width",3)
+        .attr("stroke",function (d) { return d.color; });
+    */
+};
+
+
 Breadboard.prototype.drawBreadboard = function(json) {
   console.log("called into drawBreadboard");
   var self = this;
@@ -145,50 +192,8 @@ Breadboard.prototype.drawBreadboard = function(json) {
     this.labels = hashToLabels(this.rowData,self);
 
     var svg = this.drawEmptyBreadboard();
+    this.redrawBoard(svg);
 
-    svg.selectAll(".label")
-      .data(this.labels)
-      .enter()
-      .append("text")
-      .attr("x", function(d) { return d.x; })
-      .attr("y", function(d) { return d.y; })
-      .attr("dy", ".30em")
-      .text(function(d) { return d.label; });
-
-    svg.append("text")
-      .attr("x",280)
-      .attr("y",390)
-      .attr("dy",".30em")
-      .text("VDD: " + vdd.toFixed(1) + "V");
-
-    svg.selectAll("rect")
-      .data(this.voltageAttr)
-      .enter()
-      .append("rect")
-      .attr("x", function(d) { return d.x; })
-      .attr("y", function(d) { return d.y; })
-      .attr("height", function(d) { return d.height; })
-      .attr("width", function(d) { return d.width; })
-      .attr("rx", 5)
-      .attr("ry",5)
-      .attr("fill", function(d) { return d.color})
-      .attr("fill-opacity", 0.5)
-      .append("title").text(function(d) { return d.v.toString() + "V" });
-/*
-    svg.selectAll("line")
-        .data(this.connections)
-        .enter()
-        .append("line")
-        .attr("x1",function(d) { return d.startPin[0]; })
-        .attr("y1",function(d) { return d.startPin[1]; })
-        .attr("x2",function(d) { return d.endPin[0]; })
-        .attr("y2",function(d) { return d.endPin[1]; })
-        .attr("stroke-width",3)
-        .attr("stroke",function (d) { return d.color; });
-*/
-    if (this.drawCallback) {
-      this.drawCallback();
-    }
   } else {
     console.log("no real data");
   }

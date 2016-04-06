@@ -150,7 +150,6 @@ socket.on('info', function (data) {
     var rands = fullRowToRowAndSide(json.oscillo.row);
     $("#graphviz").html("");
     myGraph.addData(json.oscillo);
-    $("#selected-row").html("<p>Selected row " + rands[0] + " " + rands[1] + "<\p>");
     myGraph.drawGraph();
   } else if (json.rowsLeft) {
     myBreadboard.drawBreadboard(json);
@@ -252,7 +251,7 @@ var enableGraphingForm = function() {
       socket.emit("o",rowString);
     });
 
-    $("#componentForm").submit(function(e) {
+    $("form#componentForm").submit(function(e) {
       e.preventDefault();
       var action = $(document.activeElement).val();
       var startrow = ($("input#startrow").val() - 1);
@@ -278,7 +277,8 @@ var enableGraphingForm = function() {
         console.log("we will delete " + removeId);
         var boardstate = JSON.parse(sessionStorage.getItem("boardstate"));
         var newcomp = [];
-        myBreadboard.drawEmptyBreadboard();
+        var svg = myBreadboard.drawEmptyBreadboard();
+        myBreadboard.redrawBoard(svg);
         boardstate.components.forEach(function(d) {
           var c = JSON.parse(d);
             if (c.id != removeId) {
