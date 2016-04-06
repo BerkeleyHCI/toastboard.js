@@ -244,7 +244,7 @@ Resistor.prototype.serialize = function() {
 Resistor.prototype.test = function(voltages) {
   if (voltages[this.startRow] == voltages[this.endRow]) {
     return "There is no current through the resistor connected to rows " + getDisplayRow(this.startRow,this.startPinNum) +
-      " and " + getDisplayRow(this.endRow,this.endPinNum);
+      " and " + getDisplayRow(this.endRow,this.endPinNum) + ".";
   }
 };
 
@@ -323,7 +323,11 @@ Diode.prototype.serialize = function() {
 
 
 Diode.prototype.test = function(voltages) {
-  return null;
+  if (voltages[this.startRow] == "f" || voltages[this.endRow] == "f" ||
+      Math.abs(voltages[this.startRow] - voltages[this.endRow]) > 2.0) {
+    return "The LED between row " + getDisplayRow(this.startRow) + " and row " + getDisplayRow(this.endRow) +
+        " is not connected properly.";
+  }
 }
 
 var Sensor = function(breadboard,startRow) {
