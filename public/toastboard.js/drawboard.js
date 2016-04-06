@@ -127,6 +127,18 @@ Breadboard.prototype.drawEmptyBreadboard = function() {
     .attr("font-size","0.7em")
     .text(function(d) { return d.label; });
 
+  var lettering = col_letters(self);
+
+  svg.selectAll(".col_letters")
+    .data(lettering)
+    .enter()
+    .append("text")
+    .attr("x",function(d) { return d.x; })
+    .attr("y",function(d) { return d.y; })
+    .attr("dy",".30em")
+    .attr("font-size","0.7em")
+    .text(function(d) { return d.label; });
+
   return svg;
 };
 
@@ -393,7 +405,6 @@ var hashToVoltageAttr = function(hash,breadboard) {
 };
 
 var numbering = function(breadboard) {
-  var self = this;
   var numbering = [];
   var row_ind;
   for (var i=1;i<49;i++) {
@@ -408,6 +419,22 @@ var numbering = function(breadboard) {
   };
   return numbering;
 };
+
+var col_letters = function(breadboard) {
+  var lettering = [];
+  var labels = ["a","b","c","d","e","f","g","h","i","j"];
+  for (var i=0;i<10;i++) {
+    if (i>4) {
+      var pin = breadboard.pinPositions[i + 48 + rownum*pinnum - 5];
+    } else {
+      var pin = breadboard.pinPositions[i + 48];
+    }
+    var entry = {x:pin[0] - 3,y:pin[1] - 15};
+    entry.label = labels[i];
+    lettering.push(entry);
+  }
+  return lettering;
+}
 
 var hashToLabels = function(hash,breadboard) {
   var self = this;
