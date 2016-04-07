@@ -53,7 +53,7 @@ Graph.prototype.drawGraph = function() {
   xAxis = d3.svg.axis()
       .scale(xRange)
       .tickSize(5)
-      .tickFormat(function(d) { return d + "ms";}),
+      .tickFormat(function(d) { return d + "s";}),
   yAxis = d3.svg.axis()
       .scale(yRange)
       .ticks(5)
