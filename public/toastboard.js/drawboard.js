@@ -7,7 +7,7 @@ var rowspacing = 20;
 var colspacing = 15;
 
 var vdd = 3.3;
-var vddColor = "red";
+var vddColor = "#e31a1c";
 var groundColor = "gray";
 
 function Breadboard() {
@@ -327,34 +327,25 @@ var getRowRect = function(rowIndex,breadboard) {
 var getVoltageColor = function(voltage) {
   var color;
   if (voltage >= 3.1) {
-    color = "red";
-  } else if (voltage >= 2.6) {
+    color = vddColor;
+  } else if (voltage >= 2.5) {
    // color = "firebrick";
-    color = "#081d58";
-  } else if (voltage >= 2.3) {
-    //color = "orangered";
-    color = "#253494";
+    color = "#fc4e2a";
   } else if (voltage >= 2.0) {
+    //color = "orangered";
+    color = "#fd8d3c";
+  } else if (voltage >= 1.5) {
     //color = "gold";
-    color = "#225ea8";
-  } else if (voltage >= 1.6) {
-    //color = "forestgreen";
-    color = "#1d91c0";
-  } else if (voltage >= 1.3) {
-    //color = "teal";
-    color = "#41b6c4";
+    color = "#feb24c";
   } else if (voltage >= 1.0) {
-    //color = "cornflowerblue";
-    color = "#7fcdbb";
-  } else if (voltage >= 0.6) {
-    //color = "midnightblue";
-    color = "#c7e9b4";
-  } else if (voltage >= 0.3) {
-    //color = "indigo"; 
-    color = "#edf8b1";
+    //color = "forestgreen";
+    color = "#fed976";
+  } else if (voltage >= 0.5) {
+    //color = "teal";
+    color = "#ffeda0";
   } else if (voltage >= 0.1) {
     //color = "purple";
-    color = "#ffffd9";
+    color = "#ffffcc";
   } else {
     color = "gray";
   }
