@@ -214,7 +214,13 @@ Breadboard.prototype.drawBreadboard = function(json) {
 
 //row pins count across
 Breadboard.prototype.getRowPin = function(rownumber,pinnumber) {
-  return this.pinPositions[(railcolumn*rownum) + (rownumber*pinnum) + pinnumber];
+  if (pinnumber == "g") {
+    return this.pinPositions[rownumber + 24];
+  } else if (pinnumber == "v") {
+    return this.pinPositions[rownumber];
+  } else {
+    return this.pinPositions[(railcolumn*rownum) + (rownumber*pinnum) + pinnumber];
+  }
 };
 
 var hashVoltages = function(rowVals) {
@@ -437,14 +443,4 @@ var hashToLabels = function(hash,breadboard) {
     labels.push(entry);
   });
   return labels;
-};
-
-// why is this here
-var conflict = function(cnxn1,cnxn2) {
-    return (cnxn2.start <= cnxn1.start) || (cnxn2.end >= cnxn1.end);
-};
-
-// this is not needed either?
-var getRailPin = function(railnumber,pinnumber) {
-  return 0; //this.pinPositions[];
 };
