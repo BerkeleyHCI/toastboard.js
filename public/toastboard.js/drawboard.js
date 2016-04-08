@@ -77,6 +77,8 @@ Breadboard.prototype.processJson = function(json) {
         this.rawVoltages[int_index] = v;
         newRow[index] = v;
         this.rowData.push(newRow);      
+      } else {
+        this.rawVoltages[i+24] = json.rowsRight[i];
       }
     }
   }

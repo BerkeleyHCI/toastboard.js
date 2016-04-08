@@ -138,13 +138,19 @@ Wire.prototype.draw = function() {
     .attr("stroke","black")
 
   var msg = this.test();
-  console.log("check text");
-  console.log(msg);
+
   if (msg) {
     line.append("title").text(msg);
     this.failedTest = msg;
-  }
 
+    svg.append("svg:image")
+      .attr('x',this.startPin[0])
+      .attr('y',this.startPin[1] - 10)
+      .attr('width', 24)
+      .attr('height', 24)
+      .attr("xlink:href","Warning-128.png")
+      .append("title").text(msg);
+  }
 };
 
 Wire.prototype.getId = function() {
@@ -162,8 +168,8 @@ Wire.prototype.serialize = function() {
   return JSON.stringify(c);
 }
 
-Wire.prototype.test = function(voltages) {
-  if (voltages[this.startRow] != voltages[this.endRow]) {
+Wire.prototype.test = function() {
+  if (this.breadboard.rawVoltages[this.startRow] != this.breadboard.rawVoltages[this.endRow]) {
     return "The voltage at pin " + getDisplayRow(this.startRow,this.startPinNum)
      + " is not the same as the voltage at pin " + getDisplayRow(this.endRow,this.endPinNum)
       + ". Check this wire for faulty connections."; 
@@ -247,6 +253,13 @@ Resistor.prototype.draw = function() {
   if (msg) {
     path.append("title").text(msg);
     this.failedTest = msg;
+    svg.append("svg:image")
+      .attr('x',this.startPin[0])
+      .attr('y',this.startPin[1] - 10)
+      .attr('width', 24)
+      .attr('height', 24)
+      .attr("xlink:href","Warning-128.png")
+      .append("title").text(msg);
   }
 };
 
@@ -265,8 +278,9 @@ Resistor.prototype.serialize = function() {
   return JSON.stringify(c);
 }
 
-Resistor.prototype.test = function(voltages) {
-  if (voltages[this.startRow] == voltages[this.endRow]) {
+Resistor.prototype.test = function() {
+  if (this.breadboard.rawVoltages[this.startRow] == this.breadboard.rawVoltages[this.endRow] ||
+    this.breadboard.rawVoltages[this.startRow] == "f" || this.breadboard.rawVoltages[this.endRow] == "f") {
     return "There is no current through the resistor connected to pin " + getDisplayRow(this.startRow,this.startPinNum) +
       " and " + getDisplayRow(this.endRow,this.endPinNum) + ".";
   }
@@ -336,6 +350,13 @@ Diode.prototype.draw = function() {
     line2.append("title").text(msg);
     line3.append("title").text(msg);
     this.failedTest = msg;
+    svg.append("svg:image")
+      .attr('x',this.startPin[0])
+      .attr('y',this.startPin[1] - 10)
+      .attr('width', 24)
+      .attr('height', 24)
+      .attr("xlink:href","Warning-128.png")
+      .append("title").text(msg);
   }
 };
 
@@ -355,12 +376,12 @@ Diode.prototype.serialize = function() {
 }
 
 
-Diode.prototype.test = function(voltages) {
-//  if (voltages[this.startRow] == "f" || voltages[this.endRow] == "f" ||
-//      Math.abs(voltages[this.startRow] - voltages[this.endRow]) > 2.0) {
+Diode.prototype.test = function() {
+  if (this.breadboard.rawVoltages[this.startRow] == "f" || this.breadboard.rawVoltages[this.endRow] == "f" ||
+      Math.abs(this.breadboard.rawVoltages[this.startRow] - this.breadboard.rawVoltages[this.endRow]) > 2.0) {
     return "The LED between pin " + getDisplayRow(this.startRow,this.startPinNum) + " and pin " + getDisplayRow(this.endRow,this.endPinNum) +
         " is not connected properly. Check that the pins are connected, that the LED is in the right direction, or that the LED itself is not faulty.";
- // }
+  }
 }
 
 var Sensor = function(breadboard,startRow) {
