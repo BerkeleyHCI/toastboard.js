@@ -39,6 +39,7 @@
   <option value="diode">Diode</option>
   <option value="resistor">Resistor</option>
   <option value="component">Component</option>
+  <option value="button">Button</option>
   </select>
   </div>
   <div class="form-group">
@@ -96,7 +97,10 @@ var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,
     var c = new Wire(breadboard,startrow,startpin,endrow,endpin);
   } else if (component_type == "component") {
     var c = new Component(breadboard,startrow,startpin,endrow,endpin);
+  } else if (component_type == "button") {
+    var c = new Button(breadboard,startrow,startpin,endrow,endpin);
   }
+
   return c;
 };
 

@@ -33,6 +33,7 @@
         <option value="diode">Diode</option>
         <option value="resistor">Resistor</option>
         <option value="component">Component</option>
+        <option value="button">Button</option>
         </select>
       </div>
       <div class="form-group">
@@ -262,6 +263,14 @@ var enableGraphingForm = function() {
       myBreadboard.drawEmptyBreadboard();
     });
 
+    var printButton = document.createElement("button");
+    printButton.innerHTML = "Print Board";
+    printButton.className = "btn btn-secondary";
+    printButton.addEventListener("click", function() {
+      window.print();
+    });
+
+
     $("#graphForm").submit(function(e) {
       e.preventDefault();
       var row = $("input#rowToGraph").val();
@@ -333,6 +342,7 @@ var enableGraphingForm = function() {
 
     var belowBoardDiv = document.getElementById("clearButtonDiv");
     belowBoardDiv.appendChild(clearBoardButton);
+    belowBoardDiv.appendChild(printButton);
 
     $("#stopScan").toggle();
 

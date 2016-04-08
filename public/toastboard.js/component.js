@@ -10,6 +10,8 @@ var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,
     var c = new Wire(breadboard,startrow,startpin,endrow,endpin);
   } else if (component_type == "component") {
     var c = new Component(breadboard,startrow,startpin,endrow,endpin);
+  } else if (component_type =="button") {
+    var c = new Button(breadboard,startrow,startpin,endrow,endpin);
   }
   return c;
 };
@@ -385,6 +387,7 @@ Diode.prototype.test = function() {
   }
 }
 
+
 var Sensor = function(breadboard,startRow) {
   this.breadboard = breadboard;
   this.startRow = startRow;
@@ -440,3 +443,122 @@ Sensor.prototype.draw = function() {
   .attr("fill","none");
 
 };
+
+var Button = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
+  this.breadboard = breadboard;
+  this.startRow = startRow;
+  this.startPinNum = startPinNum;
+  this.startPin = this.breadboard.getRowPin(this.startRow,this.startPinNum);
+  this.endRow = endRow;
+  this.endPinNum = endPinNum;
+  this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
+  this.buttonWidth = 20;
+  this.calcPoints();
+  this.failedTest = null;
+};
+
+
+
+Button.prototype.calcPoints = function() {
+  var buttonHeight = 15;
+  var fullHeight = this.endPin[1] - this.startPin[1];
+  this.verticalLineHeight = (fullHeight - buttonHeight) / 2;
+  this.middleSpot = fullHeight / 2;
+};
+
+
+
+
+Button.prototype.draw = function() {
+  var lineFunction = d3.svg.line()
+                       .x(function(d) { return d.x; })
+                       .y(function(d) { return d.y; })
+                       .interpolate("linear");
+
+  var svg = d3.select("svg");
+
+  var line1 = svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1])
+    .attr("x2",this.startPin[0])
+    .attr("y2",this.startPin[1] + this.verticalLineHeight - 3)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var line2 = svg.append("line")
+    .attr("x1",this.endPin[0])
+    .attr("y1",this.endPin[1] - this.verticalLineHeight +3)
+    .attr("x2",this.endPin[0])
+    .attr("y2",this.endPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var circle1 = svg.append("circle")
+    .attr("cx", this.startPin[0] )
+    .attr("cy", this.endPin[1] - this.verticalLineHeight )
+    .attr("r", 4)
+    .attr("stroke","black")
+    .attr("stroke-width",3)
+    .attr("fill","none");
+  var cicle2 = svg.append("circle")
+    .attr("cx", this.endPin[0] )
+    .attr("cy", this.startPin[1] + this.verticalLineHeight )
+    .attr("r", 4)
+    .attr("stroke","black")
+    .attr("stroke-width",3)
+    .attr("fill","none");
+  var line3 = svg.append("line")
+    .attr("x1",this.endPin[0]+8)
+    .attr("y1",this.endPin[1] - this.verticalLineHeight)
+    .attr("x2",this.endPin[0]+8)
+    .attr("y2",this.startPin[1] + this.verticalLineHeight)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var line4 = svg.append("line")
+    .attr("x1",this.endPin[0]+8)
+    .attr("y1",this.startPin[1]+this.middleSpot)
+    .attr("x2",this.endPin[0]+14)
+    .attr("y2",this.startPin[1]+this.middleSpot)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var msg = this.test();
+  if (msg) {
+    line1.append("title").text(msg);
+    line2.append("title").text(msg);
+    line3.append("title").text(msg);
+    line4.append("title").text(msg);
+    circle1.append("title").text(msg);
+    circle2.append("title").text(msg);
+    this.failedTest = msg;
+    svg.append("svg:image")
+      .attr('x',this.startPin[0])
+      .attr('y',this.startPin[1] - 10)
+      .attr('width', 24)
+      .attr('height', 24)
+      .attr("xlink:href","Warning-128.png")
+      .append("title").text(msg);
+  }
+};
+
+
+Button.prototype.getId = function() {
+  return "dr" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+}
+
+Button.prototype.serialize = function() {
+  var c = {};
+  c["id"] = this.getId();
+  c["type"] = "button";
+  c["startRow"] = this.startRow;
+  c["startPinNum"] = this.startPinNum;
+  c["endRow"] = this.endRow;
+  c["endPinNum"] = this.endPinNum;
+  return JSON.stringify(c);
+}
+
+
+Button.prototype.test = function() {
+  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f" ||
+      Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)) > 2.0) {
+    return "The button between pin " + getDisplayRow(this.startRow,this.startPinNum) + " and pin " + getDisplayRow(this.endRow,this.endPinNum) +
+        " is not connected properly. Check that the pins are connected, that the LED is in the right direction, or that the LED itself is not faulty.";
+  }
+}
