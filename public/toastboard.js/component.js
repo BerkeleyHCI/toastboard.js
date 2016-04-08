@@ -130,20 +130,45 @@ var Wire = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
 };
 
 Wire.prototype.draw = function() {
-  var svg = d3.select("svg");
+  var self = this;
+  var alpha = 30; // amt to skew line for curve
 
-  var line = svg.append("line")
+  var svg = d3.select("svg");
+  if (this.startPin[0] == this.endPin[0]) {
+    var m_x = ((self.startPin[0] + self.endPin[0]) / 2) + alpha;
+    var m_y = self.startPin[1];
+  } else {
+    var m_x = ((self.startPin[0] + self.endPin[0]) / 2);
+    var m_y = ((self.startPin[1] + self.endPin[1]) / 2) - alpha;
+  }
+  var lineData = [{"x": this.startPin[0], "y": this.startPin[1]},
+                  {"x": m_x, "y": m_y},
+                  {"x": this.endPin[0], "y": this.endPin[1]}];
+  var lineFunction = d3.svg.line()
+                      .x(function(d) { return d.x; })
+                      .y(function(d) { return d.y; })
+                      .interpolate("bundle");
+
+  var path = svg.append("path")
+      .attr("d",lineFunction(lineData))
+      .attr("stroke-width",4)
+      .attr("stroke","black")
+      .attr("fill","none");
+/*
+
+  var line = svg.append("polyline")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1])
     .attr("x2",this.endPin[0])
     .attr("y2",this.endPin[1])
     .attr("stroke-width",4)
     .attr("stroke","black")
-
+    .interpolate("basis");
+*/
   var msg = this.test();
 
   if (msg) {
-    line.append("title").text(msg);
+    path.append("title").text(msg);
     this.failedTest = msg;
 
     svg.append("svg:image")
