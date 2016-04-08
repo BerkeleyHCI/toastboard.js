@@ -40,27 +40,28 @@ var redrawComponents = function(breadboard,removeId) {
   sessionStorage.setItem("boardstate",JSON.stringify(boardstate));
 };
 
-var testComponents = function(breadboard) {
-  var boardstate = JSON.parse(sessionStorage.getItem("boardstate"));
-  var failedTests = [];
-  boardstate.components.forEach(function(d) {
-    var c = JSON.parse(d);
-    var cobj = makeComponent(breadboard,c.type,c.startRow,c.startPinNum,c.endRow,c.endPinNum);
-    var msg = cobj.test(breadboard.rawVoltages);
-    if (msg) failedTests.push(msg)
-    cobj["failedTest"] = true;
-  });
-  return failedTests;
+var getDisplayCol = function(rownum,pinnum) {
+  if (pinnum == "v") {
+    return "VDD";
+  } else if (pinnum == "g") {
+    return "GND";
+  } else {
+    if (rownum > 24) {
+      return rightCols[pinnum];
+    } else {
+      return leftCols[pinnum];
+    }
+  }
 }
 
 var getDisplayRow = function(rownum,pinnum) {
   var returntext = "";
   if (rownum > 24) {
-    returntext += (rownum + 24 + 1);
-    returntext += rightCols[pinnum];
+    returntext += (rownum - 24 + 1);
+    returntext += getDisplayCol(rownum,pinnum);
   } else {
     returntext += (rownum + 1);
-    returntext += leftCols[pinnum];
+    returntext += getDisplayCol(rownum,pinnum);
   }
   return returntext;
 }
@@ -169,7 +170,7 @@ Wire.prototype.serialize = function() {
 }
 
 Wire.prototype.test = function() {
-  if (this.breadboard.rawVoltages[this.startRow] != this.breadboard.rawVoltages[this.endRow]) {
+  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) != this.breadboard.getVoltage(this.endRow,this.endPinNum)) {
     return "The voltage at pin " + getDisplayRow(this.startRow,this.startPinNum)
      + " is not the same as the voltage at pin " + getDisplayRow(this.endRow,this.endPinNum)
       + ". Check this wire for faulty connections."; 
@@ -279,8 +280,8 @@ Resistor.prototype.serialize = function() {
 }
 
 Resistor.prototype.test = function() {
-  if (this.breadboard.rawVoltages[this.startRow] == this.breadboard.rawVoltages[this.endRow] ||
-    this.breadboard.rawVoltages[this.startRow] == "f" || this.breadboard.rawVoltages[this.endRow] == "f") {
+  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == this.breadboard.getVoltage(this.endRow,this.endPinNum) ||
+    this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
     return "There is no current through the resistor connected to pin " + getDisplayRow(this.startRow,this.startPinNum) +
       " and " + getDisplayRow(this.endRow,this.endPinNum) + ".";
   }
@@ -377,8 +378,8 @@ Diode.prototype.serialize = function() {
 
 
 Diode.prototype.test = function() {
-  if (this.breadboard.rawVoltages[this.startRow] == "f" || this.breadboard.rawVoltages[this.endRow] == "f" ||
-      Math.abs(this.breadboard.rawVoltages[this.startRow] - this.breadboard.rawVoltages[this.endRow]) > 2.0) {
+  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f" ||
+      Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)) > 2.0) {
     return "The LED between pin " + getDisplayRow(this.startRow,this.startPinNum) + " and pin " + getDisplayRow(this.endRow,this.endPinNum) +
         " is not connected properly. Check that the pins are connected, that the LED is in the right direction, or that the LED itself is not faulty.";
   }

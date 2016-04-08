@@ -223,6 +223,16 @@ Breadboard.prototype.getRowPin = function(rownumber,pinnumber) {
   }
 };
 
+Breadboard.prototype.getVoltage = function(rownumber,pinnumber) {
+  if (pinnumber == "v") {
+    return 3.3;
+  } else if (pinnumber == "g") {
+    return 0.0;
+  } else {
+    return this.rawVoltages[rownumber];
+  }
+}
+
 var hashVoltages = function(rowVals) {
   var hash = {}
   rowVals.forEach(function(row) {
