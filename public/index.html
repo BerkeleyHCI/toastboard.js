@@ -92,6 +92,8 @@
       </div>
       </div>
 
+      <input type="text" class="form-control" id="resistance" style="width: 100px" placeholder="Resistance">
+
         <button type="submit" class="btn btn-secondary" value="add">Add</button>
         <button type="submit" class="btn btn-secondary" value="delete">Delete</button>
 
@@ -226,6 +228,8 @@ var enableGraphingForm = function() {
 
   $(document).ready(function() {
     // draw buttons nicely
+
+    $("#resistance").hide();
     
     var getDataButton = document.getElementById("scanOnce");
     getDataButton.id = "scanOnce";
@@ -332,6 +336,14 @@ var enableGraphingForm = function() {
         myBreadboard.redrawBoard(svg);
         redrawComponents(myBreadboard,removeId);
 
+      }
+    });
+
+    $("#newcomponent").change(function(e) {
+      if ($("#newcomponent").val() == "resistor") {
+        $("#resistance").show();
+      } else {
+        $("#resistance").hide();
       }
     });
 
