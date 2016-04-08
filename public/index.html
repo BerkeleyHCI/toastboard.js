@@ -180,12 +180,6 @@ socket.on('info', function (data) {
   } else if (json.rowsLeft) {
     myBreadboard.drawBreadboard(json);
     redrawComponents(myBreadboard);
-    var failedTests = testComponents(myBreadboard);
-    $("#failedTests").html("");
-    failedTests.forEach(function(msg) {
-      console.log(msg)
-      $("#failedTests").append("<h6>" + msg + "</h6>");
-    });
     var timestring = getTimeStampString();
     $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
   }

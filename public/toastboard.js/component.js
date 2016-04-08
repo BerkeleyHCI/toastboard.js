@@ -1,4 +1,7 @@
-var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,endpin) {
+var leftCols = ["a","b","c","d","e"];
+var rightCols = ["f","g","h","i","j"];
+
+var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,endpin,failedTest) {
   if (component_type == "resistor") {
     var c = new Resistor(breadboard,startrow,startpin,endrow,endpin);
   } else if (component_type == "diode") {
@@ -45,16 +48,21 @@ var testComponents = function(breadboard) {
     var cobj = makeComponent(breadboard,c.type,c.startRow,c.startPinNum,c.endRow,c.endPinNum);
     var msg = cobj.test(breadboard.rawVoltages);
     if (msg) failedTests.push(msg)
+    cobj["failedTest"] = true;
   });
   return failedTests;
 }
 
 var getDisplayRow = function(rownum,pinnum) {
-  if (pinnum > 4) {
-    return rownum + 24 + 1;
+  var returntext = "";
+  if (rownum > 24) {
+    returntext += (rownum + 24 + 1);
+    returntext += rightCols[pinnum];
   } else {
-    return rownum + 1;
+    returntext += (rownum + 1);
+    returntext += leftCols[pinnum];
   }
+  return returntext;
 }
 
 var Component = function(breadboard, startRow, startPinNum, endRow, endPinNum) {
@@ -65,6 +73,7 @@ var Component = function(breadboard, startRow, startPinNum, endRow, endPinNum) {
   this.endRow = endRow;
   this.endPinNum = endPinNum;
   this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
+  this.failedTest = null;
 };
 
 Component.prototype.draw = function() {
@@ -114,18 +123,28 @@ var Wire = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.endRow = endRow;
   this.endPinNum = endPinNum;
   this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
+  this.failedTest = null;
 };
 
 Wire.prototype.draw = function() {
   var svg = d3.select("svg");
 
-  svg.append("line")
+  var line = svg.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1])
     .attr("x2",this.endPin[0])
     .attr("y2",this.endPin[1])
     .attr("stroke-width",4)
-    .attr("stroke","black");
+    .attr("stroke","black")
+
+  var msg = this.test();
+  console.log("check text");
+  console.log(msg);
+  if (msg) {
+    line.append("title").text(msg);
+    this.failedTest = msg;
+  }
+
 };
 
 Wire.prototype.getId = function() {
@@ -144,14 +163,13 @@ Wire.prototype.serialize = function() {
 }
 
 Wire.prototype.test = function(voltages) {
-  //var self = this;
   if (voltages[this.startRow] != voltages[this.endRow]) {
-    return "The voltage at row " + getDisplayRow(this.startRow,this.startPinNum)
-     + " is not the same as the voltage at row " + getDisplayRow(this.endRow,this.endPinNum) + ".";
+    return "The voltage at pin " + getDisplayRow(this.startRow,this.startPinNum)
+     + " is not the same as the voltage at pin " + getDisplayRow(this.endRow,this.endPinNum)
+      + ". Check this wire for faulty connections."; 
   }
 };
 
-// should subclass these in OOP-ish style, but whatever....
 var Resistor = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.breadboard = breadboard;
   this.startRow = startRow;
@@ -163,6 +181,7 @@ var Resistor = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.lineData = null;
   this.lineFunction = null;
   this.calcLineData();
+  this.failedTest = null;
 }
 
 Resistor.prototype.calcLineData = function() {
@@ -219,11 +238,16 @@ Resistor.prototype.draw = function() {
                          .y(function(d) { return d.y; })
                          .interpolate("linear");
   var svg = d3.select("svg");
-  svg.append("path")
+  var path = svg.append("path")
     .attr("d", lineFunction(this.lineData))
     .attr("stroke", "black")
     .attr("stroke-width", 3)
     .attr("fill", "none");
+  var msg = this.test();
+  if (msg) {
+    path.append("title").text(msg);
+    this.failedTest = msg;
+  }
 };
 
 Resistor.prototype.getId = function() {
@@ -243,7 +267,7 @@ Resistor.prototype.serialize = function() {
 
 Resistor.prototype.test = function(voltages) {
   if (voltages[this.startRow] == voltages[this.endRow]) {
-    return "There is no current through the resistor connected to rows " + getDisplayRow(this.startRow,this.startPinNum) +
+    return "There is no current through the resistor connected to pin " + getDisplayRow(this.startRow,this.startPinNum) +
       " and " + getDisplayRow(this.endRow,this.endPinNum) + ".";
   }
 };
@@ -258,6 +282,7 @@ var Diode = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
   this.diodeWidth = 20;
   this.calcPoints();
+  this.failedTest = null;
 };
 
 Diode.prototype.calcPoints = function() {
@@ -278,32 +303,40 @@ Diode.prototype.draw = function() {
                        .interpolate("linear");
 
   var svg = d3.select("svg");
-  svg.append("line")
+  var line = svg.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1])
     .attr("x2",this.startPin[0])
     .attr("y2",this.startPin[1] + this.verticalLineHeight)
     .attr("stroke-width",3)
     .attr("stroke","black");
-  svg.append("path")
+  var path = svg.append("path")
     .attr("d", lineFunction(this.triangleData))
     .attr("stroke", "black")
     .attr("stroke-width", 3)
     .attr("fill", "none");
-  svg.append("line")
+  var line2 = svg.append("line")
     .attr("x1",this.startPin[0] - (this.diodeWidth/2))
     .attr("y1",this.endPin[1] - this.verticalLineHeight)
     .attr("x2",this.startPin[0] + (this.diodeWidth/2))
     .attr("y2",this.endPin[1] - this.verticalLineHeight)
     .attr("stroke-width",3)
     .attr("stroke","black");
-  svg.append("line")
+  var line3 = svg.append("line")
     .attr("x1",this.endPin[0])
     .attr("y1",this.endPin[1] - this.verticalLineHeight)
     .attr("x2",this.endPin[0])
     .attr("y2",this.endPin[1])
     .attr("stroke-width",3)
     .attr("stroke","black");
+  var msg = this.test();
+  if (msg) {
+    line.append("title").text(msg);
+    path.append("title").text(msg);
+    line2.append("title").text(msg);
+    line3.append("title").text(msg);
+    this.failedTest = msg;
+  }
 };
 
 Diode.prototype.getId = function() {
@@ -323,11 +356,11 @@ Diode.prototype.serialize = function() {
 
 
 Diode.prototype.test = function(voltages) {
-  if (voltages[this.startRow] == "f" || voltages[this.endRow] == "f" ||
-      Math.abs(voltages[this.startRow] - voltages[this.endRow]) > 2.0) {
-    return "The LED between row " + getDisplayRow(this.startRow) + " and row " + getDisplayRow(this.endRow) +
-        " is not connected properly.";
-  }
+//  if (voltages[this.startRow] == "f" || voltages[this.endRow] == "f" ||
+//      Math.abs(voltages[this.startRow] - voltages[this.endRow]) > 2.0) {
+    return "The LED between pin " + getDisplayRow(this.startRow,this.startPinNum) + " and pin " + getDisplayRow(this.endRow,this.endPinNum) +
+        " is not connected properly. Check that the pins are connected, that the LED is in the right direction, or that the LED itself is not faulty.";
+ // }
 }
 
 var Sensor = function(breadboard,startRow) {
