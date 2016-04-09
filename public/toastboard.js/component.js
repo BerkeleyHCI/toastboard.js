@@ -12,6 +12,8 @@ var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,
     var c = new Component(breadboard,startrow,startpin,endrow,endpin);
   } else if (component_type =="button") {
     var c = new Button(breadboard,startrow,startpin,endrow,endpin);
+  } else if (component_type =="ina128") {
+    var c = new INA128(breadboard,startrow,startpin,endrow,endpin);
   }
   return c;
 };
@@ -597,3 +599,156 @@ Button.prototype.test = function() {
     return "This button may not be inserted correctly!\n\nHow I know: At least one of the connections is floating.";
   }
 }
+
+var INA128 = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
+  this.breadboard = breadboard;
+  this.startRow = startRow;
+  this.startPinNum = 4;
+  this.startPin = this.breadboard.getRowPin(this.startRow,this.startPinNum);
+  this.endRow = endRow;
+  this.endPinNum = endPinNum;
+  this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
+  this.buttonWidth = 20;
+  this.calcPoints();
+  this.failedTest = null;
+};
+
+
+
+INA128.prototype.calcPoints = function() {
+  var buttonHeight = 15;
+  var fullHeight = this.endPin[1] - this.startPin[1];
+  this.verticalLineHeight = (fullHeight - buttonHeight) / 2;
+  this.middleSpot = fullHeight / 2;
+};
+
+
+
+
+INA128.prototype.draw = function() {
+  var lineFunction = d3.svg.line()
+                       .x(function(d) { return d.x; })
+                       .y(function(d) { return d.y; })
+                       .interpolate("linear");
+
+  var svg = d3.select("svg");
+
+  var line1 = svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1])
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var line2 = svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1]+15)
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1]+15)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var line3 = svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1]+30)
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1]+30)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var line4 = svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1]+45)
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1]+45)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var line5 = svg.append("line")
+    .attr("x1",this.startPin[0]+50)
+    .attr("y1",this.startPin[1])
+    .attr("x2",this.startPin[0]+55)
+    .attr("y2",this.startPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var line6 = svg.append("line")
+    .attr("x1",this.startPin[0]+50)
+    .attr("y1",this.startPin[1]+15)
+    .attr("x2",this.startPin[0]+55)
+    .attr("y2",this.startPin[1]+15)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var line7 = svg.append("line")
+    .attr("x1",this.startPin[0]+50)
+    .attr("y1",this.startPin[1]+30)
+    .attr("x2",this.startPin[0]+55)
+    .attr("y2",this.startPin[1]+30)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var line8 = svg.append("line")
+    .attr("x1",this.startPin[0]+50)
+    .attr("y1",this.startPin[1]+45)
+    .attr("x2",this.startPin[0]+55)
+    .attr("y2",this.startPin[1]+45)
+    .attr("stroke-width",3)
+    .attr("stroke","black");
+  var package = svg.append("rect")
+    .attr("x",this.startPin[0] + 5)
+    .attr("y",this.startPin[1] - 5)
+    .attr("width",45)
+    .attr("height",55)
+    .attr("stroke","black")
+    .attr("stroke-width",2)
+    .attr("fill","white");
+  var circle1 = svg.append("circle")
+    .attr("cx", this.startPin[0]+40 )
+    .attr("cy", this.startPin[1]+1 )
+    .attr("r", 4)
+    .attr("stroke","black")
+    .attr("stroke-width",2)
+    .attr("fill","white");
+
+
+  var msg = this.test();
+  if (msg) {
+    line1.append("title").text(msg);
+    line2.append("title").text(msg);
+    line3.append("title").text(msg);
+    line4.append("title").text(msg);
+    line5.append("title").text(msg);
+    line6.append("title").text(msg);
+    line7.append("title").text(msg);
+    line8.append("title").text(msg);
+    package.append("title").text(msg);
+    circle1.append("title").text(msg);
+    this.failedTest = msg;
+    svg.append("svg:image")
+      .attr('x',this.startPin[0]+30)
+      .attr('y',this.startPin[1]+25)
+      .attr('width', 24)
+      .attr('height', 24)
+      .attr("xlink:href","Warning-128.png")
+      .append("title").text(msg);
+  }
+};
+
+
+INA128.prototype.getId = function() {
+  return "dr" + this.startRow;
+}
+
+INA128.prototype.serialize = function() {
+  var c = {};
+  c["id"] = this.getId();
+  c["type"] = "button";
+  c["startRow"] = this.startRow;
+  c["startPinNum"] = this.startPinNum;
+  c["endRow"] = this.endRow;
+  c["endPinNum"] = this.endPinNum;
+  return JSON.stringify(c);
+}
+
+
+INA128.prototype.test = function() {
+  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f")  {
+    return "This amplifier may not function correctly!\n\nHow I know: Reference voltage (pin1) is floating";
+  }
+}
+
