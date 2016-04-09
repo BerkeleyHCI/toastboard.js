@@ -199,10 +199,10 @@ Wire.prototype.test = function() {
   if (this.breadboard.getVoltage(this.startRow,this.startPinNum) != this.breadboard.getVoltage(this.endRow,this.endPinNum)) {
     var index = this.startRow+1;
     var index_2 = this.endRow+1;
-    return "This wire may not be inserted correctly!\n\nHow I know: The voltage at " + getDisplayRow(this.startRow,this.startPinNum)
+    return "<strong>This wire may not be inserted correctly!</strong><br><i>How I know:</i> The voltage at " + getDisplayRow(this.startRow,this.startPinNum)
      + " is not the same as the voltage at " + getDisplayRow(this.endRow,this.endPinNum) }
   else if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f"){
-    return "This wire may not be inserted correctly!\n\nHow I know: At least one of the connections is floating"
+    return "<strong>This wire may not be inserted correctly!</strong><br><i>How I know:</i> At least one of the connections is floating"
   }
 };
 
@@ -305,10 +305,10 @@ Resistor.prototype.serialize = function() {
 
 Resistor.prototype.test = function() {
   if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == this.breadboard.getVoltage(this.endRow,this.endPinNum)) {
-    return "There is no current through this resistor!\n\nHow I know: V=IR - there is currently no voltage difference between "+getDisplayRow(this.startRow,this.startPinNum)
+    return "<strong>There is no current through this resistor!</strong><br><i>How I know:</i> V=IR - there is currently no voltage difference between "+getDisplayRow(this.startRow,this.startPinNum)
     +" and "+getDisplayRow(this.endRow,this.endPinNum);
   } else if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f"){
-    return "This resistor may not be inserted correctly!\n\nHow I know: At least one of the connections is floating"; 
+    return "<strong>This resistor may not be inserted correctly!</strong><br><i>How I know:</i> At least one of the connections is floating"; 
   }
 };
 
@@ -399,9 +399,9 @@ Diode.prototype.serialize = function() {
 Diode.prototype.test = function() {
 
    if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
-    return "This LED may not be inserted correctly!\n\nHow I know: At least one of the connections is floating";
+    return "<strong>This LED may not be inserted correctly!</strong><br><i>How I know:</i> At least one of the connections is floating";
   } else if (Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)) > 2.0){
-    return "This LED may be inserted backwards!\n\nHow I know: The voltage drop across "+getDisplayRow(this.startRow,this.startPinNum)+"and "+getDisplayRow(this.startRow,this.startPinNum)
+    return "<strong>This LED may be inserted backwards!</strong><br><i>How I know:</i> The voltage drop across "+getDisplayRow(this.startRow,this.startPinNum)+"and "+getDisplayRow(this.startRow,this.startPinNum)
     +" is unusually large"; 
   }
 }
@@ -571,7 +571,7 @@ Button.prototype.serialize = function() {
 
 Button.prototype.test = function() {
   if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
-    return "This button may not be inserted correctly!\n\nHow I know: At least one of the connections is floating.";
+    return "<strong>This button may not be inserted correctly!</strong><br><i>How I know:</i> At least one of the connections is floating.";
   }
 }
 
@@ -683,7 +683,7 @@ INA128.prototype.draw = function() {
 
   var msg = this.test();
   if (msg) {
-    line1.append("title").text(msg);
+    /*line1.append("title").text(msg);
     line2.append("title").text(msg);
     line3.append("title").text(msg);
     line4.append("title").text(msg);
@@ -692,15 +692,16 @@ INA128.prototype.draw = function() {
     line7.append("title").text(msg);
     line8.append("title").text(msg);
     package.append("title").text(msg);
-    circle1.append("title").text(msg);
+    circle1.append("title").text(msg);*/
     this.failedTest = msg;
-    svg.append("svg:image")
+    addIconAndTooltip(svg,this.startPin[0]+30,this.startPin[1]+25,msg);
+    /*svg.append("svg:image")
       .attr('x',this.startPin[0]+30)
       .attr('y',this.startPin[1]+25)
       .attr('width', 24)
       .attr('height', 24)
       .attr("xlink:href","Warning-128.png")
-      .append("title").text(msg);
+      .append("title").text(msg);*/
   }
 };
 
@@ -723,12 +724,12 @@ INA128.prototype.serialize = function() {
 
 INA128.prototype.test = function() {
   if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f")  {
-    return "This amplifier may not function correctly!\n\nHow I know: Reference voltage (pin1) is floating";
+    return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i> Reference voltage (pin1) is floating";
   }
 }
 
 var addIconAndTooltip = function(svg, x, y, message) {
-  var foWidth = 150;
+  var foWidth = 275;
   var anchor = {'w': 125, 'h': 80};
   var t = 50, k = 15;
   var tip = {'w': (3/4 * t), 'h': k};
