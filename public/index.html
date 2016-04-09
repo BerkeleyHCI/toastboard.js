@@ -313,6 +313,7 @@ var enableGraphingForm = function() {
         var endpin = endpinraw;
       }
       var component_type = $("#newcomponent").val();
+      var resistance = $("#resistance").val();
 
       console.log(component_type + " start side " + startrow + " " + startpin + " end side " + endrow + " " + endpin);
       if (startpin > 4) {
@@ -326,6 +327,9 @@ var enableGraphingForm = function() {
             console.log(component_type + " start side " + startrow + " " + startpin + " end side " + endrow + " " + endpin);
       if (action == "add") {
         var c = makeComponent(myBreadboard,component_type,startrow,startpin,endrow,endpin);
+        if (component_type == "resistor") {
+          c.resistance = resistance;
+        }
         c.draw();
         saveComponent(c);
       } else if (action == "delete") {

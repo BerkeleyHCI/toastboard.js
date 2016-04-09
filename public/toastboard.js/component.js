@@ -216,6 +216,7 @@ var Resistor = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.lineFunction = null;
   this.calcLineData();
   this.failedTest = null;
+  this.resistance = null;
 }
 
 Resistor.prototype.calcLineData = function() {
