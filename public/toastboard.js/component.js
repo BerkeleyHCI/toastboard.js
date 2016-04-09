@@ -317,7 +317,8 @@ Resistor.prototype.serialize = function() {
 
 Resistor.prototype.test = function() {
   if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == this.breadboard.getVoltage(this.endRow,this.endPinNum)) {
-    return "There is no current through this resistor!\n\nHow I know: V=IR, and there is currently no voltage difference across this resistor";
+    return "There is no current through this resistor!\n\nHow I know: V=IR - there is currently no voltage difference between "+getDisplayRow(this.startRow,this.startPinNum)
+    +" and "+getDisplayRow(this.endRow,this.endPinNum);
   } else if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f"){
     return "This resistor may not be inserted correctly!\n\nHow I know: At least one of the connections is floating"; 
   }
@@ -418,7 +419,8 @@ Diode.prototype.test = function() {
    if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
     return "This LED may not be inserted correctly!\n\nHow I know: At least one of the connections is floating";
   } else if (Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)) > 2.0){
-    return "This LED may be inserted backwards!\n\nHow I know: The voltage drop across it is unusually large"; 
+    return "This LED may be inserted backwards!\n\nHow I know: The voltage drop across "+getDisplayRow(this.startRow,this.startPinNum)+"and "+getDisplayRow(this.startRow,this.startPinNum)
+    +" is unusually large"; 
   }
 }
 
