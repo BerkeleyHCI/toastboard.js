@@ -58,12 +58,17 @@ var getDisplayCol = function(rownum,pinnum) {
 
 var getDisplayRow = function(rownum,pinnum) {
   var returntext = "";
-  if (rownum > 24) {
-    returntext += (rownum - 24 + 1);
-    returntext += getDisplayCol(rownum,pinnum);
-  } else {
-    returntext += (rownum + 1);
-    returntext += getDisplayCol(rownum,pinnum);
+  if (pinnum == "v" ){
+    returntext += "VDD";
+  } else if (pinnum == "g"){
+    returntext += "GND";
+  } else{
+    returntext += "row "
+    if (rownum > 24) {
+      returntext += (rownum - 24 + 1);
+      } else {
+      returntext += (rownum + 1);
+      }
   }
   return returntext;
 }
@@ -198,9 +203,12 @@ Wire.prototype.serialize = function() {
 
 Wire.prototype.test = function() {
   if (this.breadboard.getVoltage(this.startRow,this.startPinNum) != this.breadboard.getVoltage(this.endRow,this.endPinNum)) {
-    return "The voltage at pin " + getDisplayRow(this.startRow,this.startPinNum)
-     + " is not the same as the voltage at pin " + getDisplayRow(this.endRow,this.endPinNum)
-      + ". Check this wire for faulty connections."; 
+    var index = this.startRow+1;
+    var index_2 = this.endRow+1;
+    return "This wire may not be inserted correctly!\n\nHow I know: The voltage at " + getDisplayRow(this.startRow,this.startPinNum)
+     + " is not the same as the voltage at " + getDisplayRow(this.endRow,this.endPinNum) }
+  else if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f"){
+    return "This wire may not be inserted correctly!\n\nHow I know: At least one of the connections is floating"
   }
 };
 
@@ -310,7 +318,7 @@ Resistor.prototype.test = function() {
   if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == this.breadboard.getVoltage(this.endRow,this.endPinNum)) {
     return "There is no current through this resistor!\n\nHow I know: V=IR, and there is currently no voltage difference across this resistor";
   } else if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f"){
-    return "Your resistor may not be connected correctly!\n\nHow I know: At least one of the connections is floating"; 
+    return "This resistor may not be inserted correctly!\n\nHow I know: At least one of the connections is floating"; 
   }
 };
 
@@ -407,7 +415,7 @@ Diode.prototype.serialize = function() {
 Diode.prototype.test = function() {
 
    if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
-    return "This LED may not be connected correctly!\n\nHow I know: At least one of the connections is floating";
+    return "This LED may not be inserted correctly!\n\nHow I know: At least one of the connections is floating";
   } else if (Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)) > 2.0){
     return "This LED may be inserted backwards!\n\nHow I know: The voltage drop across it is unusually large"; 
   }
@@ -582,9 +590,7 @@ Button.prototype.serialize = function() {
 
 
 Button.prototype.test = function() {
-  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f" ||
-      Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)) > 2.0) {
-    return "The button between pin " + getDisplayRow(this.startRow,this.startPinNum) + " and pin " + getDisplayRow(this.endRow,this.endPinNum) +
-        " is not connected properly. Check that the pins are connected, that the LED is in the right direction, or that the LED itself is not faulty.";
+  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
+    return "This button may not be inserted correctly!\n\nHow I know: At least one of the connections is floating.";
   }
 }
