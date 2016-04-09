@@ -46,3 +46,27 @@ a.navbar-brand {
 .btn {
   margin: 10px;
 }
+
+svg {
+  display: block;
+  margin: 0 auto;
+}
+.svg-tooltip {
+    pointer-events: none;
+}
+.c-tooltip {
+    padding: 10px;
+    color: #000;
+}
+.jumbotron p.c-lead {
+    margin: 5px 0px;
+    font-style: italic;
+    font-size: 12pt;
+}
+.jumbotron p.c-p {
+    margin: 5px 0px;
+    font-size: 10pt;
+}
+polygon {
+    pointer-events: none;
+}

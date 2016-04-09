@@ -175,16 +175,8 @@ Wire.prototype.draw = function() {
   var msg = this.test();
 
   if (msg) {
-    path.append("title").text(msg);
-    this.failedTest = msg;
-
-    svg.append("svg:image")
-      .attr('x',this.startPin[0])
-      .attr('y',this.startPin[1] - 10)
-      .attr('width', 24)
-      .attr('height', 24)
-      .attr("xlink:href","Warning-128.png")
-      .append("title").text(msg);
+   // path.append("title").text(msg);
+    addIconAndTooltip(svg,this.startPin[0],this.startPin[1],msg);
   }
 };
 
@@ -290,15 +282,9 @@ Resistor.prototype.draw = function() {
     .attr("fill", "none");
   var msg = this.test();
   if (msg) {
-    path.append("title").text(msg);
+   // path.append("title").text(msg);
     this.failedTest = msg;
-    svg.append("svg:image")
-      .attr('x',this.startPin[0])
-      .attr('y',this.startPin[1] - 10)
-      .attr('width', 24)
-      .attr('height', 24)
-      .attr("xlink:href","Warning-128.png")
-      .append("title").text(msg);
+    addIconAndTooltip(svg,this.startPin[0],this.startPin[1],msg);
   }
 };
 
@@ -384,19 +370,13 @@ Diode.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke","black");
   var msg = this.test();
-  if (msg) {
+  if (msg) { /*
     line.append("title").text(msg);
     path.append("title").text(msg);
     line2.append("title").text(msg);
-    line3.append("title").text(msg);
+    line3.append("title").text(msg); */
     this.failedTest = msg;
-    svg.append("svg:image")
-      .attr('x',this.startPin[0])
-      .attr('y',this.startPin[1] - 10)
-      .attr('width', 24)
-      .attr('height', 24)
-      .attr("xlink:href","Warning-128.png")
-      .append("title").text(msg);
+    addIconAndTooltip(svg,this.startPin[0],this.startPin[1],msg);
   }
 };
 
@@ -560,20 +540,15 @@ Button.prototype.draw = function() {
     .attr("stroke","black");
   var msg = this.test();
   if (msg) {
+    /*
     line1.append("title").text(msg);
     line2.append("title").text(msg);
     line3.append("title").text(msg);
     line4.append("title").text(msg);
     circle1.append("title").text(msg);
-    circle2.append("title").text(msg);
+    circle2.append("title").text(msg); */
     this.failedTest = msg;
-    svg.append("svg:image")
-      .attr('x',this.startPin[0])
-      .attr('y',this.startPin[1] - 10)
-      .attr('width', 24)
-      .attr('height', 24)
-      .attr("xlink:href","Warning-128.png")
-      .append("title").text(msg);
+    addIconAndTooltip(svg,this.startPin[0],this.startPin[1],msg);
   }
 };
 
@@ -752,3 +727,49 @@ INA128.prototype.test = function() {
   }
 }
 
+var addIconAndTooltip = function(svg, x, y, message) {
+  var foWidth = 150;
+  var anchor = {'w': 125, 'h': 80};
+  var t = 50, k = 15;
+  var tip = {'w': (3/4 * t), 'h': k};
+  svg.append("svg:image")
+  .attr('x',x)
+  .attr('y',y - 10)
+  .attr('width', 24)
+  .attr('height', 24)
+  .attr("xlink:href","Warning-128.png")
+  .on('mouseover', function() {
+    var fo = svg.append('foreignObject')
+        .attr({
+            'x': x + 5,
+            'y': y ,
+            'width': foWidth,
+            'class': 'svg-tooltip'
+        });
+    var div = fo.append('xhtml:div')
+        .append('div')
+        .attr({
+            'class': 'c-tooltip'
+        });
+    div.append('p')
+        .attr('class', 'c-p')
+        .html(message);
+    var foHeight = div[0][0].getBoundingClientRect().height;
+    fo.attr({
+        'height': foHeight
+    });
+    svg.insert('polygon', '.svg-tooltip')
+        .attr({
+            'points': "0,0 0," + foHeight + " " + foWidth + "," + foHeight + " " + foWidth + ",0 ",
+            'height': foHeight + tip.h,
+            'width': foWidth,
+            'fill': '#D8D8D8', 
+            'opacity': 0.85,
+            'transform': 'translate(' + x + ',' + y + ')'
+                  });
+  }) 
+  .on('mouseout', function() {
+      svg.selectAll('.svg-tooltip').remove();
+      svg.selectAll('polygon').remove();
+  })
+}
