@@ -307,10 +307,10 @@ Resistor.prototype.serialize = function() {
 }
 
 Resistor.prototype.test = function() {
-  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == this.breadboard.getVoltage(this.endRow,this.endPinNum) ||
-    this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
-    return "There is no current through the resistor connected to pin " + getDisplayRow(this.startRow,this.startPinNum) +
-      " and " + getDisplayRow(this.endRow,this.endPinNum) + ".";
+  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == this.breadboard.getVoltage(this.endRow,this.endPinNum)) {
+    return "There is no current through this resistor!\n\nHow I know: V=IR, and there is currently no voltage difference across this resistor";
+  } else if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f"){
+    return "Your resistor may not be connected correctly!\n\nHow I know: At least one of the connections is floating"; 
   }
 };
 
@@ -405,10 +405,11 @@ Diode.prototype.serialize = function() {
 
 
 Diode.prototype.test = function() {
-  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f" ||
-      Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)) > 2.0) {
-    return "The LED between pin " + getDisplayRow(this.startRow,this.startPinNum) + " and pin " + getDisplayRow(this.endRow,this.endPinNum) +
-        " is not connected properly. Check that the pins are connected, that the LED is in the right direction, or that the LED itself is not faulty.";
+
+   if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
+    return "This LED may not be connected correctly!\n\nHow I know: At least one of the connections is floating";
+  } else if (Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)) > 2.0){
+    return "This LED may be inserted backwards!\n\nHow I know: The voltage drop across it is unusually large"; 
   }
 }
 
