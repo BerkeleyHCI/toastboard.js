@@ -196,6 +196,7 @@ socket.on('info', function (data) {
   } else if (json.rowsLeft) {
     myBreadboard.drawBreadboard(json);
     redrawComponents(myBreadboard);
+    myBreadboard.attachPinClickEvents();
     var timestring = getTimeStampString();
     $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
   }
@@ -265,6 +266,7 @@ var enableGraphingForm = function() {
 
     $("#clear").on("click",function() {
       myBreadboard.drawEmptyBreadboard();
+      myBreadboard.attachPinClickEvents();
     });
     $("#print").on("click",function() {
       window.print();
@@ -342,6 +344,7 @@ var enableGraphingForm = function() {
         var svg = myBreadboard.drawEmptyBreadboard();
         myBreadboard.redrawBoard(svg);
         redrawComponents(myBreadboard,removeId);
+        myBreadboard.attachPinClickEvents();
 
       }
     });
@@ -360,6 +363,7 @@ var enableGraphingForm = function() {
   var fakeJson = '{\"rowsLeft\":["f",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"], \"rowsRight\":[\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",3.3,\"f\",\"f\",\"f\",\"f\",1.5,\"f\",\"f\",\"f\",1.5,0.0,\"f\",\"f\",\"f\"]}';
   myBreadboard.drawBreadboard(JSON.parse(fakeJson));
   sessionStorage.setItem("boardstate",JSON.stringify({"components":[]}));
+  myBreadboard.attachPinClickEvents();
 
   });
 </script>

@@ -95,6 +95,19 @@ var thresholdVoltage = function(voltage) {
   }
 };
 
+Breadboard.prototype.attachPinClickEvents = function() {
+  d3.select("#board").selectAll("rect")
+  .data(this.pinPositions)
+  .enter()
+  .append("rect")
+  .attr("x",function(d) { return d[0]; })
+  .attr("y",function(d) { return d[1]; })
+  .attr("width",5)
+  .attr("height",5)
+  .attr("class","pinclick")
+  .attr("onclick","alert('click!')");
+}
+
 Breadboard.prototype.drawEmptyBreadboard = function() {
   var self = this;
   d3.select("#board")
