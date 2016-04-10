@@ -401,8 +401,8 @@ Diode.prototype.test = function() {
    if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
     return "<strong>This LED may not be inserted correctly!</strong><br><i>How I know:</i> At least one of the connections is floating";
   } else if (Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)) > 2.0){
-    return "<strong>This LED may be inserted backwards!</strong><br><i>How I know:</i> The voltage drop across "+getDisplayRow(this.startRow,this.startPinNum)+"and "+getDisplayRow(this.startRow,this.startPinNum)
-    +" is unusually large"; 
+    return "<strong>This LED may be inserted backwards or broken!</strong><br><i>How I know:</i> The voltage drop across "+getDisplayRow(this.startRow,this.startPinNum)+" and "+getDisplayRow(this.endRow,this.endPinNum)
+    +" is unusually large<br><i>Suggested fix:</i> Try reversing the LED; if that doesn't clear this error, get a new LED"; 
   }
 }
 
@@ -570,8 +570,9 @@ Button.prototype.serialize = function() {
 
 
 Button.prototype.test = function() {
-  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
-    return "<strong>This button may not be inserted correctly!</strong><br><i>How I know:</i> At least one of the connections is floating.";
+  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == this.breadboard.getVoltage(this.endRow,this.endPinNum) ) {
+    return "<strong>This button may not function correctly!</strong><br><i>How I know:</i> The voltages at "+getDisplayRow(this.startRow,this.startPinNum)+
+    " and "+getDisplayRow(this.endRow,this.endPinNum)+" are already the same<br><i>Suggested fix:</i> Make sure the button is not stuck down; if it isn't, try rotating it 90 degrees";
   }
 }
 
@@ -732,9 +733,16 @@ INA128.prototype.serialize = function() {
 
 INA128.prototype.test = function() {
 
+var reasons = ""
+
   if (this.breadboard.getVoltage(this.startRow+27,this.startPinNum) == "f")  {
-    return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i> V<sub>ref</sub> (pin5) at "+getDisplayRow(this.startRow+27,this.startPinNum)+" is floating";
+    reasons += "<br>-V<sub>ref</sub> (pin5) at "+getDisplayRow(this.startRow+27,this.startPinNum)+" is floating";
   }
+  if (this.breadboard.getVoltage(this.startRow+3,this.startPinNum) == "f" || this.breadboard.getVoltage(this.startRow+3,this.startPinNum)==this.breadboard.getVoltage(this.startRow+25,this.startPinNum) ) {
+    reasons +=  "<br>-The negative supply (pin4) at "+getDisplayRow(this.startRow+3,this.startPinNum)+" is floating or the same as the positive supply";
+  }
+
+return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i>"+reasons;
 }
 
 var addIconAndTooltip = function(svg, x, y, message) {
