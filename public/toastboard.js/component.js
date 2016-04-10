@@ -736,15 +736,18 @@ INA128.prototype.serialize = function() {
 INA128.prototype.test = function() {
 
 var reasons = ""
+var solutions =""
 
   if (this.breadboard.getVoltage(this.startRow+27,this.startPinNum) == "f")  {
     reasons += "<br>-V<sub>ref</sub> (pin5) at "+getDisplayRow(this.startRow+27,this.startPinNum)+" is floating";
+    solutions +="<br>-In most cases, V<sub>ref</sub> should be connected to GND";
   }
   if (this.breadboard.getVoltage(this.startRow+3,this.startPinNum) == "f" || this.breadboard.getVoltage(this.startRow+3,this.startPinNum)==this.breadboard.getVoltage(this.startRow+25,this.startPinNum) ) {
     reasons +=  "<br>-The negative supply (pin4) at "+getDisplayRow(this.startRow+3,this.startPinNum)+" is floating or the same as the positive supply";
+    solutions += "<br>-To get the full output voltage range, V<sub>-</sub> should be connected to GND or ideally a negative voltage"
   }
 
-return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i>"+reasons;
+return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
 }
 
 var addWarningIconAndTooltip = function(svg, x, y, message) {
