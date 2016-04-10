@@ -114,7 +114,10 @@
   <svg width="500" height="300" id="board" />
 
 </div>
-  <div id="clearButtonDiv"></div>
+  <div id="clearButtonDiv">
+    <button type="button" class="btn btn-secondary" id="clear">Clear Board</button>
+    <button type="button" class="btn btn-secondary" id="print">Print Board</button>
+  </div>
 <div id="timestamp"></div> 
 </div>
 <div class="col-xs-6">
@@ -241,47 +244,30 @@ var enableGraphingForm = function() {
 
     $("#resistance").hide();
     
-    var getDataButton = document.getElementById("scanOnce");
-    getDataButton.id = "scanOnce";
-    getDataButton.innerHTML = "Scan once";
-    getDataButton.className = "btn btn-secondary";
-    getDataButton.addEventListener("click", function() {
-      console.log("client asks for data");
+    $("#scanOnce").on("click",function() {
       socket.emit("d","hello");
     });
 
-    var continuousButton = document.getElementById("scanCon");
-    continuousButton.id = "scanCon";
-    continuousButton.innerHTML = "Scan continuously";
-    continuousButton.className = "btn btn-secondary";
-    continuousButton.addEventListener("click", function() {
-      console.log("client asks for continuous scan");
+    $("#scanCon").on("click",function() {
       socket.emit("s","hello");
       scanningConfig();
     });
 
-    var stopButton = document.getElementById("stopScan");
-    stopButton.id = "stopScan";
-    stopButton.innerHTML = "Stop scan";
-    stopButton.className = "btn btn-secondary";
-    stopButton.addEventListener("click", function() {
-      console.log("client says stop scan");
+    $("#stopScan").on("click",function() {
       socket.emit("t","data");
       startConfig();
-    });
+    })
 
-    var stopGraphButton = document.getElementById("stopGraph");
     $("#stopGraph").on("click",function() {
       socket.emit("t","data");
       startConfig();
     });
 
-
-    var clearBoardButton = document.createElement("button");
-    clearBoardButton.innerHTML = "Clear Board";
-    clearBoardButton.className = "btn btn-secondary";
-    clearBoardButton.addEventListener("click", function() {
+    $("#clear").on("click",function() {
       myBreadboard.drawEmptyBreadboard();
+    });
+    $("#print").on("click",function() {
+      window.print();
     });
 
     var printButton = document.createElement("button");
@@ -367,15 +353,6 @@ var enableGraphingForm = function() {
         $("#resistance").hide();
       }
     });
-
-    var controlsDiv = document.getElementsByClassName("controls")[0];
-    controlsDiv.appendChild(getDataButton);
-    controlsDiv.appendChild(continuousButton);
-    controlsDiv.appendChild(stopButton);
-
-    var belowBoardDiv = document.getElementById("clearButtonDiv");
-    belowBoardDiv.appendChild(clearBoardButton);
-    belowBoardDiv.appendChild(printButton);
 
     $("#stopScan").toggle();
     $("#stopGraph").hide();
