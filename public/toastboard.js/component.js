@@ -679,6 +679,14 @@ INA128.prototype.draw = function() {
     .attr("stroke","black")
     .attr("stroke-width",2)
     .attr("fill","white");
+  var text = svg.append("text")
+    .attr("x", this.startPin[0]+10 )
+    .attr("y", this.startPin[1]+45 )
+    .text( function(d) { return "INA128"})                                                                                                                                                                                         
+    .attr("font-family","sans-serif")
+    .attr("font-size" , "8px")
+    .attr("fill","black");
+    
 
 
   var msg = this.test();
@@ -713,7 +721,7 @@ INA128.prototype.getId = function() {
 INA128.prototype.serialize = function() {
   var c = {};
   c["id"] = this.getId();
-  c["type"] = "button";
+  c["type"] = "ina128";
   c["startRow"] = this.startRow;
   c["startPinNum"] = this.startPinNum;
   c["endRow"] = this.endRow;
@@ -723,8 +731,9 @@ INA128.prototype.serialize = function() {
 
 
 INA128.prototype.test = function() {
-  if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f")  {
-    return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i> Reference voltage (pin1) is floating";
+
+  if (this.breadboard.getVoltage(this.startRow+27,this.startPinNum) == "f")  {
+    return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i> V<sub>ref</sub> (pin5) at "+getDisplayRow(this.startRow+27,this.startPinNum)+" is floating";
   }
 }
 
