@@ -121,16 +121,21 @@
     <form class="form-inline" id="graphForm">
     <div class="form-group">
     <div class="input-group">
-      <div class="input-group-addon">Row</div>
-      <input type="text" class="form-control" id="rowToGraph" placeholder="Number">
-      <select class="form-control" id="sideToGraph">
+      <div class="input-group-addon">Row to Graph: </div>
+      <input type="text" class="form-control" id="rowToGraph" placeholder="Row" style="width: 70px">
+      <select class="form-control" id="sideToGraph" style="width: 70px">
         <option>Left</option>
         <option>Right</option>
       </select>
       </div>
       </div>
-      <button type="submit" class="btn btn-secondary" id="graphButton">Graph row</button>
+      <div class="form-group">
+      <div class="input-group">
+      <button type="submit" class="btn btn-secondary" id="graphButton">Start graphing</button>
+        <button type="button" class="btn btn-secondary" id="stopGraph">Stop graphing</button>
+        </div></div>
     </form>
+
   <div class="rightside">
   
   <div class="graph">
@@ -198,6 +203,7 @@ var startConfig = function() {
   $("#scanOnce").show();
   $("#scanCon").show();
   $("#stopScan").hide();
+  $("#stopGraph").hide();
   enableGraphingForm();
 }
 
@@ -211,20 +217,23 @@ var scanningConfig = function() {
 var graphingConfig = function() {
   $("#scanOnce").hide();
   $("#scanCon").hide();
-  $("#stopScan").show();
+  $("#stopScan").hide();
+  $("#stopGraph").show();
   disableGraphingForm();
 }
 
 var disableGraphingForm = function() {
   $("#rowToGraph").attr("disabled","disabled");
   $("#sideToGraph").attr("disabled","disabled");
-  $("#graphButton").attr("disabled","disabled");
+  //$("#graphButton").attr("disabled","disabled");
+  $("#graphButton").hide();
 }
 
 var enableGraphingForm = function() {
   $("#rowToGraph").removeAttr("disabled");
   $("#sideToGraph").removeAttr("disabled");
-  $("#graphButton").removeAttr("disabled");
+  //$("#graphButton").removeAttr("disabled");
+  $("#graphButton").show();
 }
 
   $(document).ready(function() {
@@ -260,6 +269,13 @@ var enableGraphingForm = function() {
       socket.emit("t","data");
       startConfig();
     });
+
+    var stopGraphButton = document.getElementById("stopGraph");
+    $("#stopGraph").on("click",function() {
+      socket.emit("t","data");
+      startConfig();
+    });
+
 
     var clearBoardButton = document.createElement("button");
     clearBoardButton.innerHTML = "Clear Board";
@@ -362,8 +378,9 @@ var enableGraphingForm = function() {
     belowBoardDiv.appendChild(printButton);
 
     $("#stopScan").toggle();
+    $("#stopGraph").hide();
 
-  var fakeJson = '{\"rowsLeft\":[\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"], \"rowsRight\":[\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",3.3,\"f\",\"f\",\"f\",\"f\",1.5,\"f\",\"f\",\"f\",1.5,0.0,\"f\",\"f\",\"f\"]}';
+  var fakeJson = '{\"rowsLeft\":["f",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"], \"rowsRight\":[\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",3.3,\"f\",\"f\",\"f\",\"f\",1.5,\"f\",\"f\",\"f\",1.5,0.0,\"f\",\"f\",\"f\"]}';
   myBreadboard.drawBreadboard(JSON.parse(fakeJson));
   sessionStorage.setItem("boardstate",JSON.stringify({"components":[]}));
 
