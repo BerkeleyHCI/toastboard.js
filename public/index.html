@@ -267,9 +267,50 @@ var enableGraphingForm = function() {
   $("#graphButton").show();
 }
 
-var setStartPin = function(pinNum) {
+// controls for add comp bar
+var addCompConfig = function() {
+  $("#add-group").show();
+  $("#add").show();
+  $("#deleteComp").hide();
+  $("#graphComp").hide();
+  $("#cancel").hide();
+  $("#cancelDelete").hide();
   $("#start-pin-group").hide();
-  $("#end-pin-group").show();
+  $("#end-pin-group").hide();
+}
+
+var highlightedConfig = function(type_initial) {
+  $("#add-group").hide();
+  $("#add").hide();
+  $("#deleteComp").show();
+  if (type_initial == "s") {
+    $("#graphComp").show();
+  } else {
+    $("#graphComp").hide();
+  }
+  $("#cancel").hide();
+  $("#cancelDelete").show();
+  $("#start-pin-group").hide();
+  $("#end-pin-group").hide();
+}
+
+var placePinConfig = function(stage) {
+  $("#add-group").hide();
+  $("#add").hide();
+  $("#deleteComp").hide();
+  $("#graphComp").hide();
+  $("#cancel").show();
+  $("#cancelDelete").hide();
+  if (stage == "start") {
+    $("#start-pin-group").show();
+    $("#end-pin-group").hide();
+  } else {
+    $("#start-pin-group").hide();
+    $("#end-pin-group").show();
+  }
+}
+
+var setStartPin = function(pinNum) {
   var rowAndPin = getRowAndPinFromPinIndex(pinNum);
   holder.startRow = rowAndPin[0];
   holder.startPin = rowAndPin[1];
@@ -280,26 +321,17 @@ var setStartPin = function(pinNum) {
     var svg = myBreadboard.drawEmptyBreadboard();
     myBreadboard.redrawBoard(svg);
     redrawComponents(myBreadboard);
-    $("#add-group").show();
-    $("#start-pin-group").hide();
-    $("#end-pin-group").hide();
-    $("#add").show();
-    $("#cancel").hide();
-    $("#graphComp").hide();
+    addCompConfig();
   } else {
     svg = myBreadboard.drawEmptyBreadboard();
     myBreadboard.redrawBoard(svg);
     redrawComponents(myBreadboard);
     myBreadboard.attachPinClickEvents("end");
+    placePinConfig("end");
   }
 };
 
 var setEndPin = function(pinNum) {
-  $("#add-group").show();
-  $("#start-pin-group").hide();
-  $("#end-pin-group").hide();
-  $("#add").show();
-  $("#cancel").hide();
   var rowAndPin = getRowAndPinFromPinIndex(pinNum);
   holder.endRow = rowAndPin[0];
   holder.endPin = rowAndPin[1];
@@ -308,6 +340,7 @@ var setEndPin = function(pinNum) {
   var svg = myBreadboard.drawEmptyBreadboard();
   myBreadboard.redrawBoard(svg);
   redrawComponents(myBreadboard);
+  addCompConfig();
 }
 var highlightComponentAndRedraw = function(id) {
   highlightStateComponent(id,"true");
@@ -361,13 +394,7 @@ var graphRow = function(row,side) {
   $(document).ready(function() {
     // draw buttons nicely
 
-    $("#resistance").hide();
-    $("#cancel").hide();
-    $("#start-pin-group").hide();
-    $("#end-pin-group").hide();
-    $("#deleteComp").hide();
-    $("#graphComp").hide();
-    $("#cancelDelete").hide();
+    addCompConfig();
     
     $("#scanOnce").on("click",function() {
       socket.emit("d","hello");
@@ -426,38 +453,20 @@ var graphRow = function(row,side) {
         myBreadboard.redrawBoard(svg);
         redrawComponents(myBreadboard);
         myBreadboard.attachPinClickEvents("start");
-        $("#start-pin-group").show();
-        $("#cancel").show();
-        $("#graphComp").show();
-        $("#add").hide();
-        $("#add-group").hide();
+        placePinConfig("start");
       } else if (action == "cancel") {
         // redraw with no events
         holder.empty();
         svg = myBreadboard.drawEmptyBreadboard();
         myBreadboard.redrawBoard(svg);
         redrawComponents(myBreadboard);
-        $("#start-pin-group").hide();
-        $("#end-pin-group").hide();
-        $("#cancel").hide();
-        $("#add-group").show();
-        $("#add").show();
-        $("#graphComp").hide();
-        $("#deleteComp").hide();
+        addCompConfig();
       } else if (action == "delete") {
         deleteHighlightedComponent();
-        $("#deleteComp").hide();
-        $("#cancelDelete").hide();
-        $("#graphComp").hide();
-        $("#add-group").show();
-        $("#add").show();
+        addCompConfig();
       } else if (action == "cancelDelete") {
         clearHighlightedComponent();
-        $("#deleteComp").hide();
-        $("#cancelDelete").hide();
-        $("#graphComp").hide();
-        $("#add-group").show();
-        $("#add").show();
+        addCompConfig();
       } else if (action == "graph") {
         var id = holder.id;
         $("#deleteComp").hide();
