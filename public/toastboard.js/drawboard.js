@@ -263,7 +263,7 @@ Breadboard.prototype.redrawBoard = function(svg) {
     .attr("dy", ".30em")
     .text(function(d) { return d.label; });
 
-  svg.selectAll("rect")
+  svg.selectAll(".rowRect")
     .data(this.voltageAttr)
     .enter()
     .append("rect")
