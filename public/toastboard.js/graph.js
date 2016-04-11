@@ -22,7 +22,7 @@ Graph.prototype.addData = function(reading) {
 Graph.prototype.drawGraph = function(component_type) {
   var valuesTransform = function(voltage) {
     if (component_type == "sensor") {
-      return voltage / 512.0;
+      return voltage / 0.5120;
     } else {
       return voltage;
     }
@@ -36,7 +36,7 @@ Graph.prototype.drawGraph = function(component_type) {
   };
   var displayDigits = function() {
     if (component_type == "sensor") {
-      return 3;
+      return 2;
     } else {
       return 1;
     }
