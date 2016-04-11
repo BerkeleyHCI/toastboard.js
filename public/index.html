@@ -433,56 +433,6 @@ var clearHighlightedComponent = function() {
         $("#add").show();
       }
     });
-/*
-    $("form#componentForm").submit(function(e) {
-      e.preventDefault();
-      var action = $(document.activeElement).val();
-      var startrow = ($("input#startrow").val() - 1);
-      var startpinraw = $("#startPinNum").val();
-      if ($.isNumeric(startpinraw)) {
-        var startpin = startpinraw - 1;
-      } else {
-        var startpin = startpinraw;
-      }
-      var endrow = ($("input#endrow").val() - 1);
-      var endpinraw = $("#endPinNum").val();
-      if ($.isNumeric(endpinraw)) {
-        var endpin = endpinraw - 1;
-      } else {
-        var endpin = endpinraw;
-      }
-      var component_type = $("#newcomponent").val();
-      var resistance = $("#resistance").val();
-
-      console.log(component_type + " start side " + startrow + " " + startpin + " end side " + endrow + " " + endpin);
-      if (startpin > 4) {
-        startrow += 24;
-        startpin -= 5
-      }
-      if (endpin > 4) {
-        endrow += 24;
-        endpin -= 5;
-      }
-            console.log(component_type + " start side " + startrow + " " + startpin + " end side " + endrow + " " + endpin);
-      if (action == "add") {
-        var c = makeComponent(myBreadboard,component_type,startrow,startpin,endrow,endpin);
-        if (component_type == "resistor") {
-          c.resistance = resistance;
-        }
-        c.draw();
-        saveComponent(c);
-      } else if (action == "delete") {
-        var removeId = makeComponentId(component_type,startrow,startpin,endrow,endpin);
-        console.log("we will delete " + removeId);
-
-        var svg = myBreadboard.drawEmptyBreadboard();
-        myBreadboard.redrawBoard(svg);
-        redrawComponents(myBreadboard,removeId);
-        myBreadboard.attachPinClickEvents();
-
-      }
-    });
-    */
 
     $("#newcomponent").change(function(e) {
       if ($("#newcomponent").val() == "resistor") {
