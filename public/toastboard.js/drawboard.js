@@ -414,9 +414,9 @@ var getRowRect = function(rowIndex,breadboard) {
 
 var getRowAndPinFromPinIndex = function(pinIndex) {
   if (pinIndex < 24) {
-    return [pinIndex,"g"];
+    return [pinIndex,"v"];
   } else if (pinIndex < 48) {
-    return [pinIndex - 24, "v"];
+    return [pinIndex - 24, "g"];
   } else {
     var row = Math.floor( (pinIndex - (rownum*railcolumn)) / pinnum);
     var pin = (pinIndex - rownum*railcolumn) % pinnum;
