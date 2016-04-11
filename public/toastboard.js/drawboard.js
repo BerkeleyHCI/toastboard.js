@@ -114,7 +114,57 @@ Breadboard.prototype.attachPinClickEvents = function(pintype) {
   .attr("onclick",function(d,i) { return methodName + "(" + i + ");"});
 }
 
+var isPinLegal = function(i) {
+  var randp = getRowAndPinFromPinIndex(i);
+  if (holder.type != null) {
+    if (holder.startRow != null) {
+      // choose pins that are legal given type and start row/pin
+      if (holder.type == "wire") {
+        if ((holder.startPin == "v" || holder.startPin == "g") && (randp[1] == "v" || randp[1] == "g")) {
+          return false;
+        } else {
+          return true;
+        }
+      } else if (holder.type == "diode" || holder.type == "resistor" || holder.type == "button") {
+
+        if (holder.startPin == randp[1] && ((holder.startRow < 24) == (randp[0] < 24))) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    } else {
+      // choose pins that are legal given type
+      if (holder.type == "ina128") {
+        if (randp[0] < 21 && randp[1] == 4) {
+          return true;
+        } else {
+          return false;
+        }
+      } else if (holder.type == "diode" || holder.type == "resistor" || holder.type == "button") {
+        if (randp[1] == "v" || randp[1] == "g") {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    }
+  } else {
+    // not in the midst of placing a component
+    // don't highlight any pin
+    return false;
+  }
+}
+
+var isSamePin = function(i) {
+  var randp = getRowAndPinFromPinIndex(i);
+  return (holder.startRow == randp[0] && holder.startPin == randp[1]);
+};
+
 Breadboard.prototype.drawEmptyBreadboard = function() {
+  console.log(holder);
   var self = this;
   d3.select("#board")
     .remove();
@@ -132,7 +182,8 @@ Breadboard.prototype.drawEmptyBreadboard = function() {
   .attr("cx", function(d) { return d[0];} )
   .attr("cy", function(d) { return d[1];} )
   .attr("r", 2.5)
-  .style("fill",function(d) { return "gray";});
+  .style("fill",function(d,i) 
+    { if (isSamePin(i)) { return "red"; } else { if (isPinLegal(i)) { return "blue"; } else { return "gray"; }}});
 
   var numbers = numbering(self);
 
