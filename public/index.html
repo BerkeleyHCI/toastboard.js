@@ -48,7 +48,10 @@
       </div>
       <button type="submit" class="btn btn-secondary" value="add" id="add">Add</button>
       <button type="submit" class="btn btn-secondary" value="cancel" id="cancel">Cancel</button>
+      <button type="submit" class="btn btn-secondary" value="delete" id="deleteComp">Delete Component</button>
+      <button type="submit" class="btn btn-secondary" value="cancelDelete" id="cancelDelete">Cancel</button>
   </form>
+
   <!--
     <form class="form-inline" id="componentForm">
 
@@ -284,11 +287,29 @@ var setEndPin = function(pinNum) {
   redrawComponents(myBreadboard);
 }
 var highlightComponentAndRedraw = function(id) {
-  highlightComponent(id);
+  highlightStateComponent(id,"true");
+  holder.id = id;
   var svg = myBreadboard.drawEmptyBreadboard();
   myBreadboard.redrawBoard(svg);
   redrawComponents(myBreadboard);
+  $("#add-group").hide();
+  $("#add").hide();
+  $("#deleteComp").show();
+  $("#cancelDelete").show();
 }
+var deleteHighlightedComponent = function() {
+  var svg = myBreadboard.drawEmptyBreadboard();
+  myBreadboard.redrawBoard(svg);
+  redrawComponents(myBreadboard,holder.id);
+  holder.empty();
+};
+var clearHighlightedComponent = function() {
+  highlightStateComponent(holder.id,"false");
+  holder.empty();
+  var svg = myBreadboard.drawEmptyBreadboard();
+  myBreadboard.redrawBoard(svg);
+  redrawComponents(myBreadboard);
+};
 
   $(document).ready(function() {
     // draw buttons nicely
@@ -297,6 +318,8 @@ var highlightComponentAndRedraw = function(id) {
     $("#cancel").hide();
     $("#start-pin-group").hide();
     $("#end-pin-group").hide();
+    $("#deleteComp").hide();
+    $("#cancelDelete").hide();
     
     $("#scanOnce").on("click",function() {
       socket.emit("d","hello");
@@ -377,9 +400,19 @@ var highlightComponentAndRedraw = function(id) {
         $("#cancel").hide();
         $("#add-group").show();
         $("#add").show();
+      } else if (action == "delete") {
+        deleteHighlightedComponent();
+        $("#deleteComp").hide();
+        $("#cancelDelete").hide();
+        $("#add-group").show();
+        $("#add").show();
+      } else if (action == "cancelDelete") {
+        clearHighlightedComponent();
+        $("#deleteComp").hide();
+        $("#cancelDelete").hide();
+        $("#add-group").show();
+        $("#add").show();
       }
-
-
     });
 /*
     $("form#componentForm").submit(function(e) {

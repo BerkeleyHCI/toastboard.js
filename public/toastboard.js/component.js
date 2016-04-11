@@ -10,6 +10,7 @@ var ComponentHolder = function() {
   this.startPin = null;
   this.endRow = null;
   this.endPin = null;
+  this.id = null;
 }
 
 ComponentHolder.prototype.empty = function() {
@@ -18,6 +19,7 @@ ComponentHolder.prototype.empty = function() {
   this.startPin = null;
   this.endRow = null;
   this.endPin = null;
+  this.id = null;
 }
 
 ComponentHolder.prototype.create = function(breadboard) {
@@ -69,13 +71,13 @@ var redrawComponents = function(breadboard,removeId) {
   sessionStorage.setItem("boardstate",JSON.stringify(boardstate));
 };
 
-var highlightComponent = function(id) {
+var highlightStateComponent = function(id,state) {
   var boardstate = JSON.parse(sessionStorage.getItem("boardstate"));
   var newcomp = [];
   boardstate.components.forEach(function(d) {
     var c = JSON.parse(d);
     if (c.id == id) {
-      c.highlighted = "true";
+      c.highlighted = state;
     }
     newcomp.push(JSON.stringify(c));
   });
