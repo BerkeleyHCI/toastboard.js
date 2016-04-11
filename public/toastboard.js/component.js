@@ -959,57 +959,49 @@ Sensor.prototype.draw = function() {
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line5 = svg.append("line")
-    .attr("x1",this.startPin[0]+50)
-    .attr("y1",this.startPin[1])
-    .attr("x2",this.startPin[0]+55)
-    .attr("y2",this.startPin[1])
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1]+60)
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1]+60)
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line6 = svg.append("line")
-    .attr("x1",this.startPin[0]+50)
-    .attr("y1",this.startPin[1]+15)
-    .attr("x2",this.startPin[0]+55)
-    .attr("y2",this.startPin[1]+15)
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1]+75)
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1]+75)
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line7 = svg.append("line")
-    .attr("x1",this.startPin[0]+50)
-    .attr("y1",this.startPin[1]+30)
-    .attr("x2",this.startPin[0]+55)
-    .attr("y2",this.startPin[1]+30)
-    .attr("stroke-width",3)
-    .attr("stroke",color)
-    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line8 = svg.append("line")
-    .attr("x1",this.startPin[0]+50)
-    .attr("y1",this.startPin[1]+45)
-    .attr("x2",this.startPin[0]+55)
-    .attr("y2",this.startPin[1]+45)
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1]+90)
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1]+90)
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var package = svg.append("rect")
     .attr("x",this.startPin[0] + 5)
     .attr("y",this.startPin[1] - 5)
-    .attr("width",45)
-    .attr("height",55)
+    .attr("width",70)
+    .attr("height",100)
     .attr("stroke",color)
     .attr("stroke-width",2)
     .attr("fill","white")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var circle1 = svg.append("circle")
-    .attr("cx", this.startPin[0]+27 )
-    .attr("cy", this.startPin[1]+20 )
-    .attr("r", 18)
+    .attr("cx", this.startPin[0]+42 )
+    .attr("cy", this.startPin[1]+45 )
+    .attr("r", 25)
     .attr("stroke",color)
     .attr("stroke-width",2)
     .attr("fill","white")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var text = svg.append("text")
-    .attr("x", this.startPin[0]+15 )
-    .attr("y", this.startPin[1]+45 )
+    .attr("x", this.startPin[0]+30 )
+    .attr("y", this.startPin[1]+54 )
     .text( function(d) { return "sensor"})                                                                                                                                                                                         
     .attr("font-family","sans-serif")
     .attr("font-size" , "8px")
@@ -1019,7 +1011,7 @@ Sensor.prototype.draw = function() {
   var msg = this.test();
   if (msg) {
     this.failedTest = msg;
-    addWarningIconAndTooltip(svg,this.startPin[0]+30,this.startPin[1]+25,msg);
+    addWarningIconAndTooltip(svg,this.startPin[0]+10,this.startPin[1]+5,msg);
   }
 };
 
@@ -1044,19 +1036,18 @@ Sensor.prototype.test = function() {
 
 var reasons = ""
 var solutions =""
-return null;
-/*
-  if (this.breadboard.getVoltage(this.startRow+27,this.startPinNum) == "f")  {
-    reasons += "<br>-V<sub>ref</sub> (pin5) at "+getDisplayRow(this.startRow+27,this.startPinNum)+" is floating";
-    solutions +="<br>-In most cases, V<sub>ref</sub> should be connected to GND";
+
+  if (this.breadboard.getVoltage(this.startRow+6,this.startPinNum) != 0.0)  {
+    reasons += "<br>-GND input (pin7) at "+getDisplayRow(this.startRow+6,this.startPinNum)+" is not at ground";
+    solutions +="<br>-Connect "+getDisplayRow(this.startRow+6,this.startPinNum)+" to ground";
   }
-  if (this.breadboard.getVoltage(this.startRow+3,this.startPinNum) == "f" || this.breadboard.getVoltage(this.startRow+3,this.startPinNum)==this.breadboard.getVoltage(this.startRow+25,this.startPinNum) ) {
-    reasons +=  "<br>-The negative supply (pin4) at "+getDisplayRow(this.startRow+3,this.startPinNum)+" is floating or the same as the positive supply";
-    solutions += "<br>-To get the full output voltage range, V<sub>-</sub> should be connected to GND or ideally a negative voltage"
+  if (this.breadboard.getVoltage(this.startRow+5,this.startPinNum) < 5.0)  {
+    reasons +=  "<br>-PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is less than the suggested 5V";
+    solutions += "<br>-Either supply 5V to "+getDisplayRow(this.startRow+5,this.startPinNum)+" or the datasheet scale factor will be incorrect";
   }
 
-return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
-*/
+return "<strong>This sensor may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
+
 }
 
 var addWarningIconAndTooltip = function(svg, x, y, message) {
