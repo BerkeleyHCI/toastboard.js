@@ -267,11 +267,26 @@ var setStartPin = function(pinNum) {
   var rowAndPin = getRowAndPinFromPinIndex(pinNum);
   holder.startRow = rowAndPin[0];
   holder.startPin = rowAndPin[1];
-  svg = myBreadboard.drawEmptyBreadboard();
-  myBreadboard.redrawBoard(svg);
-  redrawComponents(myBreadboard);
-  myBreadboard.attachPinClickEvents("end");
-}
+  if (holder.type == "pot" || holder.type == "ina128") {
+    // this components have fixed size, only need 1 pin
+    var c = holder.create(myBreadboard);
+    saveComponent(c);
+    var svg = myBreadboard.drawEmptyBreadboard();
+    myBreadboard.redrawBoard(svg);
+    redrawComponents(myBreadboard);
+    $("#add-group").show();
+    $("#start-pin-group").hide();
+    $("#end-pin-group").hide();
+    $("#add").show();
+    $("#cancel").hide();
+  } else {
+    svg = myBreadboard.drawEmptyBreadboard();
+    myBreadboard.redrawBoard(svg);
+    redrawComponents(myBreadboard);
+    myBreadboard.attachPinClickEvents("end");
+  }
+};
+
 var setEndPin = function(pinNum) {
   $("#add-group").show();
   $("#start-pin-group").hide();
