@@ -16,7 +16,7 @@ app.use(express.static(__dirname + '/public'));
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort;
 
-var serialPort = new SerialPort("COM4",  {
+var serialPort = new SerialPort("COM5",  {
   baudrate: 115200,
 //    baudrate: 9600,
     parser: serialport.parsers.readline("\n")
