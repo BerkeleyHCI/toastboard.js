@@ -25,6 +25,31 @@
 <div class="container theme-showcase">
   <div class="jumbotron">
   <div class="row">
+  <form class="form-inline" id="componentForm">
+    <div class="form-group">
+    <div class="input-group" id="add-group">
+      <div class="input-group-addon">Add a</div>
+        <select id="newcomponent" name="newcomponent" class="form-control">
+        <option value="wire">Wire</option>
+        <option value="diode">Diode</option>
+        <option value="resistor">Resistor</option>
+        <option value="component">Component</option>
+        <option value="button">Button</option>
+        <option value="ina128">INA128</option>
+        </select>
+
+      </div>
+      </div>
+      <div class="input-group" id="start-pin-group">
+      <div class="input-group-addon">Choose a start pin</div>
+      </div>
+      <div class="input-group" id="end-pin-group">
+      <div class="input-group-addon">Choose an end pin</div>
+      </div>
+      <button type="submit" class="btn btn-secondary" value="add" id="add">Add</button>
+      <button type="submit" class="btn btn-secondary" value="cancel" id="cancel">Cancel</button>
+  </form>
+  <!--
     <form class="form-inline" id="componentForm">
 
       <div class="form-group">
@@ -41,12 +66,7 @@
       <label class="sr-only" for="startRow">Starting point</label>
       <div class="input-group">
 
-      <div class="input-group-addon">Start: Row</div>
-      <!--
-            <select id="startSide" name="startSide" class="form-control" style="width: 100px">
-        <option value="left">Left side</option>
-        <option value="right">Right side</option>
-        </select> -->
+      <div class="input-group-addon">Start: Row</div> 
       <input type="text" class="form-control" id="startRow" style="width: 70px" placeholder="Row">
       <div class="input-group-addon">Pin</div>
       <select id="startPinNum" name="startPinNum" class="form-control" style="width: 80px">
@@ -69,11 +89,7 @@
       <label class="sr-only" for="endRow">Ending point</label>
       <div class="input-group">
       <div class="input-group-addon">End: Row</div>
-      <!--
-        <select id="endSide" name="endSide" class="form-control" style="width: 100px">
-        <option value="left">Left side</option>
-        <option value="right">Right side</option>
-        </select> -->
+
       <input type="text" class="form-control" id="endRow" style="width: 70px" placeholder="Row">
       <div class="input-group-addon">Pin</div>
       <select id="endPinNum" name="endPinNum" class="form-control" style="width: 80px">
@@ -98,7 +114,7 @@
         <button type="submit" class="btn btn-secondary" value="add">Add</button>
         <button type="submit" class="btn btn-secondary" value="delete">Delete</button>
 
-    </form>
+    </form> -->
 </div>
     <div class="row">
     <div class="col-xs-6">
@@ -181,6 +197,7 @@ var fullRowToRowAndSide = function(row) {
 
 var myBreadboard = new Breadboard();
 var myGraph = new Graph();
+var holder = new ComponentHolder();
 
 // if we get an "info" emit from the socket server then console.log the data we receive
 socket.on('info', function (data) {
@@ -240,10 +257,40 @@ var enableGraphingForm = function() {
   $("#graphButton").show();
 }
 
+var setStartPin = function(pinNum) {
+  $("#start-pin-group").hide();
+  $("#end-pin-group").show();
+  var rowAndPin = getRowAndPinFromPinIndex(pinNum);
+  holder.startRow = rowAndPin[0];
+  holder.startPin = rowAndPin[1];
+  svg = myBreadboard.drawEmptyBreadboard();
+  myBreadboard.redrawBoard(svg);
+  redrawComponents(myBreadboard);
+  myBreadboard.attachPinClickEvents("end");
+}
+var setEndPin = function(pinNum) {
+  $("#add-group").show();
+  $("#start-pin-group").hide();
+  $("#end-pin-group").hide();
+  $("#add").show();
+  $("#cancel").hide();
+  var rowAndPin = getRowAndPinFromPinIndex(pinNum);
+  holder.endRow = rowAndPin[0];
+  holder.endPin = rowAndPin[1];
+  var c = holder.create(myBreadboard);
+  saveComponent(c);
+  var svg = myBreadboard.drawEmptyBreadboard();
+  myBreadboard.redrawBoard(svg);
+  redrawComponents(myBreadboard);
+}
+
   $(document).ready(function() {
     // draw buttons nicely
 
     $("#resistance").hide();
+    $("#cancel").hide();
+    $("#start-pin-group").hide();
+    $("#end-pin-group").hide();
     
     $("#scanOnce").on("click",function() {
       socket.emit("d","hello");
@@ -303,6 +350,35 @@ var enableGraphingForm = function() {
     $("form#componentForm").submit(function(e) {
       e.preventDefault();
       var action = $(document.activeElement).val();
+      if (action == "add") {
+        holder.type = $("#newcomponent").val();
+        svg = myBreadboard.drawEmptyBreadboard();
+        myBreadboard.redrawBoard(svg);
+        redrawComponents(myBreadboard);
+        myBreadboard.attachPinClickEvents("start");
+        $("#start-pin-group").show();
+        $("#cancel").show();
+        $("#add").hide();
+        $("#add-group").hide();
+      } else if (action == "cancel") {
+        // redraw with no events
+        holder.empty();
+        svg = myBreadboard.drawEmptyBreadboard();
+        myBreadboard.redrawBoard(svg);
+        redrawComponents(myBreadboard);
+        $("#start-pin-group").hide();
+        $("#end-pin-group").hide();
+        $("#cancel").hide();
+        $("#add-group").show();
+        $("#add").show();
+      }
+
+
+    });
+/*
+    $("form#componentForm").submit(function(e) {
+      e.preventDefault();
+      var action = $(document.activeElement).val();
       var startrow = ($("input#startrow").val() - 1);
       var startpinraw = $("#startPinNum").val();
       if ($.isNumeric(startpinraw)) {
@@ -348,6 +424,7 @@ var enableGraphingForm = function() {
 
       }
     });
+    */
 
     $("#newcomponent").change(function(e) {
       if ($("#newcomponent").val() == "resistor") {
@@ -363,7 +440,7 @@ var enableGraphingForm = function() {
   var fakeJson = '{\"rowsLeft\":["f",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"], \"rowsRight\":[\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",3.3,\"f\",\"f\",\"f\",\"f\",1.5,\"f\",\"f\",\"f\",1.5,0.0,\"f\",\"f\",\"f\"]}';
   myBreadboard.drawBreadboard(JSON.parse(fakeJson));
   sessionStorage.setItem("boardstate",JSON.stringify({"components":[]}));
-  myBreadboard.attachPinClickEvents();
+//  myBreadboard.attachPinClickEvents();
 
   });
 </script>

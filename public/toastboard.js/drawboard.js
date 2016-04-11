@@ -95,17 +95,23 @@ var thresholdVoltage = function(voltage) {
   }
 };
 
-Breadboard.prototype.attachPinClickEvents = function() {
-  d3.select("#board").selectAll("rect")
+Breadboard.prototype.attachPinClickEvents = function(pintype) {
+  if (pintype == "start") {
+    var methodName = "setStartPin";
+  } else if (pintype == "end") {
+    var methodName = "setEndPin";
+  }
+  console.log("attaching pin events");
+  d3.select("#board").selectAll("pinclick")
   .data(this.pinPositions)
   .enter()
   .append("rect")
-  .attr("x",function(d) { return d[0]; })
-  .attr("y",function(d) { return d[1]; })
-  .attr("width",5)
-  .attr("height",5)
+  .attr("x",function(d) { return d[0] - 5; })
+  .attr("y",function(d) { return d[1] - 5; })
+  .attr("width",10)
+  .attr("height",10)
   .attr("class","pinclick")
-  .attr("onclick","alert('click!')");
+  .attr("onclick",function(d,i) { return methodName + "(" + i + ");"});
 }
 
 Breadboard.prototype.drawEmptyBreadboard = function() {
@@ -354,6 +360,18 @@ var getRowRect = function(rowIndex,breadboard) {
   var lastPin = breadboard.pinPositions[(rownum*railcolumn) + (rowIndex*pinnum) + (pinnum - 1)];
   return getRectAttr(firstPin,lastPin);
 };
+
+var getRowAndPinFromPinIndex = function(pinIndex) {
+  if (pinIndex < 24) {
+    return [pinIndex,"g"];
+  } else if (pinIndex < 48) {
+    return [pinIndex - 24, "v"];
+  } else {
+    var row = Math.floor( (pinIndex - (rownum*railcolumn)) / pinnum);
+    var pin = (pinIndex - rownum*railcolumn) % pinnum;
+    return [row,pin];
+  }
+}
 
 var getVoltageColor = function(voltage) {
   var color;

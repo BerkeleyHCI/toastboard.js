@@ -1,7 +1,29 @@
 var leftCols = ["a","b","c","d","e"];
 var rightCols = ["f","g","h","i","j"];
 
-var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,endpin,failedTest) {
+var ComponentHolder = function() {
+  this.type = null;
+  this.startRow = null;
+  this.startPin = null;
+  this.endRow = null;
+  this.endPin = null;
+}
+
+ComponentHolder.prototype.empty = function() {
+  this.type = null;
+  this.startRow = null;
+  this.startPin = null;
+  this.endRow = null;
+  this.endPin = null;
+}
+
+ComponentHolder.prototype.create = function(breadboard) {
+  var c = makeComponent(breadboard,this.type,this.startRow,this.startPin,this.endRow,this.endPin);
+  this.empty();
+  return c;
+}
+
+var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,endpin) {
   if (component_type == "resistor") {
     var c = new Resistor(breadboard,startrow,startpin,endrow,endpin);
   } else if (component_type == "diode") {
