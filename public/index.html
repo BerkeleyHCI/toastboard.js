@@ -35,7 +35,7 @@
         <option value="resistor">Resistor</option>
         <option value="component">Component</option>
         <option value="button">Button</option>
-        <option value="LMC6482">LMC6482</option>
+        <option value="ina128">LMC6482</option>
         <option value="pot">Potentiometer</option>
         <option value="sensor">Ultrasonic sensor</option>
         </select>
@@ -268,7 +268,7 @@ var setStartPin = function(pinNum) {
   var rowAndPin = getRowAndPinFromPinIndex(pinNum);
   holder.startRow = rowAndPin[0];
   holder.startPin = rowAndPin[1];
-  if (holder.type == "pot" || holder.type == "LMC6482" || holder.type == "sensor") {
+  if (holder.type == "pot" || holder.type == "LMC6482" || holder.type == "sensor" || holder.type == "ina128") {
     // this components have fixed size, only need 1 pin
     var c = holder.create(myBreadboard);
     saveComponent(c);
