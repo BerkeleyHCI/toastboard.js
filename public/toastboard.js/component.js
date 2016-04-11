@@ -43,6 +43,8 @@ var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,
     var c = new INA128(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type == "pot") {
     var c = new Potentiometer(breadboard,startrow,startpin,endrow,endpin,highlighted);
+  } else if (component_type == "sensor") {
+    var c = new Sensor(breadboard,startrow,startpin,endrow,endpin,highlighted);
   }
   return c;
 };
@@ -880,6 +882,174 @@ var solutions =""
   }
 
 return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
+}
+
+var Sensor = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
+  this.breadboard = breadboard;
+  this.startRow = startRow;
+  this.startPinNum = 4;
+  this.startPin = this.breadboard.getRowPin(this.startRow,this.startPinNum);
+  this.endRow = endRow;
+  this.endPinNum = endPinNum;
+  this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
+  this.buttonWidth = 20;
+  this.calcPoints();
+  this.failedTest = null;
+  this.highlighted = highlighted;
+};
+
+Sensor.prototype.calcPoints = function() {
+  var buttonHeight = 15;
+  var fullHeight = this.endPin[1] - this.startPin[1];
+  this.verticalLineHeight = (fullHeight - buttonHeight) / 2;
+  this.middleSpot = fullHeight / 2;
+};
+
+
+Sensor.prototype.draw = function() {
+  if (this.highlighted == "true") {
+    var color = highlightedColor;
+  } else {
+    var color = defaultColor;
+  }
+  var lineFunction = d3.svg.line()
+                       .x(function(d) { return d.x; })
+                       .y(function(d) { return d.y; })
+                       .interpolate("linear");
+
+  var svg = d3.select("svg");
+
+  var line1 = svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1])
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var line2 = svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1]+15)
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1]+15)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var line3 = svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1]+30)
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1]+30)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var line4 = svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1]+45)
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1]+45)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var line5 = svg.append("line")
+    .attr("x1",this.startPin[0]+50)
+    .attr("y1",this.startPin[1])
+    .attr("x2",this.startPin[0]+55)
+    .attr("y2",this.startPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var line6 = svg.append("line")
+    .attr("x1",this.startPin[0]+50)
+    .attr("y1",this.startPin[1]+15)
+    .attr("x2",this.startPin[0]+55)
+    .attr("y2",this.startPin[1]+15)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var line7 = svg.append("line")
+    .attr("x1",this.startPin[0]+50)
+    .attr("y1",this.startPin[1]+30)
+    .attr("x2",this.startPin[0]+55)
+    .attr("y2",this.startPin[1]+30)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var line8 = svg.append("line")
+    .attr("x1",this.startPin[0]+50)
+    .attr("y1",this.startPin[1]+45)
+    .attr("x2",this.startPin[0]+55)
+    .attr("y2",this.startPin[1]+45)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var package = svg.append("rect")
+    .attr("x",this.startPin[0] + 5)
+    .attr("y",this.startPin[1] - 5)
+    .attr("width",45)
+    .attr("height",55)
+    .attr("stroke",color)
+    .attr("stroke-width",2)
+    .attr("fill","white")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var circle1 = svg.append("circle")
+    .attr("cx", this.startPin[0]+27 )
+    .attr("cy", this.startPin[1]+20 )
+    .attr("r", 18)
+    .attr("stroke",color)
+    .attr("stroke-width",2)
+    .attr("fill","white")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var text = svg.append("text")
+    .attr("x", this.startPin[0]+15 )
+    .attr("y", this.startPin[1]+45 )
+    .text( function(d) { return "sensor"})                                                                                                                                                                                         
+    .attr("font-family","sans-serif")
+    .attr("font-size" , "8px")
+    .attr("fill","black")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+    
+  var msg = this.test();
+  if (msg) {
+    this.failedTest = msg;
+    addWarningIconAndTooltip(svg,this.startPin[0]+30,this.startPin[1]+25,msg);
+  }
+};
+
+Sensor.prototype.getId = function() {
+  return "s" + this.startRow;
+}
+
+Sensor.prototype.serialize = function() {
+  var c = {};
+  c["id"] = this.getId();
+  c["type"] = "sensor";
+  c["startRow"] = this.startRow;
+  c["startPinNum"] = this.startPinNum;
+  c["endRow"] = this.endRow;
+  c["endPinNum"] = this.endPinNum;
+  c["highlighted"] = this.highlighted;
+  return JSON.stringify(c);
+}
+
+
+Sensor.prototype.test = function() {
+
+var reasons = ""
+var solutions =""
+return null;
+/*
+  if (this.breadboard.getVoltage(this.startRow+27,this.startPinNum) == "f")  {
+    reasons += "<br>-V<sub>ref</sub> (pin5) at "+getDisplayRow(this.startRow+27,this.startPinNum)+" is floating";
+    solutions +="<br>-In most cases, V<sub>ref</sub> should be connected to GND";
+  }
+  if (this.breadboard.getVoltage(this.startRow+3,this.startPinNum) == "f" || this.breadboard.getVoltage(this.startRow+3,this.startPinNum)==this.breadboard.getVoltage(this.startRow+25,this.startPinNum) ) {
+    reasons +=  "<br>-The negative supply (pin4) at "+getDisplayRow(this.startRow+3,this.startPinNum)+" is floating or the same as the positive supply";
+    solutions += "<br>-To get the full output voltage range, V<sub>-</sub> should be connected to GND or ideally a negative voltage"
+  }
+
+return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
+*/
 }
 
 var addWarningIconAndTooltip = function(svg, x, y, message) {

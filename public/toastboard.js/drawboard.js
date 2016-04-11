@@ -126,7 +126,6 @@ var isPinLegal = function(i) {
           return true;
         }
       } else if (holder.type == "diode" || holder.type == "resistor" || holder.type == "button") {
-
         if (holder.startPin == randp[1] && ((holder.startRow < 24) == (randp[0] < 24))) {
           return true;
         } else {
@@ -135,11 +134,17 @@ var isPinLegal = function(i) {
       }
     } else {
       // choose pins that are legal given type
-      if (holder.type == "ina128") {
+      if (holder.type == "ina128" || holder.type == "sensor") {
         if (randp[0] < 21 && randp[1] == 4) {
           return true;
         } else {
           return false;
+        }
+      } else if (holder.type == "pot") {
+        if (randp[1] == "v" || randp[1] == "g" || randp[0] > 21) {
+          return false;
+        } else {
+          return true;
         }
       } else if (holder.type == "diode" || holder.type == "resistor" || holder.type == "button") {
         if (randp[1] == "v" || randp[1] == "g") {
