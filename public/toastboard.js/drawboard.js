@@ -214,6 +214,41 @@ Breadboard.prototype.drawEmptyBreadboard = function() {
     .attr("font-size","0.7em")
     .text(function(d) { return d.label; });
 
+  var defaultVoltages = [];
+    // manually add power and ground rails
+  pwrVoltage = getRailRect(0,this);
+  pwrVoltage.r = 0;
+  pwrVoltage.v = 3.3;
+  pwrVoltage.color = vddColor;
+  defaultVoltages.push(pwrVoltage);
+
+  grdVoltage = getRailRect(1,this);
+  grdVoltage.r = 1;
+  grdVoltage.v = 0;
+  grdVoltage.color = groundColor;
+  defaultVoltages.push(grdVoltage);
+
+  svg.selectAll(".defaultVoltages")
+  .data(defaultVoltages)
+  .enter()
+  .append("rect")
+  .attr("x", function(d) { return d.x; })
+  .attr("y", function(d) { return d.y; })
+  .attr("height", function(d) { return d.height; })
+  .attr("width", function(d) { return d.width; })
+  .attr("rx", 5)
+  .attr("ry",5)
+  .attr("fill", function(d) { return d.color})
+  .attr("fill-opacity", 0.5)
+  .attr("class","defaultVoltages")
+  .append("title").text(function(d) { return d.v.toString() + "V" });
+
+    svg.append("text")
+    .attr("x",280)
+    .attr("y",390)
+    .attr("dy",".30em")
+    .text("VDD: " + vdd.toFixed(1) + "V");
+
   return svg;
 };
 
@@ -227,12 +262,6 @@ Breadboard.prototype.redrawBoard = function(svg) {
     .attr("y", function(d) { return d.y; })
     .attr("dy", ".30em")
     .text(function(d) { return d.label; });
-
-  svg.append("text")
-    .attr("x",280)
-    .attr("y",390)
-    .attr("dy",".30em")
-    .text("VDD: " + vdd.toFixed(1) + "V");
 
   svg.selectAll("rect")
     .data(this.voltageAttr)
@@ -248,19 +277,6 @@ Breadboard.prototype.redrawBoard = function(svg) {
     .attr("fill-opacity", 0.5)
     .append("title").text(function(d) { return d.v.toString() + "V" });
 
-    // we used to automatically draw wires
-    /*
-    svg.selectAll("line")
-        .data(this.connections)
-        .enter()
-        .append("line")
-        .attr("x1",function(d) { return d.startPin[0]; })
-        .attr("y1",function(d) { return d.startPin[1]; })
-        .attr("x2",function(d) { return d.endPin[0]; })
-        .attr("y2",function(d) { return d.endPin[1]; })
-        .attr("stroke-width",3)
-        .attr("stroke",function (d) { return d.color; });
-    */
 };
 
 
@@ -462,19 +478,8 @@ var hashToVoltageAttr = function(hash,breadboard) {
   //var self = this;
   var voltageAttr = [];
   Object.keys(hash).forEach(function(hashKey) {
-    /*
-    var color;
-    if (hashKey == 0) {
-      color = groundColor;
-    } else if (hashKey == vdd) {
-      color = vddColor;
-    } else {
-      var colorIndex = Math.floor(Math.random() * colorArray.length);
-      color = colorArray[colorIndex];
-      colorArray.splice(colorIndex,1);
-    }
-    */
-    hash[hashKey].forEach(function(row) {
+
+  hash[hashKey].forEach(function(row) {
       var newVoltage = getRowRect(row,breadboard);
       newVoltage.r = row;
       newVoltage.v = hashKey;
@@ -483,18 +488,6 @@ var hashToVoltageAttr = function(hash,breadboard) {
     });
   });
 
-  // manually add power and ground rails
-  pwrVoltage = getRailRect(0,breadboard);
-  pwrVoltage.r = 0;
-  pwrVoltage.v = 3.3;
-  pwrVoltage.color = vddColor;
-  voltageAttr.push(pwrVoltage);
-
-  grdVoltage = getRailRect(1,breadboard);
-  grdVoltage.r = 1;
-  grdVoltage.v = 0;
-  grdVoltage.color = groundColor;
-  voltageAttr.push(grdVoltage);
   return voltageAttr;
 };
 
