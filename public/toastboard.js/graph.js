@@ -33,7 +33,14 @@ Graph.prototype.drawGraph = function(component_type) {
     } else {
       return "V";
     }
-  }
+  };
+  var displayDigits = function() {
+    if (component_type == "sensor") {
+      return 3;
+    } else {
+      return 1;
+    }
+  };
 
   d3.select("#graphxaxis").remove();
   d3.select("#graphyaxis").remove();
@@ -78,7 +85,7 @@ Graph.prototype.drawGraph = function(component_type) {
       .ticks(5)
       .tickSize(5)
       .orient('left')
-      .tickFormat(function(d) { return d.toFixed(3) + units();});
+      .tickFormat(function(d) { return d.toFixed(displayDigits()) + units();});
 
 
   vis.append('svg:g')
