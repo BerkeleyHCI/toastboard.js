@@ -51,6 +51,7 @@
       <button type="submit" class="btn btn-secondary" value="add" id="add">Add</button>
       <button type="submit" class="btn btn-secondary" value="cancel" id="cancel">Cancel</button>
       <button type="submit" class="btn btn-secondary" value="delete" id="deleteComp">Delete Component</button>
+      <button type="submit" class="btn btn-secondary" value="graph" id="graphComp">Graph Component</button>
       <button type="submit" class="btn btn-secondary" value="cancelDelete" id="cancelDelete">Cancel</button>
   </form>
 
@@ -280,6 +281,7 @@ var setStartPin = function(pinNum) {
     $("#end-pin-group").hide();
     $("#add").show();
     $("#cancel").hide();
+    $("#graphComp").hide();
   } else {
     svg = myBreadboard.drawEmptyBreadboard();
     myBreadboard.redrawBoard(svg);
@@ -312,6 +314,10 @@ var highlightComponentAndRedraw = function(id) {
   $("#add-group").hide();
   $("#add").hide();
   $("#deleteComp").show();
+  var type_initial = id[0];
+  if (type_initial == "i" || type_initial == "s" || type_initial == "p" || type_initial == "d") {
+    $("#graphComp").show();
+  }
   $("#cancelDelete").show();
 }
 var deleteHighlightedComponent = function() {
@@ -328,6 +334,23 @@ var clearHighlightedComponent = function() {
   redrawComponents(myBreadboard);
 };
 
+var graphRow = function(row,side) {
+  var rowString = "";
+  row -= 1;
+  if (side == "Right") {
+    row +=24;
+  }
+  if (row < 10) {
+    rowString = "0" + row;
+  } else {
+    rowString = "" + row;
+  }
+  console.log("graph row " + rowString + " on side " + side);
+  graphingConfig();
+  myGraph.clear();
+  socket.emit("o",rowString);
+};
+
   $(document).ready(function() {
     // draw buttons nicely
 
@@ -336,6 +359,7 @@ var clearHighlightedComponent = function() {
     $("#start-pin-group").hide();
     $("#end-pin-group").hide();
     $("#deleteComp").hide();
+    $("#graphComp").hide();
     $("#cancelDelete").hide();
     
     $("#scanOnce").on("click",function() {
@@ -374,25 +398,11 @@ var clearHighlightedComponent = function() {
       window.print();
     });
 
-
     $("#graphForm").submit(function(e) {
       e.preventDefault();
       var row = $("input#rowToGraph").val();
       var side = $("#sideToGraph").val();
-      var rowString = "";
-      row -= 1;
-      if (side == "Right") {
-        row +=24;
-      }
-      if (row < 10) {
-        rowString = "0" + row;
-      } else {
-        rowString = "" + row;
-      }
-      console.log("graph row " + rowString + " on side " + side);
-      graphingConfig();
-      myGraph.clear();
-      socket.emit("o",rowString);
+      graphRow(row,side);
     });
 
     $("form#componentForm").submit(function(e) {
@@ -406,6 +416,7 @@ var clearHighlightedComponent = function() {
         myBreadboard.attachPinClickEvents("start");
         $("#start-pin-group").show();
         $("#cancel").show();
+        $("#graphComp").show();
         $("#add").hide();
         $("#add-group").hide();
       } else if (action == "cancel") {
@@ -419,16 +430,19 @@ var clearHighlightedComponent = function() {
         $("#cancel").hide();
         $("#add-group").show();
         $("#add").show();
+        $("#graphComp").hide();
       } else if (action == "delete") {
         deleteHighlightedComponent();
         $("#deleteComp").hide();
         $("#cancelDelete").hide();
+        $("#graphComp").hide();
         $("#add-group").show();
         $("#add").show();
       } else if (action == "cancelDelete") {
         clearHighlightedComponent();
         $("#deleteComp").hide();
         $("#cancelDelete").hide();
+        $("#graphComp").hide();
         $("#add-group").show();
         $("#add").show();
       }
