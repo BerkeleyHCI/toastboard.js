@@ -843,7 +843,7 @@ INA128.prototype.draw = function() {
   var text = svg.append("text")
     .attr("x", this.startPin[0]+10 )
     .attr("y", this.startPin[1]+45 )
-    .text( function(d) { return "INA128"})                                                                                                                                                                                         
+    .text( function(d) { return "LMC6482"})                                                                                                                                                                                         
     .attr("font-family","sans-serif")
     .attr("font-size" , "8px")
     .attr("fill","black")
@@ -1043,7 +1043,7 @@ var solutions =""
   }
   if (this.breadboard.getVoltage(this.startRow+5,this.startPinNum) < 5.0)  {
     reasons +=  "<br>-PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is less than the suggested 5V";
-    solutions += "<br>-Either supply 5V to "+getDisplayRow(this.startRow+5,this.startPinNum)+" or the datasheet scale factor will be incorrect";
+    solutions += "<br>-Either supply 5V to "+getDisplayRow(this.startRow+5,this.startPinNum)+" or the datasheet scale factor may be incorrect";
   }
 
 return "<strong>This sensor may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;

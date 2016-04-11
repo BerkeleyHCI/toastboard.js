@@ -134,7 +134,7 @@ var isPinLegal = function(i) {
       }
     } else {
       // choose pins that are legal given type
-      if (holder.type == "ina128" || holder.type == "sensor") {
+      if (holder.type == "LMC6482" || holder.type == "sensor") {
         if (randp[0] < 21 && randp[1] == 4) {
           return true;
         } else {
