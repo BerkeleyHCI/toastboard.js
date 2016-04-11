@@ -39,8 +39,8 @@ var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,
     var c = new Component(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type =="button") {
     var c = new Button(breadboard,startrow,startpin,endrow,endpin,highlighted);
-  } else if (component_type =="ina128") {
-    var c = new INA128(breadboard,startrow,startpin,endrow,endpin,highlighted);
+  } else if (component_type =="LMC6482") {
+    var c = new LMC6482(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type == "pot") {
     var c = new Potentiometer(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type == "sensor") {
@@ -720,7 +720,7 @@ Button.prototype.test = function() {
   }
 }
 
-var INA128 = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
+var LMC6482 = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
   this.breadboard = breadboard;
   this.startRow = startRow;
   this.startPinNum = 4;
@@ -736,7 +736,7 @@ var INA128 = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlight
 
 
 
-INA128.prototype.calcPoints = function() {
+LMC6482.prototype.calcPoints = function() {
   var buttonHeight = 15;
   var fullHeight = this.endPin[1] - this.startPin[1];
   this.verticalLineHeight = (fullHeight - buttonHeight) / 2;
@@ -746,7 +746,7 @@ INA128.prototype.calcPoints = function() {
 
 
 
-INA128.prototype.draw = function() {
+LMC6482.prototype.draw = function() {
   if (this.highlighted == "true") {
     var color = highlightedColor;
   } else {
@@ -857,14 +857,14 @@ INA128.prototype.draw = function() {
 };
 
 
-INA128.prototype.getId = function() {
+LMC6482.prototype.getId = function() {
   return "dr" + this.startRow;
 }
 
-INA128.prototype.serialize = function() {
+LMC6482.prototype.serialize = function() {
   var c = {};
   c["id"] = this.getId();
-  c["type"] = "ina128";
+  c["type"] = "LMC6482";
   c["startRow"] = this.startRow;
   c["startPinNum"] = this.startPinNum;
   c["endRow"] = this.endRow;
@@ -874,21 +874,25 @@ INA128.prototype.serialize = function() {
 }
 
 
-INA128.prototype.test = function() {
+LMC6482.prototype.test = function() {
 
 var reasons = ""
 var solutions =""
+var post = 0;
 
   if (this.breadboard.getVoltage(this.startRow+27,this.startPinNum) == "f")  {
     reasons += "<br>-V<sub>ref</sub> (pin5) at "+getDisplayRow(this.startRow+27,this.startPinNum)+" is floating";
     solutions +="<br>-In most cases, V<sub>ref</sub> should be connected to GND";
+    post = 1;
   }
   if (this.breadboard.getVoltage(this.startRow+3,this.startPinNum) == "f" || this.breadboard.getVoltage(this.startRow+3,this.startPinNum)==this.breadboard.getVoltage(this.startRow+25,this.startPinNum) ) {
     reasons +=  "<br>-The negative supply (pin4) at "+getDisplayRow(this.startRow+3,this.startPinNum)+" is floating or the same as the positive supply";
     solutions += "<br>-To get the full output voltage range, V<sub>-</sub> should be connected to GND or ideally a negative voltage"
   }
 
+  if (post == 1){
 return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
+}
 }
 
 var Sensor = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
@@ -1034,20 +1038,24 @@ Sensor.prototype.serialize = function() {
 
 Sensor.prototype.test = function() {
 
-var reasons = ""
-var solutions =""
+var reasons = "";
+var solutions ="";
+var post = 0;
 
   if (this.breadboard.getVoltage(this.startRow+6,this.startPinNum) != 0.0)  {
     reasons += "<br>-GND input (pin7) at "+getDisplayRow(this.startRow+6,this.startPinNum)+" is not at ground";
     solutions +="<br>-Connect "+getDisplayRow(this.startRow+6,this.startPinNum)+" to ground";
+    post = 1;
   }
   if (this.breadboard.getVoltage(this.startRow+5,this.startPinNum) < 5.0)  {
     reasons +=  "<br>-PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is less than the suggested 5V";
     solutions += "<br>-Either supply 5V to "+getDisplayRow(this.startRow+5,this.startPinNum)+" or the datasheet scale factor may be incorrect";
+    post = 1;
   }
 
+if (post==1){
 return "<strong>This sensor may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
-
+}
 }
 
 var addWarningIconAndTooltip = function(svg, x, y, message) {
