@@ -8,6 +8,9 @@ Graph = function() {
 Graph.prototype.clear = function() {
   this.readings = [];
   this.voltageData = [];
+  d3.select("#graphxaxis").remove();
+  d3.select("#graphyaxis").remove();
+  d3.select("#graphpath").remove();
 }
 
 Graph.prototype.addData = function(reading) {

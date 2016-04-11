@@ -89,6 +89,13 @@ var highlightStateComponent = function(id,state) {
   sessionStorage.setItem("boardstate",JSON.stringify(boardstate));
 };
 
+var deleteAllComponents = function() {
+  var boardstate = JSON.parse(sessionStorage.getItem("boardstate"));
+  var newcomp = [];
+  boardstate.components = newcomp;
+  sessionStorage.setItem("boardstate",JSON.stringify(boardstate));
+};
+
 var getDisplayCol = function(rownum,pinnum) {
   if (pinnum == "v") {
     return "VDD";

@@ -359,7 +359,8 @@ var clearHighlightedComponent = function() {
 
     $("#clear").on("click",function() {
       myBreadboard.drawEmptyBreadboard();
-      myBreadboard.attachPinClickEvents();
+      deleteAllComponents();
+      myGraph.clear();
     });
     $("#print").on("click",function() {
       window.print();
