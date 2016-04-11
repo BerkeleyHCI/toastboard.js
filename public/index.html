@@ -283,6 +283,12 @@ var setEndPin = function(pinNum) {
   myBreadboard.redrawBoard(svg);
   redrawComponents(myBreadboard);
 }
+var highlightComponentAndRedraw = function(id) {
+  highlightComponent(id);
+  var svg = myBreadboard.drawEmptyBreadboard();
+  myBreadboard.redrawBoard(svg);
+  redrawComponents(myBreadboard);
+}
 
   $(document).ready(function() {
     // draw buttons nicely

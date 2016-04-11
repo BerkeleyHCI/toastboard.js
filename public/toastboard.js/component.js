@@ -1,6 +1,9 @@
 var leftCols = ["a","b","c","d","e"];
 var rightCols = ["f","g","h","i","j"];
 
+var defaultColor = "black";
+var highlightedColor = "gold";
+
 var ComponentHolder = function() {
   this.type = null;
   this.startRow = null;
@@ -23,19 +26,19 @@ ComponentHolder.prototype.create = function(breadboard) {
   return c;
 }
 
-var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,endpin) {
+var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,endpin,highlighted) {
   if (component_type == "resistor") {
-    var c = new Resistor(breadboard,startrow,startpin,endrow,endpin);
+    var c = new Resistor(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type == "diode") {
-    var c = new Diode(breadboard,startrow,startpin,endrow,endpin);
+    var c = new Diode(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type == "wire") {
-    var c = new Wire(breadboard,startrow,startpin,endrow,endpin);
+    var c = new Wire(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type == "component") {
-    var c = new Component(breadboard,startrow,startpin,endrow,endpin);
+    var c = new Component(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type =="button") {
-    var c = new Button(breadboard,startrow,startpin,endrow,endpin);
+    var c = new Button(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type =="ina128") {
-    var c = new INA128(breadboard,startrow,startpin,endrow,endpin);
+    var c = new INA128(breadboard,startrow,startpin,endrow,endpin,highlighted);
   }
   return c;
 };
@@ -58,9 +61,23 @@ var redrawComponents = function(breadboard,removeId) {
     var c = JSON.parse(d);
     if (c.id != removeId) {
       newcomp.push(d);
-      var cobj = makeComponent(breadboard,c.type,c.startRow,c.startPinNum,c.endRow,c.endPinNum);
+      var cobj = makeComponent(breadboard,c.type,c.startRow,c.startPinNum,c.endRow,c.endPinNum,c.highlighted);
       cobj.draw();
     }
+  });
+  boardstate.components = newcomp;
+  sessionStorage.setItem("boardstate",JSON.stringify(boardstate));
+};
+
+var highlightComponent = function(id) {
+  var boardstate = JSON.parse(sessionStorage.getItem("boardstate"));
+  var newcomp = [];
+  boardstate.components.forEach(function(d) {
+    var c = JSON.parse(d);
+    if (c.id == id) {
+      c.highlighted = "true";
+    }
+    newcomp.push(JSON.stringify(c));
   });
   boardstate.components = newcomp;
   sessionStorage.setItem("boardstate",JSON.stringify(boardstate));
@@ -97,7 +114,7 @@ var getDisplayRow = function(rownum,pinnum) {
   return returntext;
 }
 
-var Component = function(breadboard, startRow, startPinNum, endRow, endPinNum) {
+var Component = function(breadboard, startRow, startPinNum, endRow, endPinNum, highlighted) {
   this.breadboard = breadboard;
   this.startRow = startRow;
   this.startPinNum = startPinNum;
@@ -106,9 +123,15 @@ var Component = function(breadboard, startRow, startPinNum, endRow, endPinNum) {
   this.endPinNum = endPinNum;
   this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
   this.failedTest = null;
+  this.highlighted = highlighted;
 };
 
 Component.prototype.draw = function() {
+  if (this.highlighted == "true") {
+    var color = highlightedColor;
+  } else {
+    var color = defaultColor;
+  }
   var svg = d3.select("svg");
 
   svg.append("line")
@@ -117,14 +140,14 @@ Component.prototype.draw = function() {
     .attr("x2",this.endPin[0])
     .attr("y2",this.endPin[1])
     .attr("stroke-width",4)
-    .attr("stroke","black");
+    .attr("stroke",color);
 
   svg.append("rect")
     .attr("x",this.startPin[0] - 8)
     .attr("y",this.startPin[1] + 10)
     .attr("width",16)
     .attr("height",this.endPin[1] - this.startPin[1] - 20)
-    .attr("fill","black");
+    .attr("fill",color);
 
 };
 
@@ -140,6 +163,7 @@ Component.prototype.serialize = function() {
   c["startPinNum"] = this.startPinNum;
   c["endRow"] = this.endRow;
   c["endPinNum"] = this.endPinNum;
+  c["highlighted"] = this.highlighted;
   return JSON.stringify(c);
 }
 
@@ -147,7 +171,7 @@ Component.prototype.test = function(voltages) {
   return null;
 }
 
-var Wire = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
+var Wire = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
   this.breadboard = breadboard;
   this.startRow = startRow;
   this.startPinNum = startPinNum;
@@ -156,11 +180,18 @@ var Wire = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.endPinNum = endPinNum;
   this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
   this.failedTest = null;
+  this.highlighted = highlighted;
 };
 
 Wire.prototype.draw = function() {
   var self = this;
   var alpha = 30; // amt to skew line for curve
+
+  if (this.highlighted == "true") {
+    var wirecolor = highlightedColor;
+  } else {
+    var wirecolor = defaultColor;
+  }
 
   var svg = d3.select("svg");
   if (this.startPin[0] == this.endPin[0]) {
@@ -181,8 +212,10 @@ Wire.prototype.draw = function() {
   var path = svg.append("path")
       .attr("d",lineFunction(lineData))
       .attr("stroke-width",4)
-      .attr("stroke","black")
-      .attr("fill","none");
+      .attr("stroke",wirecolor)
+      .attr("fill","none")
+      .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+
 /*
 
   var line = svg.append("polyline")
@@ -214,6 +247,7 @@ Wire.prototype.serialize = function() {
   c["startPinNum"] = this.startPinNum;
   c["endRow"] = this.endRow;
   c["endPinNum"] = this.endPinNum;
+  c["highlighted"] = this.highlighted;
   return JSON.stringify(c);
 }
 
@@ -228,7 +262,7 @@ Wire.prototype.test = function() {
   }
 };
 
-var Resistor = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
+var Resistor = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
   this.breadboard = breadboard;
   this.startRow = startRow;
   this.startPinNum = startPinNum;
@@ -241,6 +275,7 @@ var Resistor = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.calcLineData();
   this.failedTest = null;
   this.resistance = null;
+  this.highlighted = highlighted;
 }
 
 Resistor.prototype.calcLineData = function() {
@@ -292,6 +327,11 @@ Resistor.prototype.calcLineData = function() {
 };
 
 Resistor.prototype.draw = function() {
+  if (this.highlighted == "true") {
+    var color = highlightedColor;
+  } else {
+    var color = defaultColor;
+  }
   var lineFunction = d3.svg.line()
                          .x(function(d) { return d.x; })
                          .y(function(d) { return d.y; })
@@ -299,7 +339,7 @@ Resistor.prototype.draw = function() {
   var svg = d3.select("svg");
   var path = svg.append("path")
     .attr("d", lineFunction(this.lineData))
-    .attr("stroke", "black")
+    .attr("stroke", color)
     .attr("stroke-width", 3)
     .attr("fill", "none");
   var msg = this.test();
@@ -324,6 +364,7 @@ Resistor.prototype.serialize = function() {
   c["startPinNum"] = this.startPinNum;
   c["endRow"] = this.endRow;
   c["endPinNum"] = this.endPinNum;
+  c["highlighted"] = this.highlighted;
   return JSON.stringify(c);
 }
 
@@ -336,7 +377,7 @@ Resistor.prototype.test = function() {
   }
 };
 
-var Diode = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
+var Diode = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
   this.breadboard = breadboard;
   this.startRow = startRow;
   this.startPinNum = startPinNum;
@@ -347,6 +388,7 @@ var Diode = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.diodeWidth = 20;
   this.calcPoints();
   this.failedTest = null;
+  this.highlighted = highlighted;
 };
 
 Diode.prototype.calcPoints = function() {
@@ -361,6 +403,11 @@ Diode.prototype.calcPoints = function() {
 };
 
 Diode.prototype.draw = function() {
+  if (this.highlighted == "true") {
+    var color = highlightedColor;
+  } else {
+    var color = defaultColor;
+  }
   var lineFunction = d3.svg.line()
                        .x(function(d) { return d.x; })
                        .y(function(d) { return d.y; })
@@ -373,10 +420,10 @@ Diode.prototype.draw = function() {
     .attr("x2",this.startPin[0])
     .attr("y2",this.startPin[1] + this.verticalLineHeight)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var path = svg.append("path")
     .attr("d", lineFunction(this.triangleData))
-    .attr("stroke", "black")
+    .attr("stroke", color)
     .attr("stroke-width", 3)
     .attr("fill", "none");
   var line2 = svg.append("line")
@@ -385,14 +432,14 @@ Diode.prototype.draw = function() {
     .attr("x2",this.startPin[0] + (this.diodeWidth/2))
     .attr("y2",this.endPin[1] - this.verticalLineHeight)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var line3 = svg.append("line")
     .attr("x1",this.endPin[0])
     .attr("y1",this.endPin[1] - this.verticalLineHeight)
     .attr("x2",this.endPin[0])
     .attr("y2",this.endPin[1])
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var msg = this.test();
   if (msg) { /*
     line.append("title").text(msg);
@@ -416,6 +463,7 @@ Diode.prototype.serialize = function() {
   c["startPinNum"] = this.startPinNum;
   c["endRow"] = this.endRow;
   c["endPinNum"] = this.endPinNum;
+  c["highlighted"] = this.highlighted;
   return JSON.stringify(c);
 }
 
@@ -455,6 +503,11 @@ Sensor.prototype.calcPoints = function() {
 };
 
 Sensor.prototype.draw = function() {
+  if (this.highlighted == "true") {
+    var color = highlightedColor;
+  } else {
+    var color = defaultColor;
+  }
   var lineFunction = d3.svg.line()
                      .x(function(d) { return d.x; })
                      .y(function(d) { return d.y; })
@@ -469,7 +522,7 @@ Sensor.prototype.draw = function() {
       .attr("x2",self.pins[i][0])
       .attr("y2",self.pins[i][1])
       .attr("stroke-width",3)
-      .attr("stroke","black");
+      .attr("stroke",color);
   }
     svg.append("path")
     .attr("d", lineFunction(this.squareData))
@@ -481,13 +534,13 @@ Sensor.prototype.draw = function() {
   .attr("cx", this.pins[0][0]-55 )
   .attr("cy", this.pins[0][1]+45 )
   .attr("r", 30)
-  .attr("stroke","black")
+  .attr("stroke",color)
   .attr("stroke-width",3)
   .attr("fill","none");
 
 };
 
-var Button = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
+var Button = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
   this.breadboard = breadboard;
   this.startRow = startRow;
   this.startPinNum = startPinNum;
@@ -498,6 +551,7 @@ var Button = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.buttonWidth = 20;
   this.calcPoints();
   this.failedTest = null;
+  this.highlighted = highlighted;
 };
 
 
@@ -513,6 +567,11 @@ Button.prototype.calcPoints = function() {
 
 
 Button.prototype.draw = function() {
+  if (this.highlighted == "true") {
+    var color = highlightedColor;
+  } else {
+    var color = defaultColor;
+  }
   var lineFunction = d3.svg.line()
                        .x(function(d) { return d.x; })
                        .y(function(d) { return d.y; })
@@ -526,26 +585,26 @@ Button.prototype.draw = function() {
     .attr("x2",this.startPin[0])
     .attr("y2",this.startPin[1] + this.verticalLineHeight - 3)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var line2 = svg.append("line")
     .attr("x1",this.endPin[0])
     .attr("y1",this.endPin[1] - this.verticalLineHeight +3)
     .attr("x2",this.endPin[0])
     .attr("y2",this.endPin[1])
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var circle1 = svg.append("circle")
     .attr("cx", this.startPin[0] )
     .attr("cy", this.endPin[1] - this.verticalLineHeight )
     .attr("r", 4)
-    .attr("stroke","black")
+    .attr("stroke",color)
     .attr("stroke-width",3)
     .attr("fill","none");
   var cicle2 = svg.append("circle")
     .attr("cx", this.endPin[0] )
     .attr("cy", this.startPin[1] + this.verticalLineHeight )
     .attr("r", 4)
-    .attr("stroke","black")
+    .attr("stroke",color)
     .attr("stroke-width",3)
     .attr("fill","none");
   var line3 = svg.append("line")
@@ -554,14 +613,14 @@ Button.prototype.draw = function() {
     .attr("x2",this.endPin[0]+8)
     .attr("y2",this.startPin[1] + this.verticalLineHeight)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var line4 = svg.append("line")
     .attr("x1",this.endPin[0]+8)
     .attr("y1",this.startPin[1]+this.middleSpot)
     .attr("x2",this.endPin[0]+14)
     .attr("y2",this.startPin[1]+this.middleSpot)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var msg = this.test();
   if (msg) {
     /*
@@ -589,6 +648,7 @@ Button.prototype.serialize = function() {
   c["startPinNum"] = this.startPinNum;
   c["endRow"] = this.endRow;
   c["endPinNum"] = this.endPinNum;
+  c["highlighted"] = this.highlighted;
   return JSON.stringify(c);
 }
 
@@ -599,7 +659,7 @@ Button.prototype.test = function() {
   }
 }
 
-var INA128 = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
+var INA128 = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
   this.breadboard = breadboard;
   this.startRow = startRow;
   this.startPinNum = 4;
@@ -610,6 +670,7 @@ var INA128 = function(breadboard,startRow,startPinNum,endRow,endPinNum) {
   this.buttonWidth = 20;
   this.calcPoints();
   this.failedTest = null;
+  this.highlighted = highlighted;
 };
 
 
@@ -625,6 +686,11 @@ INA128.prototype.calcPoints = function() {
 
 
 INA128.prototype.draw = function() {
+  if (this.highlighted) {
+    var color = highlightedColor;
+  } else {
+    var color = defaultColor;
+  }
   var lineFunction = d3.svg.line()
                        .x(function(d) { return d.x; })
                        .y(function(d) { return d.y; })
@@ -638,69 +704,69 @@ INA128.prototype.draw = function() {
     .attr("x2",this.startPin[0]+5)
     .attr("y2",this.startPin[1])
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var line2 = svg.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+15)
     .attr("x2",this.startPin[0]+5)
     .attr("y2",this.startPin[1]+15)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var line3 = svg.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+30)
     .attr("x2",this.startPin[0]+5)
     .attr("y2",this.startPin[1]+30)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var line4 = svg.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+45)
     .attr("x2",this.startPin[0]+5)
     .attr("y2",this.startPin[1]+45)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var line5 = svg.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1])
     .attr("x2",this.startPin[0]+55)
     .attr("y2",this.startPin[1])
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var line6 = svg.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1]+15)
     .attr("x2",this.startPin[0]+55)
     .attr("y2",this.startPin[1]+15)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var line7 = svg.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1]+30)
     .attr("x2",this.startPin[0]+55)
     .attr("y2",this.startPin[1]+30)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var line8 = svg.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1]+45)
     .attr("x2",this.startPin[0]+55)
     .attr("y2",this.startPin[1]+45)
     .attr("stroke-width",3)
-    .attr("stroke","black");
+    .attr("stroke",color);
   var package = svg.append("rect")
     .attr("x",this.startPin[0] + 5)
     .attr("y",this.startPin[1] - 5)
     .attr("width",45)
     .attr("height",55)
-    .attr("stroke","black")
+    .attr("stroke",color)
     .attr("stroke-width",2)
     .attr("fill","white");
   var circle1 = svg.append("circle")
     .attr("cx", this.startPin[0]+40 )
     .attr("cy", this.startPin[1]+1 )
     .attr("r", 4)
-    .attr("stroke","black")
+    .attr("stroke",color)
     .attr("stroke-width",2)
     .attr("fill","white");
   var text = svg.append("text")
@@ -750,6 +816,7 @@ INA128.prototype.serialize = function() {
   c["startPinNum"] = this.startPinNum;
   c["endRow"] = this.endRow;
   c["endPinNum"] = this.endPinNum;
+  c["highlighted"] = this.highlighted;
   return JSON.stringify(c);
 }
 
