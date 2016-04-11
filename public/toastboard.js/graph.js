@@ -1,3 +1,4 @@
+
 Graph = function() {
   this.readings = [];
   this.voltageData = [];
@@ -18,7 +19,21 @@ Graph.prototype.addData = function(reading) {
   this.voltageData.push({voltage:reading.data[0],second:reading.time[0]})
 };
 
-Graph.prototype.drawGraph = function() {
+Graph.prototype.drawGraph = function(component_type) {
+  var valuesTransform = function(voltage) {
+    if (component_type == "sensor") {
+      return voltage / 512.0;
+    } else {
+      return voltage;
+    }
+  };
+  var units = function() {
+    if (component_type == "sensor") {
+      return '"';
+    } else {
+      return "V";
+    }
+  }
 
   d3.select("#graphxaxis").remove();
   d3.select("#graphyaxis").remove();
@@ -52,7 +67,8 @@ Graph.prototype.drawGraph = function() {
       return d.voltage;
     })]),
     */
-  yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0.0,3.3]),
+
+  yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([valuesTransform(0.0),valuesTransform(3.3)]),
   xAxis = d3.svg.axis()
       .scale(xRange)
       .tickSize(5)
@@ -62,7 +78,7 @@ Graph.prototype.drawGraph = function() {
       .ticks(5)
       .tickSize(5)
       .orient('left')
-      .tickFormat(function(d) { return d.toFixed(1) + "V";});
+      .tickFormat(function(d) { return d.toFixed(3) + units();});
 
 
   vis.append('svg:g')
@@ -83,7 +99,7 @@ var lineFunc = d3.svg.line()
     return xRange(d.second);
   })
   .y(function(d) {
-    return yRange(d.voltage);
+    return yRange(valuesTransform(d.voltage));
   })
   .interpolate('linear');
 

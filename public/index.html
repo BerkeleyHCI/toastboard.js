@@ -215,7 +215,11 @@ socket.on('info', function (data) {
     var rands = fullRowToRowAndSide(json.oscillo.row);
     $("#graphviz").html("");
     myGraph.addData(json.oscillo);
-    myGraph.drawGraph();
+    if (holder.highlighted && holder.id[0] == "s") {
+      myGraph.drawGraph(holder.type);
+    } else {
+      myGraph.drawGraph();
+    }
   } else if (json.rowsLeft) {
     myBreadboard.drawBreadboard(json);
     redrawComponents(myBreadboard);
@@ -309,6 +313,7 @@ var highlightComponentAndRedraw = function(id) {
   highlightStateComponent(id,"true");
   holder.id = id;
   holder.highlighted = true;
+
   var svg = myBreadboard.drawEmptyBreadboard();
   myBreadboard.redrawBoard(svg);
   redrawComponents(myBreadboard);
@@ -460,6 +465,9 @@ var graphRow = function(row,side) {
         $("#graphComp").hide();
         if (id[0] == "s") {
           // ultrasonic sensor
+          holder.id = id;
+          holder.type = "sensor";
+          holder.highlighted = true;
           graphRow(id[1],"Left");
         }
       }
