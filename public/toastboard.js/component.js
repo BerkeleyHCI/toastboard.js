@@ -142,14 +142,16 @@ Component.prototype.draw = function() {
     .attr("x2",this.endPin[0])
     .attr("y2",this.endPin[1])
     .attr("stroke-width",4)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
 
   svg.append("rect")
     .attr("x",this.startPin[0] - 8)
     .attr("y",this.startPin[1] + 10)
     .attr("width",16)
     .attr("height",this.endPin[1] - this.startPin[1] - 20)
-    .attr("fill",color);
+    .attr("fill",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
 
 };
 
@@ -343,7 +345,8 @@ Resistor.prototype.draw = function() {
     .attr("d", lineFunction(this.lineData))
     .attr("stroke", color)
     .attr("stroke-width", 3)
-    .attr("fill", "none");
+    .attr("fill", "none")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var msg = this.test();
   if (msg) {
    // path.append("title").text(msg);
@@ -422,26 +425,30 @@ Diode.prototype.draw = function() {
     .attr("x2",this.startPin[0])
     .attr("y2",this.startPin[1] + this.verticalLineHeight)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var path = svg.append("path")
     .attr("d", lineFunction(this.triangleData))
     .attr("stroke", color)
     .attr("stroke-width", 3)
-    .attr("fill", "none");
+    .attr("fill", "none")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line2 = svg.append("line")
     .attr("x1",this.startPin[0] - (this.diodeWidth/2))
     .attr("y1",this.endPin[1] - this.verticalLineHeight)
     .attr("x2",this.startPin[0] + (this.diodeWidth/2))
     .attr("y2",this.endPin[1] - this.verticalLineHeight)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line3 = svg.append("line")
     .attr("x1",this.endPin[0])
     .attr("y1",this.endPin[1] - this.verticalLineHeight)
     .attr("x2",this.endPin[0])
     .attr("y2",this.endPin[1])
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var msg = this.test();
   if (msg) { /*
     line.append("title").text(msg);
@@ -524,13 +531,15 @@ Sensor.prototype.draw = function() {
       .attr("x2",self.pins[i][0])
       .attr("y2",self.pins[i][1])
       .attr("stroke-width",3)
-      .attr("stroke",color);
+      .attr("stroke",color)
+      .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   }
     svg.append("path")
     .attr("d", lineFunction(this.squareData))
     .attr("stroke", "black")
     .attr("stroke-width", 3)
-    .attr("fill", "white");
+    .attr("fill", "white")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
 
   svg.append("circle")
   .attr("cx", this.pins[0][0]-55 )
@@ -538,7 +547,8 @@ Sensor.prototype.draw = function() {
   .attr("r", 30)
   .attr("stroke",color)
   .attr("stroke-width",3)
-  .attr("fill","none");
+  .attr("fill","none")
+  .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
 
 };
 
@@ -587,42 +597,48 @@ Button.prototype.draw = function() {
     .attr("x2",this.startPin[0])
     .attr("y2",this.startPin[1] + this.verticalLineHeight - 3)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line2 = svg.append("line")
     .attr("x1",this.endPin[0])
     .attr("y1",this.endPin[1] - this.verticalLineHeight +3)
     .attr("x2",this.endPin[0])
     .attr("y2",this.endPin[1])
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var circle1 = svg.append("circle")
     .attr("cx", this.startPin[0] )
     .attr("cy", this.endPin[1] - this.verticalLineHeight )
     .attr("r", 4)
     .attr("stroke",color)
     .attr("stroke-width",3)
-    .attr("fill","none");
+    .attr("fill","none")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var cicle2 = svg.append("circle")
     .attr("cx", this.endPin[0] )
     .attr("cy", this.startPin[1] + this.verticalLineHeight )
     .attr("r", 4)
     .attr("stroke",color)
     .attr("stroke-width",3)
-    .attr("fill","none");
+    .attr("fill","none")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line3 = svg.append("line")
     .attr("x1",this.endPin[0]+8)
     .attr("y1",this.endPin[1] - this.verticalLineHeight)
     .attr("x2",this.endPin[0]+8)
     .attr("y2",this.startPin[1] + this.verticalLineHeight)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line4 = svg.append("line")
     .attr("x1",this.endPin[0]+8)
     .attr("y1",this.startPin[1]+this.middleSpot)
     .attr("x2",this.endPin[0]+14)
     .attr("y2",this.startPin[1]+this.middleSpot)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var msg = this.test();
   if (msg) {
     /*
@@ -688,7 +704,7 @@ INA128.prototype.calcPoints = function() {
 
 
 INA128.prototype.draw = function() {
-  if (this.highlighted) {
+  if (this.highlighted == "true") {
     var color = highlightedColor;
   } else {
     var color = defaultColor;
@@ -706,56 +722,64 @@ INA128.prototype.draw = function() {
     .attr("x2",this.startPin[0]+5)
     .attr("y2",this.startPin[1])
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line2 = svg.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+15)
     .attr("x2",this.startPin[0]+5)
     .attr("y2",this.startPin[1]+15)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line3 = svg.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+30)
     .attr("x2",this.startPin[0]+5)
     .attr("y2",this.startPin[1]+30)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line4 = svg.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+45)
     .attr("x2",this.startPin[0]+5)
     .attr("y2",this.startPin[1]+45)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line5 = svg.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1])
     .attr("x2",this.startPin[0]+55)
     .attr("y2",this.startPin[1])
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line6 = svg.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1]+15)
     .attr("x2",this.startPin[0]+55)
     .attr("y2",this.startPin[1]+15)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line7 = svg.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1]+30)
     .attr("x2",this.startPin[0]+55)
     .attr("y2",this.startPin[1]+30)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var line8 = svg.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1]+45)
     .attr("x2",this.startPin[0]+55)
     .attr("y2",this.startPin[1]+45)
     .attr("stroke-width",3)
-    .attr("stroke",color);
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var package = svg.append("rect")
     .attr("x",this.startPin[0] + 5)
     .attr("y",this.startPin[1] - 5)
@@ -763,21 +787,24 @@ INA128.prototype.draw = function() {
     .attr("height",55)
     .attr("stroke",color)
     .attr("stroke-width",2)
-    .attr("fill","white");
+    .attr("fill","white")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var circle1 = svg.append("circle")
     .attr("cx", this.startPin[0]+40 )
     .attr("cy", this.startPin[1]+1 )
     .attr("r", 4)
     .attr("stroke",color)
     .attr("stroke-width",2)
-    .attr("fill","white");
+    .attr("fill","white")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var text = svg.append("text")
     .attr("x", this.startPin[0]+10 )
     .attr("y", this.startPin[1]+45 )
     .text( function(d) { return "INA128"})                                                                                                                                                                                         
     .attr("font-family","sans-serif")
     .attr("font-size" , "8px")
-    .attr("fill","black");
+    .attr("fill","black")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
     
 
 
