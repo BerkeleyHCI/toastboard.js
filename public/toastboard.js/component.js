@@ -41,6 +41,8 @@ var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,
     var c = new Button(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type =="ina128") {
     var c = new INA128(breadboard,startrow,startpin,endrow,endpin,highlighted);
+  } else if (component_type == "pot") {
+    var c = new Potentiometer(breadboard,startrow,startpin,endrow,endpin,highlighted);
   }
   return c;
 };
@@ -488,68 +490,99 @@ Diode.prototype.test = function() {
 }
 
 
-var Sensor = function(breadboard,startRow) {
+var Potentiometer = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
   this.breadboard = breadboard;
+  this.type = "pot";
   this.startRow = startRow;
-  this.pins = [];
-    this.squareData = null;
-  var self = this;
-  for (var i=0;i<7;i++) {
-    self.pins.push(breadboard.getRowPin(startRow+i,3))
-  };
-  this.calcPoints();
-
+  this.startPinNum = startPinNum;
+  this.startPin = this.breadboard.getRowPin(this.startRow,this.startPinNum);
+  this.midRow = startRow + 2;
+  this.midPin = this.breadboard.getRowPin(this.midRow,startPinNum);
+  this.endRow = startRow + 4;
+  this.endPinNum = startPinNum;
+  this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
+  this.highlighted = highlighted;
 };
 
-Sensor.prototype.calcPoints = function() {
-  var squareData = [{x:this.pins[0][0]-10,y:this.pins[0][1]-10},
-                    {x:this.pins[0][0]-100,y:this.pins[0][1]-10},
-                    {x:this.pins[0][0]-100,y:this.pins[0][1]+100},
-                    {x:this.pins[0][0]-10,y:this.pins[0][1]+100},
-                    {x:this.pins[0][0]-10,y:this.pins[0][1]-10}];
-  console.log(squareData);
-  this.squareData = squareData;
-};
-
-Sensor.prototype.draw = function() {
+Potentiometer.prototype.draw = function() {
   if (this.highlighted == "true") {
     var color = highlightedColor;
   } else {
     var color = defaultColor;
   }
-  var lineFunction = d3.svg.line()
-                     .x(function(d) { return d.x; })
-                     .y(function(d) { return d.y; })
-                     .interpolate("linear");
-  console.log("sensor is drawing");
+
   var svg = d3.select("#board");
   var self = this;
-  for (var i=0;i<7;i++) {
-    svg.append("line")
-      .attr("x1",self.pins[i][0]-10)
-      .attr("y1",self.pins[i][1])
-      .attr("x2",self.pins[i][0])
-      .attr("y2",self.pins[i][1])
-      .attr("stroke-width",3)
-      .attr("stroke",color)
-      .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  }
-    svg.append("path")
-    .attr("d", lineFunction(this.squareData))
-    .attr("stroke", "black")
-    .attr("stroke-width", 3)
-    .attr("fill", "white")
+  svg.append("rect")
+    .attr("x",this.startPin[0] + 5)
+    .attr("y",this.startPin[1] - 5)
+    .attr("width",32)
+    .attr("height",this.endPin[1] - this.startPin[1] + 10)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("fill","white")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var line1 = svg.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1])
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var line2 = svg.append("line")
+    .attr("x1",this.midPin[0])
+    .attr("y1",this.midPin[1])
+    .attr("x2",this.midPin[0]+5)
+    .attr("y2",this.midPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var line3 = svg.append("line")
+    .attr("x1",this.endPin[0])
+    .attr("y1",this.endPin[1])
+    .attr("x2",this.endPin[0]+5)
+    .attr("y2",this.endPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var circle = svg.append("circle")
+    .attr("cx", this.midPin[0] + 5 + 16)
+    .attr("cy", this.midPin[1]  )
+    .attr("r", 10)
+    .attr("stroke",color)
+    .attr("stroke-width",3)
+    .attr("fill","none")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  var text = svg.append("text")
+    .attr("x", this.endPin[0]+10 )
+    .attr("y", this.endPin[1]  )
+    .text( function(d) { return "POT"})                                                                                                                                                                                         
+    .attr("font-family","sans-serif")
+    .attr("font-size" , "8px")
+    .attr("fill","black")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
 
-  svg.append("circle")
-  .attr("cx", this.pins[0][0]-55 )
-  .attr("cy", this.pins[0][1]+45 )
-  .attr("r", 30)
-  .attr("stroke",color)
-  .attr("stroke-width",3)
-  .attr("fill","none")
-  .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+};
 
+Potentiometer.prototype.serialize = function() {
+  var c = {};
+  c["id"] = this.getId();
+  c["type"] = "pot";
+  c["startRow"] = this.startRow;
+  c["startPinNum"] = this.startPinNum;
+  c["endRow"] = this.endRow;
+  c["endPinNum"] = this.endPinNum;
+  c["highlighted"] = this.highlighted;
+  return JSON.stringify(c);
+};
+
+Potentiometer.prototype.getId = function() {
+  return "p" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+};
+
+Potentiometer.prototype.test = function() {
+  return null;
 };
 
 var Button = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
@@ -807,29 +840,10 @@ INA128.prototype.draw = function() {
     .attr("fill","black")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
     
-
-
   var msg = this.test();
   if (msg) {
-    /*line1.append("title").text(msg);
-    line2.append("title").text(msg);
-    line3.append("title").text(msg);
-    line4.append("title").text(msg);
-    line5.append("title").text(msg);
-    line6.append("title").text(msg);
-    line7.append("title").text(msg);
-    line8.append("title").text(msg);
-    package.append("title").text(msg);
-    circle1.append("title").text(msg);*/
     this.failedTest = msg;
     addWarningIconAndTooltip(svg,this.startPin[0]+30,this.startPin[1]+25,msg);
-    /*svg.append("svg:image")
-      .attr('x',this.startPin[0]+30)
-      .attr('y',this.startPin[1]+25)
-      .attr('width', 24)
-      .attr('height', 24)
-      .attr("xlink:href","Warning-128.png")
-      .append("title").text(msg);*/
   }
 };
 
