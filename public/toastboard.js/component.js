@@ -11,6 +11,7 @@ var ComponentHolder = function() {
   this.endRow = null;
   this.endPin = null;
   this.id = null;
+  this.highlighted = null;
 }
 
 ComponentHolder.prototype.empty = function() {
@@ -20,6 +21,7 @@ ComponentHolder.prototype.empty = function() {
   this.endRow = null;
   this.endPin = null;
   this.id = null;
+  this.highlighted = null;
 }
 
 ComponentHolder.prototype.create = function(breadboard) {

@@ -308,6 +308,7 @@ var setEndPin = function(pinNum) {
 var highlightComponentAndRedraw = function(id) {
   highlightStateComponent(id,"true");
   holder.id = id;
+  holder.highlighted = true;
   var svg = myBreadboard.drawEmptyBreadboard();
   myBreadboard.redrawBoard(svg);
   redrawComponents(myBreadboard);
@@ -315,7 +316,8 @@ var highlightComponentAndRedraw = function(id) {
   $("#add").hide();
   $("#deleteComp").show();
   var type_initial = id[0];
-  if (type_initial == "i" || type_initial == "s" || type_initial == "p" || type_initial == "d") {
+  //if (type_initial == "i" || type_initial == "s" || type_initial == "p" || type_initial == "d") {
+  if (type_initial == "s") {
     $("#graphComp").show();
   }
   $("#cancelDelete").show();
@@ -379,6 +381,11 @@ var graphRow = function(row,side) {
     $("#stopGraph").on("click",function() {
       socket.emit("t","data");
       startConfig();
+      if (holder.highlighted) {
+        $("#deleteComp").show();
+        $("#cancel").show();
+        $("#graphComp").show();
+      }
     });
 
     $("#clear").on("click",function() {
@@ -431,6 +438,7 @@ var graphRow = function(row,side) {
         $("#add-group").show();
         $("#add").show();
         $("#graphComp").hide();
+        $("#deleteComp").hide();
       } else if (action == "delete") {
         deleteHighlightedComponent();
         $("#deleteComp").hide();
@@ -445,6 +453,15 @@ var graphRow = function(row,side) {
         $("#graphComp").hide();
         $("#add-group").show();
         $("#add").show();
+      } else if (action == "graph") {
+        var id = holder.id;
+        $("#deleteComp").hide();
+        $("#cancelDelete").hide();
+        $("#graphComp").hide();
+        if (id[0] == "s") {
+          // ultrasonic sensor
+          graphRow(id[1],"Left");
+        }
       }
     });
 
