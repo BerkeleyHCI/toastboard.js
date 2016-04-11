@@ -496,9 +496,9 @@ var Potentiometer = function(breadboard,startRow,startPinNum,endRow,endPinNum,hi
   this.startRow = startRow;
   this.startPinNum = startPinNum;
   this.startPin = this.breadboard.getRowPin(this.startRow,this.startPinNum);
-  this.midRow = startRow + 2;
+  this.midRow = startRow + 1;
   this.midPin = this.breadboard.getRowPin(this.midRow,startPinNum);
-  this.endRow = startRow + 4;
+  this.endRow = startRow + 2;
   this.endPinNum = startPinNum;
   this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
   this.highlighted = highlighted;
@@ -548,7 +548,7 @@ Potentiometer.prototype.draw = function() {
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var circle = svg.append("circle")
     .attr("cx", this.midPin[0] + 5 + 16)
-    .attr("cy", this.midPin[1]  )
+    .attr("cy", this.midPin[1] -2 )
     .attr("r", 10)
     .attr("stroke",color)
     .attr("stroke-width",3)
@@ -556,7 +556,7 @@ Potentiometer.prototype.draw = function() {
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var text = svg.append("text")
     .attr("x", this.endPin[0]+10 )
-    .attr("y", this.endPin[1]  )
+    .attr("y", this.endPin[1] +2 )
     .text( function(d) { return "POT"})                                                                                                                                                                                         
     .attr("font-family","sans-serif")
     .attr("font-size" , "8px")
