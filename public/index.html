@@ -55,72 +55,6 @@
       <button type="submit" class="btn btn-secondary" value="cancelDelete" id="cancelDelete">Cancel</button>
   </form>
 
-  <!--
-    <form class="form-inline" id="componentForm">
-
-      <div class="form-group">
-        <select id="newcomponent" name="newcomponent" class="form-control">
-        <option value="wire">Wire</option>
-        <option value="diode">Diode</option>
-        <option value="resistor">Resistor</option>
-        <option value="component">Component</option>
-        <option value="button">Button</option>
-        <option value="LMC6482">LMC6482</option>
-        </select>
-      </div>
-      <div class="form-group">
-      <label class="sr-only" for="startRow">Starting point</label>
-      <div class="input-group">
-
-      <div class="input-group-addon">Start: Row</div> 
-      <input type="text" class="form-control" id="startRow" style="width: 70px" placeholder="Row">
-      <div class="input-group-addon">Pin</div>
-      <select id="startPinNum" name="startPinNum" class="form-control" style="width: 80px">
-      <option value="1">a</option>
-      <option value="2">b</option>
-      <option value="3">c</option>
-      <option value="4">d</option>
-      <option value="5">e</option>
-      <option value="6">f</option>
-      <option value="7">g</option>
-      <option value="8">h</option>
-      <option value="9">i</option>
-      <option value="10">j</option>
-      <option value="v">VDD</option>
-      <option value="g">GND</option>
-      </select>
-      </div>
-      </div>
-      <div class="form-group">
-      <label class="sr-only" for="endRow">Ending point</label>
-      <div class="input-group">
-      <div class="input-group-addon">End: Row</div>
-
-      <input type="text" class="form-control" id="endRow" style="width: 70px" placeholder="Row">
-      <div class="input-group-addon">Pin</div>
-      <select id="endPinNum" name="endPinNum" class="form-control" style="width: 80px">
-      <option value="1">a</option>
-      <option value="2">b</option>
-      <option value="3">c</option>
-      <option value="4">d</option>
-      <option value="5">e</option>
-      <option value="6">f</option>
-      <option value="7">g</option>
-      <option value="8">h</option>
-      <option value="9">i</option>
-      <option value="10">j</option>
-      <option value="v">VDD</option>
-      <option value="g">GND</option>
-      </select>
-      </div>
-      </div>
-
-      <input type="text" class="form-control" id="resistance" style="width: 100px" placeholder="Resistance">
-
-        <button type="submit" class="btn btn-secondary" value="add">Add</button>
-        <button type="submit" class="btn btn-secondary" value="delete">Delete</button>
-
-    </form> -->
 </div>
     <div class="row">
     <div class="col-xs-6">
@@ -215,7 +149,11 @@ socket.on('info', function (data) {
     var rands = fullRowToRowAndSide(json.oscillo.row);
     $("#graphviz").html("");
     myGraph.addData(json.oscillo);
-    myGraph.drawGraph();
+    if (holder.highlighted && holder.id[0] == "s") {
+      myGraph.drawGraph(holder.type);
+    } else {
+      myGraph.drawGraph();
+    }
   } else if (json.rowsLeft) {
     myBreadboard.drawBreadboard(json);
     redrawComponents(myBreadboard);
@@ -263,9 +201,50 @@ var enableGraphingForm = function() {
   $("#graphButton").show();
 }
 
-var setStartPin = function(pinNum) {
+// controls for add comp bar
+var addCompConfig = function() {
+  $("#add-group").show();
+  $("#add").show();
+  $("#deleteComp").hide();
+  $("#graphComp").hide();
+  $("#cancel").hide();
+  $("#cancelDelete").hide();
   $("#start-pin-group").hide();
-  $("#end-pin-group").show();
+  $("#end-pin-group").hide();
+}
+
+var highlightedConfig = function(type_initial) {
+  $("#add-group").hide();
+  $("#add").hide();
+  $("#deleteComp").show();
+  if (type_initial == "s") {
+    $("#graphComp").show();
+  } else {
+    $("#graphComp").hide();
+  }
+  $("#cancel").hide();
+  $("#cancelDelete").show();
+  $("#start-pin-group").hide();
+  $("#end-pin-group").hide();
+}
+
+var placePinConfig = function(stage) {
+  $("#add-group").hide();
+  $("#add").hide();
+  $("#deleteComp").hide();
+  $("#graphComp").hide();
+  $("#cancel").show();
+  $("#cancelDelete").hide();
+  if (stage == "start") {
+    $("#start-pin-group").show();
+    $("#end-pin-group").hide();
+  } else {
+    $("#start-pin-group").hide();
+    $("#end-pin-group").show();
+  }
+}
+
+var setStartPin = function(pinNum) {
   var rowAndPin = getRowAndPinFromPinIndex(pinNum);
   holder.startRow = rowAndPin[0];
   holder.startPin = rowAndPin[1];
@@ -276,26 +255,17 @@ var setStartPin = function(pinNum) {
     var svg = myBreadboard.drawEmptyBreadboard();
     myBreadboard.redrawBoard(svg);
     redrawComponents(myBreadboard);
-    $("#add-group").show();
-    $("#start-pin-group").hide();
-    $("#end-pin-group").hide();
-    $("#add").show();
-    $("#cancel").hide();
-    $("#graphComp").hide();
+    addCompConfig();
   } else {
     svg = myBreadboard.drawEmptyBreadboard();
     myBreadboard.redrawBoard(svg);
     redrawComponents(myBreadboard);
     myBreadboard.attachPinClickEvents("end");
+    placePinConfig("end");
   }
 };
 
 var setEndPin = function(pinNum) {
-  $("#add-group").show();
-  $("#start-pin-group").hide();
-  $("#end-pin-group").hide();
-  $("#add").show();
-  $("#cancel").hide();
   var rowAndPin = getRowAndPinFromPinIndex(pinNum);
   holder.endRow = rowAndPin[0];
   holder.endPin = rowAndPin[1];
@@ -304,11 +274,13 @@ var setEndPin = function(pinNum) {
   var svg = myBreadboard.drawEmptyBreadboard();
   myBreadboard.redrawBoard(svg);
   redrawComponents(myBreadboard);
+  addCompConfig();
 }
 var highlightComponentAndRedraw = function(id) {
   highlightStateComponent(id,"true");
   holder.id = id;
   holder.highlighted = true;
+
   var svg = myBreadboard.drawEmptyBreadboard();
   myBreadboard.redrawBoard(svg);
   redrawComponents(myBreadboard);
@@ -356,13 +328,7 @@ var graphRow = function(row,side) {
   $(document).ready(function() {
     // draw buttons nicely
 
-    $("#resistance").hide();
-    $("#cancel").hide();
-    $("#start-pin-group").hide();
-    $("#end-pin-group").hide();
-    $("#deleteComp").hide();
-    $("#graphComp").hide();
-    $("#cancelDelete").hide();
+    addCompConfig();
     
     $("#scanOnce").on("click",function() {
       socket.emit("d","hello");
@@ -421,38 +387,20 @@ var graphRow = function(row,side) {
         myBreadboard.redrawBoard(svg);
         redrawComponents(myBreadboard);
         myBreadboard.attachPinClickEvents("start");
-        $("#start-pin-group").show();
-        $("#cancel").show();
-        $("#graphComp").show();
-        $("#add").hide();
-        $("#add-group").hide();
+        placePinConfig("start");
       } else if (action == "cancel") {
         // redraw with no events
         holder.empty();
         svg = myBreadboard.drawEmptyBreadboard();
         myBreadboard.redrawBoard(svg);
         redrawComponents(myBreadboard);
-        $("#start-pin-group").hide();
-        $("#end-pin-group").hide();
-        $("#cancel").hide();
-        $("#add-group").show();
-        $("#add").show();
-        $("#graphComp").hide();
-        $("#deleteComp").hide();
+        addCompConfig();
       } else if (action == "delete") {
         deleteHighlightedComponent();
-        $("#deleteComp").hide();
-        $("#cancelDelete").hide();
-        $("#graphComp").hide();
-        $("#add-group").show();
-        $("#add").show();
+        addCompConfig();
       } else if (action == "cancelDelete") {
         clearHighlightedComponent();
-        $("#deleteComp").hide();
-        $("#cancelDelete").hide();
-        $("#graphComp").hide();
-        $("#add-group").show();
-        $("#add").show();
+        addCompConfig();
       } else if (action == "graph") {
         var id = holder.id;
         $("#deleteComp").hide();
@@ -460,6 +408,9 @@ var graphRow = function(row,side) {
         $("#graphComp").hide();
         if (id[0] == "s") {
           // ultrasonic sensor
+          holder.id = id;
+          holder.type = "sensor";
+          holder.highlighted = true;
           graphRow(id[1],"Left");
         }
       }
