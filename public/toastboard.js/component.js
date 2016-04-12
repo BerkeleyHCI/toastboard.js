@@ -1013,7 +1013,7 @@ Sensor.prototype.draw = function() {
 };
 
 Sensor.prototype.getId = function() {
-  return "s" + twoDigits(this.startRow);
+  return "sr" + twoDigits(this.startRow);
 }
 
 Sensor.prototype.serialize = function() {
