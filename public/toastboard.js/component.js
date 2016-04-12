@@ -350,7 +350,7 @@ Resistor.prototype.draw = function() {
                          .y(function(d) { return d.y; })
                          .interpolate("linear");
 
-  this.breadboard.layer1.append("path")
+  var path = this.breadboard.layer1.append("path")
     .attr("d", lineFunction(this.lineData))
     .attr("stroke", color)
     .attr("stroke-width", 3)
