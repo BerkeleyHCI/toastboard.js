@@ -296,6 +296,7 @@ var highlightComponentAndRedraw = function(id) {
 }
 var deleteHighlightedComponent = function() {
   var svg = myBreadboard.drawEmptyBreadboard();
+  myBreadboard.layer2.selectAll("*").remove();
   myBreadboard.redrawBoard(svg);
   redrawComponents(myBreadboard,holder.id);
   holder.empty();

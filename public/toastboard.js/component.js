@@ -147,9 +147,8 @@ Component.prototype.draw = function() {
   } else {
     var color = defaultColor;
   }
-  var svg = d3.select("svg");
 
-  svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1])
     .attr("x2",this.endPin[0])
@@ -158,7 +157,7 @@ Component.prototype.draw = function() {
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
 
-  svg.append("rect")
+  this.breadboard.layer1.append("rect")
     .attr("x",this.startPin[0] - 8)
     .attr("y",this.startPin[1] + 10)
     .attr("width",16)
@@ -210,7 +209,6 @@ Wire.prototype.draw = function() {
     var wirecolor = defaultColor;
   }
 
-  var svg = d3.select("svg");
   if (this.startPin[0] == this.endPin[0]) {
     var m_x = ((self.startPin[0] + self.endPin[0]) / 2) + alpha;
     var m_y = self.startPin[1];
@@ -226,29 +224,18 @@ Wire.prototype.draw = function() {
                       .y(function(d) { return d.y; })
                       .interpolate("bundle");
 
-  var path = svg.append("path")
+  var path = this.breadboard.layer1.append("path")
       .attr("d",lineFunction(lineData))
       .attr("stroke-width",4)
       .attr("stroke",wirecolor)
       .attr("fill","none")
       .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
 
-/*
-
-  var line = svg.append("polyline")
-    .attr("x1",this.startPin[0])
-    .attr("y1",this.startPin[1])
-    .attr("x2",this.endPin[0])
-    .attr("y2",this.endPin[1])
-    .attr("stroke-width",4)
-    .attr("stroke","black")
-    .interpolate("basis");
-*/
   var msg = this.test();
 
   if (msg) {
    // path.append("title").text(msg);
-    addWarningIconAndTooltip(svg,this.startPin[0],this.startPin[1],msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
   }
 };
 
@@ -353,8 +340,8 @@ Resistor.prototype.draw = function() {
                          .x(function(d) { return d.x; })
                          .y(function(d) { return d.y; })
                          .interpolate("linear");
-  var svg = d3.select("svg");
-  var path = svg.append("path")
+
+  this.breadboard.layer1.append("path")
     .attr("d", lineFunction(this.lineData))
     .attr("stroke", color)
     .attr("stroke-width", 3)
@@ -364,9 +351,9 @@ Resistor.prototype.draw = function() {
   if (msg) {
    // path.append("title").text(msg);
     this.failedTest = msg;
-    addWarningIconAndTooltip(svg,this.startPin[0],this.startPin[1],msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
   } else {
-    addInfoIconAndTooltip(svg,this.startPin[0],this.startPin[1],this.resistance + "W");
+    addInfoIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],this.resistance + "W");
   }
 };
 
@@ -431,8 +418,7 @@ Diode.prototype.draw = function() {
                        .y(function(d) { return d.y; })
                        .interpolate("linear");
 
-  var svg = d3.select("svg");
-  var line = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1])
     .attr("x2",this.startPin[0])
@@ -440,13 +426,13 @@ Diode.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var path = svg.append("path")
+  this.breadboard.layer1.append("path")
     .attr("d", lineFunction(this.triangleData))
     .attr("stroke", color)
     .attr("stroke-width", 3)
     .attr("fill", "none")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line2 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0] - (this.diodeWidth/2))
     .attr("y1",this.endPin[1] - this.verticalLineHeight)
     .attr("x2",this.startPin[0] + (this.diodeWidth/2))
@@ -454,7 +440,7 @@ Diode.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line3 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.endPin[0])
     .attr("y1",this.endPin[1] - this.verticalLineHeight)
     .attr("x2",this.endPin[0])
@@ -463,13 +449,9 @@ Diode.prototype.draw = function() {
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var msg = this.test();
-  if (msg) { /*
-    line.append("title").text(msg);
-    path.append("title").text(msg);
-    line2.append("title").text(msg);
-    line3.append("title").text(msg); */
+  if (msg) {
     this.failedTest = msg;
-    addWarningIconAndTooltip(svg,this.startPin[0],this.startPin[1],msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
   }
 };
 
@@ -489,9 +471,7 @@ Diode.prototype.serialize = function() {
   return JSON.stringify(c);
 }
 
-
 Diode.prototype.test = function() {
-
    if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f") {
     return "<strong>This LED may not be inserted correctly!</strong><br><i>How I know:</i> At least one of the connections is floating";
   } else if (Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)) > 2.0){
@@ -522,9 +502,8 @@ Potentiometer.prototype.draw = function() {
     var color = defaultColor;
   }
 
-  var svg = d3.select("#board");
   var self = this;
-  svg.append("rect")
+  this.breadboard.layer1.append("rect")
     .attr("x",this.startPin[0] + 5)
     .attr("y",this.startPin[1] - 5)
     .attr("width",32)
@@ -533,7 +512,7 @@ Potentiometer.prototype.draw = function() {
     .attr("stroke",color)
     .attr("fill","white")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line1 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1])
     .attr("x2",this.startPin[0]+5)
@@ -541,7 +520,7 @@ Potentiometer.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line2 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.midPin[0])
     .attr("y1",this.midPin[1])
     .attr("x2",this.midPin[0]+5)
@@ -549,7 +528,7 @@ Potentiometer.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line3 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.endPin[0])
     .attr("y1",this.endPin[1])
     .attr("x2",this.endPin[0]+5)
@@ -557,7 +536,7 @@ Potentiometer.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var circle = svg.append("circle")
+  this.breadboard.layer1.append("circle")
     .attr("cx", this.midPin[0] + 5 + 16)
     .attr("cy", this.midPin[1] -2 )
     .attr("r", 10)
@@ -565,7 +544,7 @@ Potentiometer.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("fill","none")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var text = svg.append("text")
+  this.breadboard.layer1.append("text")
     .attr("x", this.endPin[0]+10 )
     .attr("y", this.endPin[1] +2 )
     .text( function(d) { return "POT"})                                                                                                                                                                                         
@@ -633,9 +612,7 @@ Button.prototype.draw = function() {
                        .y(function(d) { return d.y; })
                        .interpolate("linear");
 
-  var svg = d3.select("svg");
-
-  var line1 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1])
     .attr("x2",this.startPin[0])
@@ -643,7 +620,7 @@ Button.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line2 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.endPin[0])
     .attr("y1",this.endPin[1] - this.verticalLineHeight +3)
     .attr("x2",this.endPin[0])
@@ -651,7 +628,7 @@ Button.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var circle1 = svg.append("circle")
+  this.breadboard.layer1.append("circle")
     .attr("cx", this.startPin[0] )
     .attr("cy", this.endPin[1] - this.verticalLineHeight )
     .attr("r", 4)
@@ -659,7 +636,7 @@ Button.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("fill","none")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var cicle2 = svg.append("circle")
+  this.breadboard.layer1.append("circle")
     .attr("cx", this.endPin[0] )
     .attr("cy", this.startPin[1] + this.verticalLineHeight )
     .attr("r", 4)
@@ -667,7 +644,7 @@ Button.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("fill","none")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line3 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.endPin[0]+8)
     .attr("y1",this.endPin[1] - this.verticalLineHeight)
     .attr("x2",this.endPin[0]+8)
@@ -675,7 +652,7 @@ Button.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line4 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.endPin[0]+8)
     .attr("y1",this.startPin[1]+this.middleSpot)
     .attr("x2",this.endPin[0]+14)
@@ -685,15 +662,8 @@ Button.prototype.draw = function() {
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var msg = this.test();
   if (msg) {
-    /*
-    line1.append("title").text(msg);
-    line2.append("title").text(msg);
-    line3.append("title").text(msg);
-    line4.append("title").text(msg);
-    circle1.append("title").text(msg);
-    circle2.append("title").text(msg); */
     this.failedTest = msg;
-    addWarningIconAndTooltip(svg,this.startPin[0],this.startPin[1],msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
   }
 };
 
@@ -759,9 +729,7 @@ LMC6482.prototype.draw = function() {
                        .y(function(d) { return d.y; })
                        .interpolate("linear");
 
-  var svg = d3.select("svg");
-
-  var line1 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1])
     .attr("x2",this.startPin[0]+5)
@@ -769,7 +737,7 @@ LMC6482.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line2 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+15)
     .attr("x2",this.startPin[0]+5)
@@ -777,7 +745,7 @@ LMC6482.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line3 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+30)
     .attr("x2",this.startPin[0]+5)
@@ -785,7 +753,7 @@ LMC6482.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line4 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+45)
     .attr("x2",this.startPin[0]+5)
@@ -793,7 +761,7 @@ LMC6482.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line5 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1])
     .attr("x2",this.startPin[0]+55)
@@ -801,7 +769,7 @@ LMC6482.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line6 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1]+15)
     .attr("x2",this.startPin[0]+55)
@@ -809,7 +777,7 @@ LMC6482.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line7 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1]+30)
     .attr("x2",this.startPin[0]+55)
@@ -817,7 +785,7 @@ LMC6482.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line8 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0]+50)
     .attr("y1",this.startPin[1]+45)
     .attr("x2",this.startPin[0]+55)
@@ -825,7 +793,7 @@ LMC6482.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var package = svg.append("rect")
+  this.breadboard.layer1.append("rect")
     .attr("x",this.startPin[0] + 5)
     .attr("y",this.startPin[1] - 5)
     .attr("width",45)
@@ -834,7 +802,7 @@ LMC6482.prototype.draw = function() {
     .attr("stroke-width",2)
     .attr("fill","white")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var circle1 = svg.append("circle")
+  this.breadboard.layer1.append("circle")
     .attr("cx", this.startPin[0]+40 )
     .attr("cy", this.startPin[1]+1 )
     .attr("r", 4)
@@ -842,7 +810,7 @@ LMC6482.prototype.draw = function() {
     .attr("stroke-width",2)
     .attr("fill","white")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var text = svg.append("text")
+  this.breadboard.layer1.append("text")
     .attr("x", this.startPin[0]+10 )
     .attr("y", this.startPin[1]+45 )
     .text( function(d) { return "LMC6482"})                                                                                                                                                                                         
@@ -854,7 +822,7 @@ LMC6482.prototype.draw = function() {
   var msg = this.test();
   if (msg) {
     this.failedTest = msg;
-    addWarningIconAndTooltip(svg,this.startPin[0]+30,this.startPin[1]+25,msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0]+30,this.startPin[1]+25,msg);
   }
 };
 
@@ -930,9 +898,7 @@ Sensor.prototype.draw = function() {
                        .y(function(d) { return d.y; })
                        .interpolate("linear");
 
-  var svg = d3.select("svg");
-
-  var line1 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1])
     .attr("x2",this.startPin[0]+5)
@@ -940,7 +906,7 @@ Sensor.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line2 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+15)
     .attr("x2",this.startPin[0]+5)
@@ -948,7 +914,7 @@ Sensor.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line3 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+30)
     .attr("x2",this.startPin[0]+5)
@@ -956,7 +922,7 @@ Sensor.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line4 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+45)
     .attr("x2",this.startPin[0]+5)
@@ -964,7 +930,7 @@ Sensor.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line5 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+60)
     .attr("x2",this.startPin[0]+5)
@@ -972,7 +938,7 @@ Sensor.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line6 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+75)
     .attr("x2",this.startPin[0]+5)
@@ -980,7 +946,7 @@ Sensor.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var line7 = svg.append("line")
+  this.breadboard.layer1.append("line")
     .attr("x1",this.startPin[0])
     .attr("y1",this.startPin[1]+90)
     .attr("x2",this.startPin[0]+5)
@@ -988,7 +954,7 @@ Sensor.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var package = svg.append("rect")
+  this.breadboard.layer1.append("rect")
     .attr("x",this.startPin[0] + 5)
     .attr("y",this.startPin[1] - 5)
     .attr("width",70)
@@ -997,7 +963,7 @@ Sensor.prototype.draw = function() {
     .attr("stroke-width",2)
     .attr("fill","white")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var circle1 = svg.append("circle")
+  this.breadboard.layer1.append("circle")
     .attr("cx", this.startPin[0]+42 )
     .attr("cy", this.startPin[1]+45 )
     .attr("r", 25)
@@ -1005,7 +971,7 @@ Sensor.prototype.draw = function() {
     .attr("stroke-width",2)
     .attr("fill","white")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
-  var text = svg.append("text")
+  this.breadboard.layer1.append("text")
     .attr("x", this.startPin[0]+30 )
     .attr("y", this.startPin[1]+54 )
     .text( function(d) { return "sensor"})                                                                                                                                                                                         
@@ -1017,7 +983,7 @@ Sensor.prototype.draw = function() {
   var msg = this.test();
   if (msg) {
     this.failedTest = msg;
-    addWarningIconAndTooltip(svg,this.startPin[0]+10,this.startPin[1]+5,msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0]+10,this.startPin[1]+5,msg);
   }
 };
 
@@ -1060,19 +1026,19 @@ return "<strong>This sensor may not function correctly!</strong><br><i>How I kno
 }
 }
 
-var addWarningIconAndTooltip = function(svg, x, y, message) {
+var addWarningIconAndTooltip = function(breadboard, x, y, message) {
   var foWidth = 275;
   var anchor = {'w': 125, 'h': 80};
   var t = 50, k = 15;
   var tip = {'w': (3/4 * t), 'h': k};
-  svg.append("svg:image")
+  breadboard.layer1.append("svg:image")
   .attr('x',x)
   .attr('y',y - 10)
   .attr('width', 24)
   .attr('height', 24)
   .attr("xlink:href","Warning-128.png")
   .on('mouseover', function() {
-    var fo = svg.append('foreignObject')
+    var fo = breadboard.layer2.append('foreignObject')
         .attr({
             'x': x + 5,
             'y': y ,
@@ -1091,7 +1057,7 @@ var addWarningIconAndTooltip = function(svg, x, y, message) {
     fo.attr({
         'height': foHeight
     });
-    svg.insert('polygon', '.svg-tooltip')
+    breadboard.layer2.insert('polygon', '.svg-tooltip')
         .attr({
             'points': "0,0 0," + foHeight + " " + foWidth + "," + foHeight + " " + foWidth + ",0 ",
             'height': foHeight + tip.h,
@@ -1102,8 +1068,8 @@ var addWarningIconAndTooltip = function(svg, x, y, message) {
                   });
   }) 
   .on('mouseout', function() {
-      svg.selectAll('.svg-tooltip').remove();
-      svg.selectAll('polygon').remove();
+      breadboard.layer2.selectAll('.svg-tooltip').remove();
+      breadboard.layer2.selectAll('polygon').remove();
   })
 }
 
@@ -1113,14 +1079,14 @@ var addInfoIconAndTooltip = function(breadboard, x, y, message) {
   var anchor = {'w': 125, 'h': 80};
   var t = 50, k = 15;
   var tip = {'w': (3/4 * t), 'h': k};
-  svg.append("svg:image")
+  breadboard.layer1.append("svg:image")
   .attr('x',x - 7)
   .attr('y',y - 15)
   .attr('width', 24)
   .attr('height', 24)
   .attr("xlink:href","info3a.png")
   .on('mouseover', function() {
-    var fo = this.layer2.append('foreignObject')
+    var fo = breadboard.layer2.append('foreignObject')
         .attr({
             'x': x + 5,
             'y': y ,
@@ -1140,7 +1106,7 @@ var addInfoIconAndTooltip = function(breadboard, x, y, message) {
         'height': foHeight
     });
 
-    this.layer2.insert('polygon', '.svg-tooltip')
+    breadboard.layer2.insert('polygon', '.svg-tooltip')
         .attr({
             'points': "0,0 0," + foHeight + " " + foWidth + "," + foHeight + " " + foWidth + ",0 ",
             'height': foHeight + tip.h,
@@ -1151,7 +1117,7 @@ var addInfoIconAndTooltip = function(breadboard, x, y, message) {
                   });
   }) 
   .on('mouseout', function() {
-      this.layer2.selectAll('.svg-tooltip').remove();
-      this.layer2.selectAll('polygon').remove();
+      breadboard.layer2.selectAll('.svg-tooltip').remove();
+      breadboard.layer2.selectAll('polygon').remove();
   })
 }
