@@ -4,6 +4,14 @@ var rightCols = ["f","g","h","i","j"];
 var defaultColor = "black";
 var highlightedColor = "gold";
 
+var twoDigits = function(row) {
+  if (row < 10) {
+    return "0" + row;
+  } else {
+    return row;
+  }
+};
+
 var ComponentHolder = function() {
   this.type = null;
   this.startRow = null;
@@ -177,7 +185,7 @@ Component.prototype.draw = function() {
 };
 
 Component.prototype.getId = function() {
-  return "cr" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+  return "cr" + twoDigits(this.startRow) + "p" + this.startPinNum + "r" + twoDigits(this.endRow) + "p" + this.endPinNum;
 }
 
 Component.prototype.serialize = function() {
@@ -249,7 +257,7 @@ Wire.prototype.draw = function() {
 };
 
 Wire.prototype.getId = function() {
-  return "wr" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+  return "wr" + twoDigits(this.startRow) + "p" + this.startPinNum + "r" + twoDigits(this.endRow) + "p" + this.endPinNum;
 }
 
 Wire.prototype.serialize = function() {
@@ -373,7 +381,7 @@ Resistor.prototype.draw = function() {
 };
 
 Resistor.prototype.getId = function() {
-  return "rr" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+  return "rr" + twoDigits(this.startRow) + "p" + this.startPinNum + "r" + twoDigits(this.endRow) + "p" + this.endPinNum;
 }
 
 Resistor.prototype.serialize = function() {
@@ -472,7 +480,7 @@ Diode.prototype.draw = function() {
 };
 
 Diode.prototype.getId = function() {
-  return "dr" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+  return "dr" + twoDigits(this.startRow) + "p" + this.startPinNum + "r" + twoDigits(this.endRow) + "p" + this.endPinNum;
 }
 
 Diode.prototype.serialize = function() {
@@ -584,7 +592,7 @@ Potentiometer.prototype.serialize = function() {
 };
 
 Potentiometer.prototype.getId = function() {
-  return "p" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+  return "p" + twoDigits(this.startRow) + "p" + this.startPinNum + "r" + twoDigits(this.endRow) + "p" + this.endPinNum;
 };
 
 Potentiometer.prototype.test = function() {
@@ -685,7 +693,7 @@ Button.prototype.draw = function() {
 
 
 Button.prototype.getId = function() {
-  return "dr" + this.startRow + "p" + this.startPinNum + "r" + this.endRow + "p" + this.endPinNum;
+  return "dr" + twoDigits(this.startRow) + "p" + this.startPinNum + "r" + twoDigits(this.endRow) + "p" + this.endPinNum;
 }
 
 Button.prototype.serialize = function() {
@@ -844,7 +852,7 @@ LMC6482.prototype.draw = function() {
 
 
 LMC6482.prototype.getId = function() {
-  return "dr" + this.startRow;
+  return "dr" + twoDigits(this.startRow);
 }
 
 LMC6482.prototype.serialize = function() {
@@ -1005,7 +1013,7 @@ Sensor.prototype.draw = function() {
 };
 
 Sensor.prototype.getId = function() {
-  return "s" + this.startRow;
+  return "s" + twoDigits(this.startRow);
 }
 
 Sensor.prototype.serialize = function() {

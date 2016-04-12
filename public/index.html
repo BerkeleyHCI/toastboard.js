@@ -435,7 +435,7 @@ var graphRow = function(row,side) {
           holder.id = id;
           holder.type = "sensor";
           holder.highlighted = true;
-          graphRow(id[1]+2,"Left");
+          graphRow(parseInt(id.slice(2,4))+2,"Left");
         }
       }
     });
