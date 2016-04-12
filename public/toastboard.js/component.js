@@ -1070,8 +1070,8 @@ var addWarningIconAndTooltip = function(breadboard, x, y, message) {
   .on('mouseover', function() {
     var fo = breadboard.layer2.append('foreignObject')
         .attr({
-            'x': x + 5,
-            'y': y ,
+            'x': x + 15,
+            'y': y + 5,
             'width': foWidth,
             'class': 'svg-tooltip'
         });
@@ -1089,12 +1089,12 @@ var addWarningIconAndTooltip = function(breadboard, x, y, message) {
     });
     breadboard.layer2.insert('polygon', '.svg-tooltip')
         .attr({
-            'points': "0,0 0," + foHeight + " " + foWidth + "," + foHeight + " " + foWidth + ",0 ",
+            'points': "5,5 5," + foHeight + " " + foWidth + "," + foHeight + " " + foWidth + ",5 ",
             'height': foHeight + tip.h,
             'width': foWidth,
             'fill': '#D8D8D8', 
             'opacity': 0.85,
-            'transform': 'translate(' + x + ',' + y + ')'
+            'transform': 'translate(' + (x+10) + ',' + (y+5) + ')'
                   });
   }) 
   .on('mouseout', function() {
@@ -1118,8 +1118,8 @@ var addInfoIconAndTooltip = function(breadboard, x, y, message) {
   .on('mouseover', function() {
     var fo = breadboard.layer2.append('foreignObject')
         .attr({
-            'x': x + 5,
-            'y': y ,
+            'x': x + 15,
+            'y': y + 5,
             'width': foWidth,
             'class': 'svg-tooltip'
         });
@@ -1138,12 +1138,12 @@ var addInfoIconAndTooltip = function(breadboard, x, y, message) {
 
     breadboard.layer2.insert('polygon', '.svg-tooltip')
         .attr({
-            'points': "0,0 0," + foHeight + " " + foWidth + "," + foHeight + " " + foWidth + ",0 ",
+            'points': "5,5 5," + foHeight + " " + foWidth + "," + foHeight + " " + foWidth + ",5 ",
             'height': foHeight + tip.h,
             'width': foWidth,
             'fill': '#D8D8D8', 
             'opacity': 0.85,
-            'transform': 'translate(' + x + ',' + y + ')'
+            'transform': 'translate(' + (x+10) + ',' + (y+5) + ')'
                   });
   }) 
   .on('mouseout', function() {
