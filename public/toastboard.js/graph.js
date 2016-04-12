@@ -36,7 +36,7 @@ Graph.prototype.drawGraph = function(component_type) {
   };
   var displayDigits = function() {
     if (component_type == "sensor") {
-      return 2;
+      return 0;
     } else {
       return 1;
     }
