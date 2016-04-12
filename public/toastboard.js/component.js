@@ -366,7 +366,11 @@ Resistor.prototype.draw = function() {
     this.failedTest = msg;
     addWarningIconAndTooltip(svg,this.startPin[0],this.startPin[1],msg);
   } else {
-    addInfoIconAndTooltip(svg,this.startPin[0],this.startPin[1],this.resistance + "W");
+    var vdrop = this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)
+    var current =  vdrop / this.resistance;
+    current *= 1000;
+    var info = "<strong>Current through this resistor:</strong> "+current+"mA<br><i>How I know:</i> V=IR; there is a voltage difference of "+vdrop+"V across this "+this.resistance+"ohm resistor";
+    addInfoIconAndTooltip(svg,this.startPin[0],this.startPin[1],info);
   }
 };
 
@@ -878,23 +882,24 @@ LMC6482.prototype.serialize = function() {
 
 LMC6482.prototype.test = function() {
 
-var reasons = ""
-var solutions =""
+var reasons = "";
+var solutions ="";
 var post = 0;
 
-  if (this.breadboard.getVoltage(this.startRow+27,this.startPinNum) == "f")  {
-    reasons += "<br>-V<sub>ref</sub> (pin5) at "+getDisplayRow(this.startRow+27,this.startPinNum)+" is floating";
-    solutions +="<br>-In most cases, V<sub>ref</sub> should be connected to GND";
+  if (this.breadboard.getVoltage(this.startRow+24,this.startPinNum) == "f")  {
+    reasons += "<br>-Positive supply input (pin8) at "+getDisplayRow(this.startRow+24,this.startPinNum)+" is floating";
+    solutions +="<br>-Connect "+getDisplayRow(this.startRow+24,this.startPinNum)+" to VDD for full output voltage range";
     post = 1;
   }
-  if (this.breadboard.getVoltage(this.startRow+3,this.startPinNum) == "f" || this.breadboard.getVoltage(this.startRow+3,this.startPinNum)==this.breadboard.getVoltage(this.startRow+25,this.startPinNum) ) {
-    reasons +=  "<br>-The negative supply (pin4) at "+getDisplayRow(this.startRow+3,this.startPinNum)+" is floating or the same as the positive supply";
-    solutions += "<br>-To get the full output voltage range, V<sub>-</sub> should be connected to GND or ideally a negative voltage"
+  if (this.breadboard.getVoltage(this.startRow+3,this.startPinNum) == "f" || this.breadboard.getVoltage(this.startRow+3,this.startPinNum)==this.breadboard.getVoltage(this.startRow+24,this.startPinNum) ) {
+    reasons +=  "<br>-Negative supply input (pin4) at "+getDisplayRow(this.startRow+3,this.startPinNum)+" is floating or the same as the positive supply";
+    solutions += "<br>-To get the full output voltage range, V<sub>-</sub> should be connected to GND or ideally a negative voltage";
+    post = 1;
   }
 
   if (post == 1){
-return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
-}
+    return "<strong>This amplifier may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
+  }
 }
 
 var Sensor = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
@@ -1052,6 +1057,11 @@ var post = 0;
   if (this.breadboard.getVoltage(this.startRow+5,this.startPinNum) < 5.0)  {
     reasons +=  "<br>-PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is less than the suggested 5V";
     solutions += "<br>-Either supply 5V to "+getDisplayRow(this.startRow+5,this.startPinNum)+" or the datasheet scale factor may be incorrect";
+    post = 1;
+  }
+  if (this.breadboard.getVoltage(this.startRow+5,this.startPinNum) == "f")  {
+    reasons +=  "<br>-PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is floating";
+    solutions += "<br>-Supply 5V (suggested) to "+getDisplayRow(this.startRow+5,this.startPinNum);
     post = 1;
   }
 
