@@ -395,6 +395,7 @@ var graphRow = function(row,side) {
       e.preventDefault();
       var row = $("input#rowToGraph").val();
       var side = $("#sideToGraph").val();
+      holder.type = null; // this is so hacky
       graphRow(row,side);
     });
 

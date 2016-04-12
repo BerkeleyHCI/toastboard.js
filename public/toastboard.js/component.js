@@ -16,14 +16,14 @@ var ComponentHolder = function() {
 }
 
 ComponentHolder.prototype.empty = function() {
-  this.type = null;
+  //this.type = null;
   this.startRow = null;
   this.startPin = null;
   this.endRow = null;
   this.endPin = null;
   this.id = null;
   this.highlighted = null;
-  this.resistance = null;
+ this.resistance = null;
 }
 
 ComponentHolder.prototype.create = function(breadboard) {
