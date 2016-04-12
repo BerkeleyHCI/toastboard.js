@@ -42,6 +42,10 @@
 
       </div>
       </div>
+      <div class="input-group" id="resistance-group">
+            <input type="text" class="form-control" id="resistance" placeholder="Resistance" style="width: 100px" />
+      </div>
+
       <div class="input-group" id="start-pin-group">
       <div class="input-group-addon">Choose a start pin</div>
       </div>
@@ -211,6 +215,12 @@ var addCompConfig = function() {
   $("#cancelDelete").hide();
   $("#start-pin-group").hide();
   $("#end-pin-group").hide();
+  $("#resistance-group").hide();
+  if ($("#newcomponent").val() == "resistor") {
+    $("#resistance-group").show();
+  } else {
+    $("#resistance-group").hide();
+  }
 }
 
 var highlightedConfig = function(type_initial) {
@@ -226,6 +236,7 @@ var highlightedConfig = function(type_initial) {
   $("#cancelDelete").show();
   $("#start-pin-group").hide();
   $("#end-pin-group").hide();
+  $("#resistance-group").hide();
 }
 
 var placePinConfig = function(stage) {
@@ -235,6 +246,7 @@ var placePinConfig = function(stage) {
   $("#graphComp").hide();
   $("#cancel").show();
   $("#cancelDelete").hide();
+  $("#resistance-group").hide();
   if (stage == "start") {
     $("#start-pin-group").show();
     $("#end-pin-group").hide();
@@ -365,6 +377,14 @@ var graphRow = function(row,side) {
       window.print();
     });
 
+    $("#newcomponent").on("change",function() {
+      if ($("#newcomponent").val() == "resistor") {
+        $("#resistance-group").show();
+      } else {
+        $("#resistance-group").hide();
+      }
+    });
+
     var printButton = document.createElement("button");
     printButton.innerHTML = "Save Board";
     printButton.className = "btn btn-secondary";
@@ -384,6 +404,9 @@ var graphRow = function(row,side) {
       var action = $(document.activeElement).val();
       if (action == "add") {
         holder.type = $("#newcomponent").val();
+        if (holder.type == "resistor") {
+          holder.resistance = $("#resistance").val();
+        }
         svg = myBreadboard.drawEmptyBreadboard();
         myBreadboard.redrawBoard(svg);
         redrawComponents(myBreadboard);

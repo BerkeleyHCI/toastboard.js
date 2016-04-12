@@ -12,6 +12,7 @@ var ComponentHolder = function() {
   this.endPin = null;
   this.id = null;
   this.highlighted = null;
+  this.resistance = null;
 }
 
 ComponentHolder.prototype.empty = function() {
@@ -22,10 +23,15 @@ ComponentHolder.prototype.empty = function() {
   this.endPin = null;
   this.id = null;
   this.highlighted = null;
+  this.resistance = null;
 }
 
 ComponentHolder.prototype.create = function(breadboard) {
   var c = makeComponent(breadboard,this.type,this.startRow,this.startPin,this.endRow,this.endPin);
+  if (this.type == "resistor") {
+    console.log("adding r to resistor " + this.resistance);
+    c.resistance = this.resistance;
+  }
   this.empty();
   return c;
 }
@@ -70,6 +76,9 @@ var redrawComponents = function(breadboard,removeId) {
     if (c.id != removeId) {
       newcomp.push(d);
       var cobj = makeComponent(breadboard,c.type,c.startRow,c.startPinNum,c.endRow,c.endPinNum,c.highlighted);
+      if (c.resistance) {
+        cobj.resistance = c.resistance;
+      }
       cobj.draw();
     }
   });
@@ -349,15 +358,17 @@ Resistor.prototype.draw = function() {
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
   var msg = this.test();
   if (msg) {
-   // path.append("title").text(msg);
+    path.append("title").text(msg);
     this.failedTest = msg;
     addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
   } else {
-    var vdrop = this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum)
+    var vdrop = Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum));
+    if (this.breadboard.getVoltage(this.startRow,this.startPinNum) != "f" && this.breadboard.getVoltage(this.endRow,this.endPinNum) != "f") {
     var current =  vdrop / this.resistance;
     current *= 1000;
-    var info = "<strong>Current through this resistor:</strong> "+current+"mA<br><i>How I know:</i> V=IR; there is a voltage difference of "+vdrop+"V across this "+this.resistance+"ohm resistor";
-    addInfoIconAndTooltip(svg,this.startPin[0],this.startPin[1],info);
+    var info = "<strong>Current through this resistor:</strong> "+current.toFixed(2)+"mA<br><i>How I know:</i> V=IR; there is a voltage difference of "+vdrop.toFixed(2)+"V across this "+this.resistance+"ohm resistor";
+    addInfoIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],info);
+  }
   }
 };
 
@@ -374,6 +385,7 @@ Resistor.prototype.serialize = function() {
   c["endRow"] = this.endRow;
   c["endPinNum"] = this.endPinNum;
   c["highlighted"] = this.highlighted;
+  c["resistance"] = this.resistance;
   return JSON.stringify(c);
 }
 
