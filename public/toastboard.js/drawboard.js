@@ -21,6 +21,18 @@ function Breadboard() {
   this.connections = null;
   this.labels = null;
 
+  d3.select("#board")
+    .remove();
+  var svg = d3.select("#breadboard").append("svg")
+  .attr("width", width)
+  .attr("height", height)
+  .attr("id","board");
+  var layer1 = svg.append("g");
+  var layer2 = svg.append("g");
+  this.svg = svg;
+  this.layer1 = layer1;
+  this.layer2 = layer2;
+
   var railPinPositionGrid = function(startX,startY) {
     var positions = [];
     for (var x=0;x<railcolumn;x++) {
@@ -102,7 +114,7 @@ Breadboard.prototype.attachPinClickEvents = function(pintype) {
     var methodName = "setEndPin";
   }
   console.log("attaching pin events");
-  d3.select("#board").selectAll("pinclick")
+  this.layer1.selectAll("pinclick")
   .data(this.pinPositions)
   .enter()
   .append("rect")
@@ -171,16 +183,10 @@ var isSamePin = function(i) {
 Breadboard.prototype.drawEmptyBreadboard = function() {
   console.log(holder);
   var self = this;
-  d3.select("#board")
-    .remove();
 
-  var svg = d3.select("#breadboard").append("svg")
-  .attr("width", width)
-  .attr("height", height)
-  .attr("id","board")
-  .append("g");
+  this.layer1.selectAll("*").remove();
 
-  svg.selectAll("circle")
+  this.layer1.selectAll("circle")
   .data(this.pinPositions)
   .enter()
   .append("circle")
@@ -192,7 +198,7 @@ Breadboard.prototype.drawEmptyBreadboard = function() {
 
   var numbers = numbering(self);
 
-  svg.selectAll(".numbers")
+  this.layer1.selectAll(".numbers")
     .data(numbers)
     .enter()
     .append("text")
@@ -204,7 +210,7 @@ Breadboard.prototype.drawEmptyBreadboard = function() {
 
   var lettering = col_letters(self);
 
-  svg.selectAll(".col_letters")
+  this.layer1.selectAll(".col_letters")
     .data(lettering)
     .enter()
     .append("text")
@@ -228,7 +234,7 @@ Breadboard.prototype.drawEmptyBreadboard = function() {
   grdVoltage.color = groundColor;
   defaultVoltages.push(grdVoltage);
 
-  svg.selectAll(".defaultVoltages")
+  this.layer1.selectAll(".defaultVoltages")
   .data(defaultVoltages)
   .enter()
   .append("rect")
@@ -243,18 +249,17 @@ Breadboard.prototype.drawEmptyBreadboard = function() {
   .attr("class","defaultVoltages")
   .append("title").text(function(d) { return d.v.toString() + "V" });
 
-    svg.append("text")
+  this.layer1.append("text")
     .attr("x",280)
     .attr("y",390)
     .attr("dy",".30em")
     .text("VDD: " + vdd.toFixed(1) + "V");
 
-  return svg;
 };
 
-Breadboard.prototype.redrawBoard = function(svg) {
+Breadboard.prototype.redrawBoard = function() {
   // this.labels and this.voltageAttr are fully populated
-  svg.selectAll(".label")
+  this.layer1.selectAll(".label")
     .data(this.labels)
     .enter()
     .append("text")
@@ -263,7 +268,7 @@ Breadboard.prototype.redrawBoard = function(svg) {
     .attr("dy", ".30em")
     .text(function(d) { return d.label; });
 
-  svg.selectAll(".rowRect")
+  this.layer1.selectAll(".rowRect")
     .data(this.voltageAttr)
     .enter()
     .append("rect")
@@ -294,8 +299,8 @@ Breadboard.prototype.drawBreadboard = function(json) {
     this.connections = hashToCnxn(hash,self);
     this.labels = hashToLabels(this.rowData,self);
 
-    var svg = this.drawEmptyBreadboard();
-    this.redrawBoard(svg);
+    this.drawEmptyBreadboard();
+    this.redrawBoard();
 
   } else {
     console.log("no real data");

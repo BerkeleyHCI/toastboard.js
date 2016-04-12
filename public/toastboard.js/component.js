@@ -1107,7 +1107,8 @@ var addWarningIconAndTooltip = function(svg, x, y, message) {
   })
 }
 
-var addInfoIconAndTooltip = function(svg, x, y, message) {
+var addInfoIconAndTooltip = function(breadboard, x, y, message) {
+  //    var tt_svg = d3.select("#tooltips");
   var foWidth = 275;
   var anchor = {'w': 125, 'h': 80};
   var t = 50, k = 15;
@@ -1119,7 +1120,7 @@ var addInfoIconAndTooltip = function(svg, x, y, message) {
   .attr('height', 24)
   .attr("xlink:href","info3a.png")
   .on('mouseover', function() {
-    var fo = svg.append('foreignObject')
+    var fo = this.layer2.append('foreignObject')
         .attr({
             'x': x + 5,
             'y': y ,
@@ -1138,7 +1139,8 @@ var addInfoIconAndTooltip = function(svg, x, y, message) {
     fo.attr({
         'height': foHeight
     });
-    svg.insert('polygon', '.svg-tooltip')
+
+    this.layer2.insert('polygon', '.svg-tooltip')
         .attr({
             'points': "0,0 0," + foHeight + " " + foWidth + "," + foHeight + " " + foWidth + ",0 ",
             'height': foHeight + tip.h,
@@ -1149,7 +1151,7 @@ var addInfoIconAndTooltip = function(svg, x, y, message) {
                   });
   }) 
   .on('mouseout', function() {
-      svg.selectAll('.svg-tooltip').remove();
-      svg.selectAll('polygon').remove();
+      this.layer2.selectAll('.svg-tooltip').remove();
+      this.layer2.selectAll('polygon').remove();
   })
 }
