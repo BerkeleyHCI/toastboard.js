@@ -361,9 +361,8 @@ var graphRow = function(row,side) {
       socket.emit("t","data");
       startConfig();
       if (holder.highlighted) {
-        $("#deleteComp").show();
-        $("#cancel").show();
-        $("#graphComp").show();
+        clearHighlightedComponent();
+        addCompConfig();
       }
     });
 
