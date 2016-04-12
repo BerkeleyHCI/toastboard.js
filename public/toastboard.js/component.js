@@ -24,7 +24,7 @@ var ComponentHolder = function() {
 }
 
 ComponentHolder.prototype.empty = function() {
-  //this.type = null;
+  this.type = null;
   this.startRow = null;
   this.startPin = null;
   this.endRow = null;
