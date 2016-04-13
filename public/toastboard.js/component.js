@@ -684,7 +684,7 @@ ThreePinButton.prototype.draw = function() {
   this.breadboard.layer1.append("text")
     .attr("x", this.endPin[0]+10 )
     .attr("y", this.endPin[1] +2 )
-    .text( function(d) { return "BUT"})                                                                                                                                                                                         
+    .text( function(d) { return "BTN"})                                                                                                                                                                                         
     .attr("font-family","sans-serif")
     .attr("font-size" , "8px")
     .attr("fill","black")
@@ -1130,11 +1130,17 @@ Sensor.prototype.draw = function() {
     .attr("font-size" , "8px")
     .attr("fill","black")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+
+
     
   var msg = this.test();
   if (msg) {
     this.failedTest = msg;
     addWarningIconAndTooltip(this.breadboard,this.startPin[0]+10,this.startPin[1]+5,msg);
+  } else if (this.breadboard.getVoltage(this.startRow+5,this.startPinNum) < 5.0)  {
+    reasons +=  "<br>-PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is less than the suggested 5V";
+  //  solutions += "<br>-Either supply 5V to "+getDisplayRow(this.startRow+5,this.startPinNum)+" or the datasheet scale factor may be incorrect";
+    addInfoIconAndTooltip(this.breadboard,this.startPin[0]+10,this.startPin[1]+5,reasons);
   }
 };
 
@@ -1166,11 +1172,7 @@ var post = 0;
     solutions +="<br>-Connect "+getDisplayRow(this.startRow+6,this.startPinNum)+" to ground";
     post = 1;
   }
-  if (this.breadboard.getVoltage(this.startRow+5,this.startPinNum) < 5.0)  {
-    reasons +=  "<br>-PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is less than the suggested 5V";
-    solutions += "<br>-Either supply 5V to "+getDisplayRow(this.startRow+5,this.startPinNum)+" or the datasheet scale factor may be incorrect";
-    post = 1;
-  }
+
   if (this.breadboard.getVoltage(this.startRow+5,this.startPinNum) == "f")  {
     reasons +=  "<br>-PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is floating";
     solutions += "<br>-Supply 5V (suggested) to "+getDisplayRow(this.startRow+5,this.startPinNum);
@@ -1183,7 +1185,7 @@ return "<strong>This sensor may not function correctly!</strong><br><i>How I kno
 }
 
 var addWarningIconAndTooltip = function(breadboard, x, y, message) {
-  var foWidth = 350;
+  var foWidth = 340;
   var anchor = {'w': 125, 'h': 80};
   var t = 50, k = 15;
   var tip = {'w': (3/4 * t), 'h': k};
@@ -1220,7 +1222,7 @@ var addWarningIconAndTooltip = function(breadboard, x, y, message) {
             'width': foWidth,
             'fill': '#D8D8D8', 
             'opacity': 0.85,
-            'transform': 'translate(' + (x+10) + ',' + (y+5) + ')'
+            'transform': 'translate(' + (x+15) + ',' + (y+5) + ')'
                   });
   }) 
 
