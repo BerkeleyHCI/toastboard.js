@@ -1002,12 +1002,12 @@ var post = 0;
 
   if (this.breadboard.getVoltage(this.startRow+24,this.startPinNum) == "f")  {
     reasons += "<br>-Positive supply input (pin8) at "+getDisplayRow(this.startRow+24,this.startPinNum)+" is floating";
-    solutions +="<br>-Connect "+getDisplayRow(this.startRow+24,this.startPinNum)+" to VDD for full output voltage range";
+    solutions +="<br>-Connect "+getDisplayRow(this.startRow+24,this.startPinNum)+" to VDD for full output<br> voltage range";
     post = 1;
   }
   if (this.breadboard.getVoltage(this.startRow+3,this.startPinNum) == "f" || this.breadboard.getVoltage(this.startRow+3,this.startPinNum)==this.breadboard.getVoltage(this.startRow+24,this.startPinNum) ) {
-    reasons +=  "<br>-Negative supply input (pin4) at "+getDisplayRow(this.startRow+3,this.startPinNum)+" is floating or the same as the positive supply";
-    solutions += "<br>-To get the full output voltage range, V<sub>-</sub> should be connected to GND or ideally a negative voltage";
+    reasons +=  "<br>-Negative supply input (pin4) at "+getDisplayRow(this.startRow+3,this.startPinNum)+" is <br>floating or the same as the positive supply";
+    solutions += "<br>-To get the full output voltage range, V<sub>-</sub> should <br>be connected to GND or ideally a <br>negative voltage";
     post = 1;
   }
 
