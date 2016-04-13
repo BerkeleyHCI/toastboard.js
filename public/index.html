@@ -60,6 +60,15 @@
       <button type="submit" class="btn btn-secondary" value="cancelDelete" id="cancelDelete">Cancel</button>
   </form>
 
+  <form class="form-inline" id="lightUp">
+      <div class="form-group">
+    <div class="input-group" id="light-group">
+  <div class="input-group-addon">Light up row</div>
+  <input type="text" id="rowToLightUp"/>
+  </div></div>
+  <button type="submit" class="btn btn-secondary">Submit</button>
+  </form>
+
 </div>
     <div class="row">
     <div class="col-xs-6">
@@ -322,6 +331,10 @@ var clearHighlightedComponent = function() {
   redrawComponents(myBreadboard);
 };
 
+var highlightDeviceRow = function(row) {
+  socket.emit("l",row);
+}
+
 var graphRow = function(row,side) {
   var rowString = "";
   row -= 1;
@@ -391,6 +404,12 @@ var graphRow = function(row,side) {
     printButton.addEventListener("click", function() {
       window.print();
     });
+
+    $("#lightUp").submit(function(e) {
+      e.preventDefault();
+      console.log("we're lighting up this row " + $("#rowToLightUp").val());
+      highlightDeviceRow($("#rowToLightUp").val());
+    })
 
     $("#graphForm").submit(function(e) {
       e.preventDefault();
