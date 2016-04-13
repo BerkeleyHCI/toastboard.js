@@ -78,6 +78,19 @@ function openSocket(socket) {
         });
       });
 
+            socket.on("l",function(data,flag) {
+        console.log("telling client to light up row " + data);
+        serialPort.write("l," + data + "\n", function(err,res) {
+          if (err !== undefined) {
+            console.log("error on writing to serial " + err);
+          }
+          if (res !== undefined) {
+            console.log("successfully wrote " + res + " characters");
+          }
+
+        })
+      });
+
       serialPort.on("data", function(data) {
         console.log("data from board");
         console.log(data);
