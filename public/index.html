@@ -59,7 +59,18 @@
       <button type="submit" class="btn btn-secondary" value="graph" id="graphComp">Graph Component</button>
       <button type="submit" class="btn btn-secondary" value="cancelDelete" id="cancelDelete">Cancel</button>
   </form>
+  </div>
+  <div class="row"
+<form class="form-inline" id="schematic">
+<div class="form-group">
+<div class="input-group">
+<label for="schematic_csv">Choose a schematic</label>
+<input class="form-control" type="file" id="schematic_csv"  />
+</div></div>
+<button type="submit" class="btn btn-secondary" value="submitCsv">Upload</button>
+</form>
 
+<!--
   <form class="form-inline" id="lightUp">
       <div class="form-group">
     <div class="input-group" id="light-group">
@@ -68,7 +79,7 @@
   </div></div>
   <button type="submit" class="btn btn-secondary">Submit</button>
   </form>
-
+-->
 </div>
     <div class="row">
     <div class="col-xs-6">
@@ -404,12 +415,12 @@ var graphRow = function(row,side) {
     printButton.addEventListener("click", function() {
       window.print();
     });
-
+/*
     $("#lightUp").submit(function(e) {
       e.preventDefault();
       console.log("we're lighting up this row " + $("#rowToLightUp").val());
       highlightDeviceRow($("#rowToLightUp").val());
-    })
+    }) */
 
     $("#graphForm").submit(function(e) {
       e.preventDefault();

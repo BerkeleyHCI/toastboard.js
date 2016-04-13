@@ -88,7 +88,7 @@ function openSocket(socket) {
           }
 
         })
-      })
+      });
 
       serialPort.on("data", function(data) {
         console.log("data from board");
