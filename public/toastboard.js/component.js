@@ -656,6 +656,23 @@ ThreePinButton.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  this.breadboard.layer1.append("line")
+    .attr("x1",this.midPin[0] + 21)
+    .attr("y1",this.midPin[1] - 7)
+    .attr("x2",this.midPin[0] + 21)
+    .attr("y2",this.midPin[1] + 7)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw(" + this.getId() + ");");
+  this.breadboard.layer1.append("line")
+    .attr("x1",this.midPin[0] + 10)
+    .attr("y1",this.midPin[1] + 7)
+    .attr("x2",this.midPin[0] + 30)
+    .attr("y2",this.midPin[1] + 7)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw(" + this.getId() + ");");
+    /*
   this.breadboard.layer1.append("circle")
     .attr("cx", this.midPin[0] + 5 + 16)
     .attr("cy", this.midPin[1] -2 )
@@ -663,7 +680,7 @@ ThreePinButton.prototype.draw = function() {
     .attr("stroke",color)
     .attr("stroke-width",3)
     .attr("fill","none")
-    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');"); */
   this.breadboard.layer1.append("text")
     .attr("x", this.endPin[0]+10 )
     .attr("y", this.endPin[1] +2 )
