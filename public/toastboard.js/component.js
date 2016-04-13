@@ -972,7 +972,7 @@ LMC6482.prototype.draw = function() {
   var msg = this.test();
   if (msg) {
     this.failedTest = msg;
-    addWarningIconAndTooltip(this.breadboard,this.startPin[0]+30,this.startPin[1]+25,msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
   }
 };
 
