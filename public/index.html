@@ -473,6 +473,8 @@ var fakeJson = '{\"rowsLeft\": [\"f\",\"f\",\"f\",\"f\",\"f\",3.3,3.3,\"f\",\"f\
 // figure 7
 //var fakeJson = '{\"rowsLeft\":[\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"],\"rowsRight\":[\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",3.3,\"f\",\"f\",\"f\",0.0,\"f\",\"f\",\"f\",\"f\",\"f\",0,\"f\",\"f\",\"f\"]}';
 
+var fakeJson = '{\"rowsLeft\": [\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",0,0,0.8,0,\"f\",0,0,0.8,\"f\",0.1,3.3,0,\"f\",\"f\",\"f\"],\"rowsRight\": [\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\",\"f\"]}';
+
   myBreadboard.drawBreadboard(JSON.parse(fakeJson));
   sessionStorage.setItem("boardstate",JSON.stringify({"components":[]}));
 //  myBreadboard.attachPinClickEvents();

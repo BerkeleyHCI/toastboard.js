@@ -1138,7 +1138,7 @@ Sensor.prototype.draw = function() {
     this.failedTest = msg;
     addWarningIconAndTooltip(this.breadboard,this.startPin[0]+10,this.startPin[1]+5,msg);
   } else if (this.breadboard.getVoltage(this.startRow+5,this.startPinNum) < 5.0)  {
-    reasons +=  "<br>-PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is less than the suggested 5V";
+    var reasons =  "PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is less than the suggested 5V";
   //  solutions += "<br>-Either supply 5V to "+getDisplayRow(this.startRow+5,this.startPinNum)+" or the datasheet scale factor may be incorrect";
     addInfoIconAndTooltip(this.breadboard,this.startPin[0]+10,this.startPin[1]+5,reasons);
   }
