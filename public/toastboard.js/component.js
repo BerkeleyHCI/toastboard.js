@@ -399,8 +399,8 @@ Resistor.prototype.serialize = function() {
 
 Resistor.prototype.test = function() {
   if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == this.breadboard.getVoltage(this.endRow,this.endPinNum)) {
-    return "<strong>There is no current through this resistor!</strong><br><i>How I know:</i> V=IR - there is currently no voltage difference between "+getDisplayRow(this.startRow,this.startPinNum)
-    +" and "+getDisplayRow(this.endRow,this.endPinNum);
+    return "<strong>There is no current through this resistor!</strong><br><i>How I know:</i> V=IR; there is currently no voltage difference between "+getDisplayRow(this.startRow,this.startPinNum)
+    +" and<br \\> "+getDisplayRow(this.endRow,this.endPinNum);
   } else if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == "f" || this.breadboard.getVoltage(this.endRow,this.endPinNum) == "f"){
     return "<strong>This resistor may not be inserted correctly!</strong><br><i>How I know:</i> At least one of the connections is floating"; 
   }
@@ -1057,7 +1057,7 @@ return "<strong>This sensor may not function correctly!</strong><br><i>How I kno
 }
 
 var addWarningIconAndTooltip = function(breadboard, x, y, message) {
-  var foWidth = 275;
+  var foWidth = 350;
   var anchor = {'w': 125, 'h': 80};
   var t = 50, k = 15;
   var tip = {'w': (3/4 * t), 'h': k};
@@ -1097,10 +1097,11 @@ var addWarningIconAndTooltip = function(breadboard, x, y, message) {
             'transform': 'translate(' + (x+10) + ',' + (y+5) + ')'
                   });
   }) 
+
   .on('mouseout', function() {
       breadboard.layer2.selectAll('.svg-tooltip').remove();
       breadboard.layer2.selectAll('polygon').remove();
-  })
+  })  
 }
 
 var addInfoIconAndTooltip = function(breadboard, x, y, message) {
