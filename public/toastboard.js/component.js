@@ -37,7 +37,6 @@ ComponentHolder.prototype.empty = function() {
 ComponentHolder.prototype.create = function(breadboard) {
   var c = makeComponent(breadboard,this.type,this.startRow,this.startPin,this.endRow,this.endPin);
   if (this.type == "resistor") {
-    console.log("adding r to resistor " + this.resistance);
     c.resistance = this.resistance;
   }
   this.empty();
@@ -61,6 +60,8 @@ var makeComponent = function(breadboard,component_type,startrow,startpin,endrow,
     var c = new Potentiometer(breadboard,startrow,startpin,endrow,endpin,highlighted);
   } else if (component_type == "sensor") {
     var c = new Sensor(breadboard,startrow,startpin,endrow,endpin,highlighted);
+  } else if (component_type == "3pin") {
+    var c = new ThreePinButton(breadboard,startrow,startpin,endrow,endpin,highlighted);
   }
   return c;
 };
@@ -596,6 +597,114 @@ Potentiometer.prototype.getId = function() {
 };
 
 Potentiometer.prototype.test = function() {
+  return null;
+};
+
+var ThreePinButton = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
+  console.log("three pinbutton constructor");
+  this.breadboard = breadboard;
+  this.type = "3pin";
+  this.startRow = startRow;
+  this.startPinNum = startPinNum;
+  this.startPin = this.breadboard.getRowPin(this.startRow,this.startPinNum);
+  this.midRow = startRow + 1;
+  this.midPin = this.breadboard.getRowPin(this.midRow,startPinNum);
+  this.endRow = startRow + 2;
+  this.endPinNum = startPinNum;
+  this.endPin = this.breadboard.getRowPin(this.endRow,this.endPinNum);
+  this.highlighted = highlighted;
+};
+
+ThreePinButton.prototype.draw = function() {
+  if (this.highlighted == "true") {
+    var color = highlightedColor;
+  } else {
+    var color = defaultColor;
+  }
+
+  var self = this;
+  this.breadboard.layer1.append("rect")
+    .attr("x",this.startPin[0] + 5)
+    .attr("y",this.startPin[1] - 5)
+    .attr("width",32)
+    .attr("height",this.endPin[1] - this.startPin[1] + 10)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("fill","white")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  this.breadboard.layer1.append("line")
+    .attr("x1",this.startPin[0])
+    .attr("y1",this.startPin[1])
+    .attr("x2",this.startPin[0]+5)
+    .attr("y2",this.startPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  this.breadboard.layer1.append("line")
+    .attr("x1",this.midPin[0])
+    .attr("y1",this.midPin[1])
+    .attr("x2",this.midPin[0]+5)
+    .attr("y2",this.midPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  this.breadboard.layer1.append("line")
+    .attr("x1",this.endPin[0])
+    .attr("y1",this.endPin[1])
+    .attr("x2",this.endPin[0]+5)
+    .attr("y2",this.endPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  this.breadboard.layer1.append("circle")
+    .attr("cx", this.midPin[0] + 5 + 16)
+    .attr("cy", this.midPin[1] -2 )
+    .attr("r", 10)
+    .attr("stroke",color)
+    .attr("stroke-width",3)
+    .attr("fill","none")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+  this.breadboard.layer1.append("text")
+    .attr("x", this.endPin[0]+10 )
+    .attr("y", this.endPin[1] +2 )
+    .text( function(d) { return "BUT"})                                                                                                                                                                                         
+    .attr("font-family","sans-serif")
+    .attr("font-size" , "8px")
+    .attr("fill","black")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+
+    if (this.breadboard.getVoltage(this.startRow,this.startPinNum) != "f" && 
+      this.breadboard.getVoltage(this.startRow,this.startPinNum) == 
+      this.breadboard.getVoltage(this.midRow,this.startPinNum) ) {
+        var msg = "Pins 1 and 2 are connected right now. To connect pins 2 and 3, press or flip the button.";
+    } else if (this.breadboard.getVoltage(this.midRow,this.startPinNum) != "f" &&
+      this.breadboard.getVoltage(this.midRow,this.startPinNum) == 
+      this.breadboard.getVoltage(this.endRow,this.startPinNum)) {
+      var msg = "Pins 2 and 3 are connected right now. To connect pins 1 and 2, press or flip the button.";
+    } 
+   // var msg = "hello";
+    if (msg) {
+      addInfoIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
+    } 
+};
+
+ThreePinButton.prototype.serialize = function() {
+  var c = {};
+  c["id"] = this.getId();
+  c["type"] = "3pin";
+  c["startRow"] = this.startRow;
+  c["startPinNum"] = this.startPinNum;
+  c["endRow"] = this.endRow;
+  c["endPinNum"] = this.endPinNum;
+  c["highlighted"] = this.highlighted;
+  return JSON.stringify(c);
+};
+
+ThreePinButton.prototype.getId = function() {
+  return "3" + twoDigits(this.startRow) + "p" + this.startPinNum + "r" + twoDigits(this.endRow) + "p" + this.endPinNum;
+};
+
+ThreePinButton.prototype.test = function() {
   return null;
 };
 
