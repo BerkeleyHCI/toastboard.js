@@ -2,6 +2,7 @@
 Graph = function() {
   this.readings = [];
   this.voltageData = [];
+  this.sampleRate;
   this.row;
   this.side;
 };
@@ -15,8 +16,17 @@ Graph.prototype.clear = function() {
 }
 
 Graph.prototype.addData = function(reading) {
+  var lastReading = this.readings.slice(-1)[0]
+  var hz;
+  if (lastReading != undefined) {
+    var lastTimestamp = lastReading.time[0];
+    var msBetween = reading.time[0] - lastTimestamp;
+    hz = 1 / (msBetween / 1000);
+  }
+  this.sampleRate = hz;
   this.readings.push(reading.data); // probably not needed
-  this.voltageData.push({voltage:reading.data[0],second:reading.time[0]})
+  this.voltageData.push({voltage:reading.data[0],second:reading.time[0]});
+
 };
 
 Graph.prototype.drawGraph = function(component_type) {
@@ -116,6 +126,8 @@ var lineFunc = d3.svg.line()
   .attr('stroke', 'blue')
   .attr('stroke-width', 2)
   .attr('fill', 'none');
+
+$("#sample-rate").html(this.sampleRate);
 
 } else {
   console.log("not enough to graph yet");
