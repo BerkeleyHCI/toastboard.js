@@ -21,7 +21,7 @@ Graph.prototype.addData = function(reading) {
   if (lastReading != undefined) {
     var lastTimestamp = lastReading.time[0];
     var msBetween = reading.time[0] - lastTimestamp;
-    hz = 1 / (msBetween / 1000);
+    hz = Math.floor(1 / (msBetween / 1000));
   }
   this.sampleRate = hz;
   this.readings.push(reading.data); // probably not needed
