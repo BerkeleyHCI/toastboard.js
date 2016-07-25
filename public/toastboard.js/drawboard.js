@@ -21,6 +21,9 @@ function Breadboard() {
   this.connections = null;
   this.labels = null;
 
+  this.lastSampleTime = null;
+  this.sampleRate = null; // this is only used in continuous sample mode
+
   d3.select("#board")
     .remove();
   var svg = d3.select("#breadboard").append("svg")
@@ -61,6 +64,21 @@ function Breadboard() {
 };
 
 Breadboard.prototype.processJson = function(json) {
+  if (json.continuous) {
+    // only set theses field if in continuous sample mode
+    if (this.lastSampleTime == null) {
+      this.lastSampleTime = json.time;
+    } else {
+      var msBetween = json.time - this.lastSampleTime;
+      var hz = 1 / (1 - (msBetween / 1000));
+      hz = hz.toFixed(2);
+      this.sampleRate = hz + " Hz";
+      this.lastSampleTime = json.time;
+    }
+  } else {
+    this.lastSampleTime = null;
+    this.sampleRate = null;
+  }
   if (json.rowsLeft) {
     this.receivedLeft = true;
     // reset data
@@ -306,6 +324,10 @@ Breadboard.prototype.drawBreadboard = function(json) {
 
   } else {
     console.log("no real data");
+  }
+
+  if (json.continuous) {
+    $("#board-sample-rate").html(this.sampleRate);
   }
 
 };

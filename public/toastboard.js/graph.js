@@ -21,10 +21,10 @@ Graph.prototype.addData = function(reading) {
   if (lastReading != undefined) {
     var lastTimestamp = lastReading.time[0];
     var msBetween = reading.time[0] - lastTimestamp;
-    hz = 1 / (msBetween / 1000);
-    hz = +hz.toFixed(2);
+    hz = 1 / (1 - (msBetween / 1000));
+    hz = hz.toFixed(2);
   }
-  this.sampleRate = hz;
+  this.sampleRate = hz + " Hz";
   this.readings.push(reading.data); // probably not needed
   this.voltageData.push({voltage:reading.data[0],second:reading.time[0]});
 
