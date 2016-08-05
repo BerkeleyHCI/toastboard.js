@@ -623,6 +623,65 @@ ThreePinButton.prototype.draw = function() {
   }
 
   var self = this;
+
+  this.breadboard.layer1.append("circle")
+    .attr("cx", this.startPin[0] )
+    .attr("cy", this.startPin[1] )
+    .attr("r", 4)
+    .attr("stroke",color)
+    .attr("stroke-width",3)
+    .attr("fill","none")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+ 
+ this.breadboard.layer1.append("circle")
+    .attr("cx", this.endPin[0] )
+    .attr("cy", this.endPin[1] )
+    .attr("r", 4)
+    .attr("stroke",color)
+    .attr("stroke-width",3)
+    .attr("fill","none")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+
+ this.breadboard.layer1.append("circle")
+    .attr("cx", this.midPin[0] + 20 )
+    .attr("cy", this.midPin[1] )
+    .attr("r", 4)
+    .attr("stroke",color)
+    .attr("stroke-width",3)
+    .attr("fill","none")
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+
+ this.breadboard.layer1.append("line")
+    .attr("x1",this.midPin[0]+30)
+    .attr("y1",this.midPin[1]-10)
+    .attr("x2",this.midPin[0]+30)
+    .attr("y2",this.midPin[1]+10)
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+
+ this.breadboard.layer1.append("line")
+    .attr("x1",this.midPin[0]+24)
+    .attr("y1",this.midPin[1])
+    .attr("x2",this.midPin[0]+30)
+    .attr("y2",this.midPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+
+
+ this.breadboard.layer1.append("line")
+    .attr("x1",this.endPin[0]+5)
+    .attr("y1",this.endPin[1]-2)
+    .attr("x2",this.midPin[0]+20)
+    .attr("y2",this.midPin[1])
+    .attr("stroke-width",3)
+    .attr("stroke",color)
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+
+
+
+/*
   this.breadboard.layer1.append("rect")
     .attr("x",this.startPin[0] + 5)
     .attr("y",this.startPin[1] - 5)
@@ -672,7 +731,7 @@ ThreePinButton.prototype.draw = function() {
     .attr("stroke-width",3)
     .attr("stroke",color)
     .attr("onclick","highlightComponentAndRedraw(" + this.getId() + ");");
-    /*
+    
   this.breadboard.layer1.append("circle")
     .attr("cx", this.midPin[0] + 5 + 16)
     .attr("cy", this.midPin[1] -2 )
@@ -680,29 +739,25 @@ ThreePinButton.prototype.draw = function() {
     .attr("stroke",color)
     .attr("stroke-width",3)
     .attr("fill","none")
-    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');"); */
+    .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
+
+     */
+
+  
   this.breadboard.layer1.append("text")
-    .attr("x", this.endPin[0]+10 )
-    .attr("y", this.endPin[1] +2 )
-    .text( function(d) { return "BTN"})                                                                                                                                                                                         
+    .attr("x", this.startPin[0]+6 )
+    .attr("y", this.startPin[1] +8 )
+    .text( function(d) { return "SPDT"})                                                                                                                                                                                         
     .attr("font-family","sans-serif")
     .attr("font-size" , "8px")
     .attr("fill","black")
     .attr("onclick","highlightComponentAndRedraw('" + this.getId() + "');");
 
-    if (this.breadboard.getVoltage(this.startRow,this.startPinNum) != "f" && 
-      this.breadboard.getVoltage(this.startRow,this.startPinNum) == 
-      this.breadboard.getVoltage(this.midRow,this.startPinNum) ) {
-        var msg = "Pins 1 and 2 are connected right now. To connect pins 2 and 3, press or flip the button.";
-    } else if (this.breadboard.getVoltage(this.midRow,this.startPinNum) != "f" &&
-      this.breadboard.getVoltage(this.midRow,this.startPinNum) == 
-      this.breadboard.getVoltage(this.endRow,this.startPinNum)) {
-      var msg = "Pins 2 and 3 are connected right now. To connect pins 1 and 2, press or flip the button.";
-    } 
-   // var msg = "hello";
-    if (msg) {
-      addInfoIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
-    } 
+  var msg = this.test();
+  if (msg) {
+    this.failedTest = msg;
+    addWarningIconAndTooltip(this.breadboard,this.midPin[0]+12,this.midPin[1]+9,msg);
+  }
 };
 
 ThreePinButton.prototype.serialize = function() {
@@ -722,7 +777,12 @@ ThreePinButton.prototype.getId = function() {
 };
 
 ThreePinButton.prototype.test = function() {
-  return null;
+
+    if (this.breadboard.getVoltage(this.startRow,this.startPinNum) == this.breadboard.getVoltage(this.midRow,this.startPinNum) ) {
+    return "<strong>This button may not function correctly!</strong><br><i>How I know:</i> The voltages at "+getDisplayRow(this.startRow,this.startPinNum)+
+    " and "+getDisplayRow(this.midRow,this.startPinNum)+" are already the same<br><i>Suggested fix:</i> Make sure the button is not stuck down; if it isn't, try rotating it 180 degrees";
+    }
+
 };
 
 var Button = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
@@ -1185,7 +1245,7 @@ return "<strong>This sensor may not function correctly!</strong><br><i>How I kno
 }
 
 var addWarningIconAndTooltip = function(breadboard, x, y, message) {
-  var foWidth = 340;
+  var foWidth = 300;
   var anchor = {'w': 125, 'h': 80};
   var t = 50, k = 15;
   var tip = {'w': (3/4 * t), 'h': k};

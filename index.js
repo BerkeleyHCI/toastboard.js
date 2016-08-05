@@ -17,7 +17,8 @@ var serialport = require("serialport");
 var SerialPort = serialport.SerialPort;
 
 var serialPort = new SerialPort("COM5",  {
-  baudrate: 115200,
+    baudrate: 921600,
+//  baudrate: 115200,
 //    baudrate: 9600,
     parser: serialport.parsers.readline("\n")
 }, false);

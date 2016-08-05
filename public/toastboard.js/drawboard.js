@@ -240,17 +240,20 @@ Breadboard.prototype.drawEmptyBreadboard = function() {
 
   var defaultVoltages = [];
     // manually add power and ground rails
-  grdVoltage = getRailRect(0,this);
+  
+  pwrVoltage = getRailRect(0,this);
+  pwrVoltage.r = 0;
+  pwrVoltage.v = 3.3;
+  pwrVoltage.color = vddColor;
+  defaultVoltages.push(pwrVoltage);
+
+
+  grdVoltage = getRailRect(1,this);
   grdVoltage.r = 1;
   grdVoltage.v = 0;
   grdVoltage.color = groundColor;
   defaultVoltages.push(grdVoltage);
 
-  pwrVoltage = getRailRect(1,this);
-  pwrVoltage.r = 0;
-  pwrVoltage.v = 3.3;
-  pwrVoltage.color = vddColor;
-  defaultVoltages.push(pwrVoltage);
 
 
 
@@ -334,9 +337,9 @@ Breadboard.prototype.drawBreadboard = function(json) {
 
 //row pins count across
 Breadboard.prototype.getRowPin = function(rownumber,pinnumber) {
-  if (pinnumber == "v") {
+  if (pinnumber == "g") {
     return this.pinPositions[rownumber + 24];
-  } else if (pinnumber == "g") {
+  } else if (pinnumber == "v") {
     return this.pinPositions[rownumber];
   } else {
     return this.pinPositions[(railcolumn*rownum) + (rownumber*pinnum) + pinnumber];
@@ -464,9 +467,9 @@ var getRowRect = function(rowIndex,breadboard) {
 
 var getRowAndPinFromPinIndex = function(pinIndex) {
   if (pinIndex < 24) {
-    return [pinIndex,"g"];
+    return [pinIndex,"v"];
   } else if (pinIndex < 48) {
-    return [pinIndex - 24, "v"];
+    return [pinIndex - 24, "g"];
   } else {
     var row = Math.floor( (pinIndex - (rownum*railcolumn)) / pinnum);
     var pin = (pinIndex - rownum*railcolumn) % pinnum;
