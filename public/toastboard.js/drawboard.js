@@ -84,7 +84,7 @@ Breadboard.prototype.processJson = function(json) {
     // reset data
     this.rowData = [];
     for (i=0;i<24;i++) {
-      if (json.rowsLeft[i] != "f") {
+      if (json.rowsLeft[i] != "f" && i != 23) {
         var newRow = {};
         var index = "" + i; // WAT
         var v = thresholdVoltage(json.rowsLeft[i]);
@@ -99,7 +99,7 @@ Breadboard.prototype.processJson = function(json) {
   if (json.rowsRight) {
     this.receivedRight = true;
     for (i=0;i<24;i++) {
-      if (json.rowsRight[i] != "f") {
+      if (json.rowsRight[i] != "f" && i != 23) {
         var newRow = {};
         var int_index = i + 24;
         var index = "" + int_index; // again WAT
