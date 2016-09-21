@@ -166,29 +166,41 @@ var myBreadboard = new Breadboard();
 var myGraph = new Graph();
 var holder = new ComponentHolder();
 
+var refreshCounter = 0;
+var okayToRefresh = function() {
+  if (refreshCounter % 20 == 0) {
+    refreshCounter = 1;
+    return true;
+  } else {
+    refreshCounter += 1;
+    return false;
+  }
+}
+
 // if we get an "info" emit from the socket server then console.log the data we receive
 socket.on('info', function (data) {
   console.log("got data from websocket inside html page");
   console.log(data);
   var json = JSON.parse(data);
   console.log(json);
-  if (json.oscillo) {
-    var rands = fullRowToRowAndSide(json.oscillo.row);
-    $("#graphviz").html("");
-    myGraph.addData(json.oscillo);
-    if (holder.type == "sensor") {
-      myGraph.drawGraph(holder.type);
-    } else {
-      myGraph.drawGraph();
+  if (okayToRefresh()) {
+    if (json.oscillo) {
+      var rands = fullRowToRowAndSide(json.oscillo.row);
+      $("#graphviz").html("");
+      myGraph.addData(json.oscillo);
+      if (holder.type == "sensor") {
+        myGraph.drawGraph(holder.type);
+      } else {
+        myGraph.drawGraph();
+      }
+    } else if (json.rowsLeft) {
+      myBreadboard.drawBreadboard(json);
+      redrawComponents(myBreadboard);
+      myBreadboard.attachPinClickEvents();
+      var timestring = getTimeStampString();
+      $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
     }
-  } else if (json.rowsLeft) {
-    myBreadboard.drawBreadboard(json);
-    redrawComponents(myBreadboard);
-    myBreadboard.attachPinClickEvents();
-    var timestring = getTimeStampString();
-    $("#timestamp").html("<p><i>last synched " + timestring + "</i></p>");
   }
-
 });
 
 var startConfig = function() {
