@@ -167,13 +167,18 @@ var myGraph = new Graph();
 var holder = new ComponentHolder();
 
 var refreshCounter = 0;
+var alwaysRedraw = false;
 var okayToRefresh = function() {
-  if (refreshCounter % 20 == 0) {
-    refreshCounter = 1;
+  if (alwaysRedraw) {
     return true;
   } else {
-    refreshCounter += 1;
-    return false;
+    if (refreshCounter % 20 == 0) {
+      refreshCounter = 1;
+      return true;
+    } else {
+      refreshCounter += 1;
+      return false;
+    }
   }
 }
 
@@ -383,10 +388,12 @@ var graphRow = function(row,side) {
     addCompConfig();
     
     $("#scanOnce").on("click",function() {
+      alwaysRedraw = true;
       socket.emit("d","hello");
     });
 
     $("#scanCon").on("click",function() {
+      alwaysRedraw = false;
       socket.emit("s","hello");
       scanningConfig();
     });
