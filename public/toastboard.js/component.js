@@ -1239,13 +1239,13 @@ var post = 0;
     post = 1;
   }
 
-if (post==1){
-return "<strong>This sensor may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
-}
+  if (post==1) {
+    return "<strong>This sensor may not function correctly!</strong><br><i>How I know:</i>"+reasons+"<br><i>Suggested fix:</i>"+solutions;
+  }
 }
 
 var addWarningIconAndTooltip = function(breadboard, x, y, message) {
-  var foWidth = 300;
+  var foWidth = 200;
   var anchor = {'w': 125, 'h': 80};
   var t = 50, k = 15;
   var tip = {'w': (3/4 * t), 'h': k};
