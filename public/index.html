@@ -394,6 +394,7 @@ var graphRow = function(row,side) {
 
     $("#scanCon").on("click",function() {
       alwaysRedraw = false;
+      refreshCounter = 0;
       socket.emit("s","hello");
       scanningConfig();
     });
