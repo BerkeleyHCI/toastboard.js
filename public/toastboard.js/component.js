@@ -253,7 +253,7 @@ Wire.prototype.draw = function() {
 
   if (msg) {
    // path.append("title").text(msg);
-    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg,this.startRow);
   }
 };
 
@@ -369,14 +369,14 @@ Resistor.prototype.draw = function() {
   if (msg) {
     path.append("title").text(msg);
     this.failedTest = msg;
-    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg,this.startRow);
   } else {
     var vdrop = Math.abs(this.breadboard.getVoltage(this.startRow,this.startPinNum) - this.breadboard.getVoltage(this.endRow,this.endPinNum));
     if (this.breadboard.getVoltage(this.startRow,this.startPinNum) != "f" && this.breadboard.getVoltage(this.endRow,this.endPinNum) != "f") {
     var current =  vdrop / this.resistance;
     current *= 1000;
     var info = "<strong>Current through this resistor:</strong> "+current.toFixed(2)+"mA<br><i>How I know:</i> V=IR; there is a voltage difference of "+vdrop.toFixed(2)+"V across this "+this.resistance+"ohm resistor";
-    addInfoIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],info);
+    addInfoIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],info,this.startRow);
   }
   }
 };
@@ -476,7 +476,7 @@ Diode.prototype.draw = function() {
   var msg = this.test();
   if (msg) {
     this.failedTest = msg;
-    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg,this.startRow);
   }
 };
 
@@ -756,7 +756,7 @@ ThreePinButton.prototype.draw = function() {
   var msg = this.test();
   if (msg) {
     this.failedTest = msg;
-    addWarningIconAndTooltip(this.breadboard,this.midPin[0]+12,this.midPin[1]+9,msg);
+    addWarningIconAndTooltip(this.breadboard,this.midPin[0]+12,this.midPin[1]+9,msg,this.startRow);
   }
 };
 
@@ -873,7 +873,7 @@ Button.prototype.draw = function() {
   var msg = this.test();
   if (msg) {
     this.failedTest = msg;
-    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg,this.startRow);
   }
 };
 
@@ -1032,7 +1032,7 @@ LMC6482.prototype.draw = function() {
   var msg = this.test();
   if (msg) {
     this.failedTest = msg;
-    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0],this.startPin[1],msg,this.startRow);
   }
 };
 
@@ -1196,11 +1196,11 @@ Sensor.prototype.draw = function() {
   var msg = this.test();
   if (msg) {
     this.failedTest = msg;
-    addWarningIconAndTooltip(this.breadboard,this.startPin[0]+10,this.startPin[1]+5,msg);
+    addWarningIconAndTooltip(this.breadboard,this.startPin[0]+10,this.startPin[1]+5,msg,this.startRow);
   } else if (this.breadboard.getVoltage(this.startRow+5,this.startPinNum) < 5.0)  {
     var reasons =  "PWR input (pin6) at "+getDisplayRow(this.startRow+5,this.startPinNum)+" is less than the suggested 5V";
   //  solutions += "<br>-Either supply 5V to "+getDisplayRow(this.startRow+5,this.startPinNum)+" or the datasheet scale factor may be incorrect";
-    addInfoIconAndTooltip(this.breadboard,this.startPin[0]+10,this.startPin[1]+5,reasons);
+    addInfoIconAndTooltip(this.breadboard,this.startPin[0]+10,this.startPin[1]+5,reasons,this.startRow);
   }
 };
 
@@ -1244,13 +1244,22 @@ var post = 0;
   }
 }
 
-var addWarningIconAndTooltip = function(breadboard, x, y, message) {
-  var foWidth = 200;
+var addWarningIconAndTooltip = function(breadboard, x, y, message, startRow) {
+  var x_margin, x_icon_margin;
+
+  var foWidth = 150;
   var anchor = {'w': 125, 'h': 80};
   var t = 50, k = 15;
   var tip = {'w': (3/4 * t), 'h': k};
+  if (startRow > 24) {
+    x_margin = -15 - foWidth;
+    x_icon_margin = -25;
+  } else {
+    x_margin = 15;
+    x_icon_margin = 0;
+  }
   breadboard.layer1.append("svg:image")
-  .attr('x',x)
+  .attr('x',x + x_icon_margin)
   .attr('y',y - 10)
   .attr('width', 24)
   .attr('height', 24)
@@ -1258,7 +1267,7 @@ var addWarningIconAndTooltip = function(breadboard, x, y, message) {
   .on('mouseover', function() {
     var fo = breadboard.layer2.append('foreignObject')
         .attr({
-            'x': x + 15,
+            'x': x + x_margin,
             'y': y + 5,
             'width': foWidth,
             'class': 'svg-tooltip'
@@ -1282,7 +1291,7 @@ var addWarningIconAndTooltip = function(breadboard, x, y, message) {
             'width': foWidth,
             'fill': '#D8D8D8', 
             'opacity': 0.85,
-            'transform': 'translate(' + (x+15) + ',' + (y+5) + ')'
+            'transform': 'translate(' + (x+x_margin) + ',' + (y+5) + ')'
                   });
   }) 
 
@@ -1292,9 +1301,16 @@ var addWarningIconAndTooltip = function(breadboard, x, y, message) {
   })  
 }
 
-var addInfoIconAndTooltip = function(breadboard, x, y, message) {
+var addInfoIconAndTooltip = function(breadboard, x, y, message, startRow) {
   //    var tt_svg = d3.select("#tooltips");
-  var foWidth = 275;
+  var foWidth = 150;
+  if (startRow > 24) {
+    x_margin = -15 - foWidth;
+    x_icon_margin = -25;
+  } else {
+    x_margin = 15;
+    x_icon_margin = 0;
+  }
   var anchor = {'w': 125, 'h': 80};
   var t = 50, k = 15;
   var tip = {'w': (3/4 * t), 'h': k};
@@ -1307,7 +1323,7 @@ var addInfoIconAndTooltip = function(breadboard, x, y, message) {
   .on('mouseover', function() {
     var fo = breadboard.layer2.append('foreignObject')
         .attr({
-            'x': x + 15,
+            'x': x + x_margin,
             'y': y + 5,
             'width': foWidth,
             'class': 'svg-tooltip'
@@ -1332,7 +1348,7 @@ var addInfoIconAndTooltip = function(breadboard, x, y, message) {
             'width': foWidth,
             'fill': '#D8D8D8', 
             'opacity': 0.85,
-            'transform': 'translate(' + (x+10) + ',' + (y+5) + ')'
+            'transform': 'translate(' + (x+x_margin) + ',' + (y+5) + ')'
                   });
   }) 
   .on('mouseout', function() {
