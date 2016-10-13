@@ -60,14 +60,15 @@
       <button type="submit" class="btn btn-secondary" value="cancelDelete" id="cancelDelete">Cancel</button>
   </form>
   </div>
-  <div class="row"
+  <div class="row">
+
 <form class="form-inline" id="schematic">
 <div class="form-group">
 <div class="input-group">
 <label for="schematic_csv">Choose a schematic to load</label>
 <input class="form-control" type="file" id="schematic_csv" />
 </div></div>
-<!-- <button type="submit" class="btn btn-secondary" value="submitCsv">Upload</button> -->
+<button type="submit" class="btn btn-secondary" value="submitCsv">Upload</button>
 </form>
 
 <!--
@@ -492,6 +493,23 @@ var graphRow = function(row,side) {
         }
       }
     });
+
+    $("form#schematic").submit(function(e) {
+      e.preventDefault();
+      var i = $("#schematic_csv");
+      var input = i[0];
+      if ( input.files && input.files[0] ) {
+        file = input.files[0]; // The file
+        fr = new FileReader(); // FileReader instance
+        fr.onload = function () {
+          console.log(fr.result);
+        };
+      fr.readAsText(file);
+    } else {
+      // Handle errors here
+      alert( "File not selected or browser incompatible." )
+    }
+    })
 
     $("#newcomponent").change(function(e) {
       if ($("#newcomponent").val() == "resistor") {
