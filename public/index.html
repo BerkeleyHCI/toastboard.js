@@ -495,6 +495,7 @@ var graphRow = function(row,side) {
     });
 
     $("form#schematic").submit(function(e) {
+      //e.stopPropagation();
       e.preventDefault();
       var i = $("#schematic_csv");
       var input = i[0];
@@ -503,6 +504,11 @@ var graphRow = function(row,side) {
         fr = new FileReader(); // FileReader instance
         fr.onload = function () {
           console.log(fr.result);
+          buildComponentsFromJson(fr.result,myBreadboard,holder);
+          var svg = myBreadboard.drawEmptyBreadboard();
+          myBreadboard.redrawBoard(svg);
+          redrawComponents(myBreadboard);
+          i.val("");
         };
       fr.readAsText(file);
     } else {

@@ -1,0 +1,9 @@
+[{"type": "wire", "startRow":9, "startPin": 0, "endRow": 20, "endPin": 0},
+{"type":"diode", "startRow":24,"startPin": 1, "endRow":28,"endPin":1},
+{"type":"resistor","startRow":9,"startPin":2,"endRow":14,"endPin":2,"resistance":200},
+{"type":"component","startRow":15,"startPin":3,"endRow":20,"endPin":3},
+{"type":"button","startRow":0,"startPin":0,"endRow":2,"endPin":0},
+{"type":"LMC6482","startRow":7,"startPin":4},
+{"type":"pot","startRow":36,"startPin":0},
+{"type":"sensor","startRow":17,"startPin":4},
+{"type":"3pin","startRow":39,"startPin":3}]

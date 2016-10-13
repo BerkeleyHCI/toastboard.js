@@ -1244,6 +1244,24 @@ var post = 0;
   }
 }
 
+var buildComponentsFromJson = function(json_blob,breadboard,holder) {
+  var json_data = JSON.parse(json_blob);
+  console.log(json_data);
+  json_data.forEach(function(j) {
+    if (j.type) {
+      holder.empty();
+      holder.type = j.type;
+      holder.startPin = j.startPin;
+      holder.startRow = j.startRow;
+      if (j.endPin) { holder.endPin = j.endPin }
+      if (j.endRow) { holder.endRow = j.endRow }
+      if (j.resistance) { holder.resistance = j.resistance }
+      var c = holder.create(breadboard);
+      saveComponent(c);
+    }
+  });
+}
+
 var addWarningIconAndTooltip = function(breadboard, x, y, message, startRow) {
   var x_margin, x_icon_margin;
 
