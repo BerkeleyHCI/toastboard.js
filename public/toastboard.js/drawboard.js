@@ -14,7 +14,7 @@ function Breadboard() {
   this.rowData = {};
   this.receivedLeft = false;
   this.receivedRight = false;
-  this.drawCallback = null; // what is this callback thing for?
+  this.drawCallback = null;
 
   this.rawVoltages = [];
   this.voltageAttr = null;
@@ -131,7 +131,6 @@ Breadboard.prototype.attachPinClickEvents = function(pintype) {
   } else if (pintype == "end") {
     var methodName = "setEndPin";
   }
-  console.log("attaching pin events");
   this.layer1.selectAll("pinclick")
   .data(this.pinPositions)
   .enter()
@@ -199,7 +198,6 @@ var isSamePin = function(i) {
 };
 
 Breadboard.prototype.drawEmptyBreadboard = function() {
-  console.log(holder);
   var self = this;
 
   this.layer1.selectAll("*").remove();
@@ -309,15 +307,12 @@ Breadboard.prototype.redrawBoard = function() {
 
 
 Breadboard.prototype.drawBreadboard = function(json) {
-  console.log("called into drawBreadboard");
   var self = this;
   var hasData = this.processJson(json);
 
   if (hasData) {
     // we've received both sides & can redraw
-    console.log(this.rowData);
     var hash = hashVoltages(this.rowData);
-    console.log(hash);
     this.voltageAttr = hashToVoltageAttr(hash,self);
     this.connections = hashToCnxn(hash,self);
     this.labels = hashToLabels(this.rowData,self);

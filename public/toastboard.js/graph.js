@@ -17,6 +17,7 @@ Graph.prototype.clear = function() {
 
 Graph.prototype.addData = function(reading) {
   var lastReading = this.readings.slice(-1)[0]
+  /*
   var hz;
   if (lastReading != undefined) {
     var lastTimestamp = lastReading.time[0];
@@ -25,7 +26,9 @@ Graph.prototype.addData = function(reading) {
     hz = hz.toFixed(2);
   }
   this.sampleRate = hz + " Hz";
-  this.readings.push(reading.data); // probably not needed
+  */
+  this.sampleRate = "Hz";
+  this.readings.push(reading);
   this.voltageData.push({voltage:reading.data[0],second:reading.time[0]});
 
 };

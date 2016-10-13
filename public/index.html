@@ -185,10 +185,7 @@ var okayToRefresh = function() {
 
 // if we get an "info" emit from the socket server then console.log the data we receive
 socket.on('info', function (data) {
-  console.log("got data from websocket inside html page");
-  console.log(data);
   var json = JSON.parse(data);
-  console.log(json);
   if (okayToRefresh()) {
     if (json.oscillo) {
       var rands = fullRowToRowAndSide(json.oscillo.row);
@@ -377,7 +374,6 @@ var graphRow = function(row,side) {
   } else {
     rowString = "" + row;
   }
-  console.log("graph row " + rowString + " on side " + side);
   graphingConfig();
   myGraph.clear();
   socket.emit("o",rowString);
@@ -503,7 +499,6 @@ var graphRow = function(row,side) {
         file = input.files[0]; // The file
         fr = new FileReader(); // FileReader instance
         fr.onload = function () {
-          console.log(fr.result);
           buildComponentsFromJson(fr.result,myBreadboard,holder);
           var svg = myBreadboard.drawEmptyBreadboard();
           myBreadboard.redrawBoard(svg);

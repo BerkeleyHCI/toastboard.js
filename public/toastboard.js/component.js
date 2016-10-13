@@ -345,7 +345,6 @@ Resistor.prototype.calcLineData = function() {
                          .x(function(d) { return d.x; })
                          .y(function(d) { return d.y; })
                          .interpolate("linear");
-                         console.log(lineData);
 };
 
 Resistor.prototype.draw = function() {
@@ -429,7 +428,6 @@ Diode.prototype.calcPoints = function() {
                       {x:this.startPin[0]-10,y:this.endPin[1]-this.verticalLineHeight-triangleHeight},
                       {x:this.startPin[0]+10,y:this.endPin[1]-this.verticalLineHeight-triangleHeight},
                       {x:this.startPin[0],y:this.endPin[1]-this.verticalLineHeight}];
-  console.log(this.triangleData);
 };
 
 Diode.prototype.draw = function() {
@@ -601,7 +599,6 @@ Potentiometer.prototype.test = function() {
 };
 
 var ThreePinButton = function(breadboard,startRow,startPinNum,endRow,endPinNum,highlighted) {
-  console.log("three pinbutton constructor");
   this.breadboard = breadboard;
   this.type = "3pin";
   this.startRow = startRow;
@@ -1246,7 +1243,6 @@ var post = 0;
 
 var buildComponentsFromJson = function(json_blob,breadboard,holder) {
   var json_data = JSON.parse(json_blob);
-  console.log(json_data);
   json_data.forEach(function(j) {
     if (j.type) {
       holder.empty();
