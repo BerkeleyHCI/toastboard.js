@@ -168,11 +168,12 @@ var myGraph = new Graph();
 var holder = new ComponentHolder();
 
 var refreshCounter = 0;
-var alwaysRedraw = false;
+
+//var alwaysRedraw = false;
 var okayToRefresh = function() {
-  if (alwaysRedraw) {
-    return true;
-  } else {
+  //if (alwaysRedraw) {
+  //  return true;
+  //} else {
     if (refreshCounter % 20 == 0) {
       refreshCounter = 1;
       return true;
@@ -180,7 +181,7 @@ var okayToRefresh = function() {
       refreshCounter += 1;
       return false;
     }
-  }
+  //}
 }
 
 // if we get an "info" emit from the socket server then console.log the data we receive
@@ -385,12 +386,13 @@ var graphRow = function(row,side) {
     addCompConfig();
     
     $("#scanOnce").on("click",function() {
-      alwaysRedraw = true;
+      //alwaysRedraw = true;
+      refreshCounter = 0;
       socket.emit("d","hello");
     });
 
     $("#scanCon").on("click",function() {
-      alwaysRedraw = false;
+      //alwaysRedraw = false;
       refreshCounter = 0;
       socket.emit("s","hello");
       scanningConfig();

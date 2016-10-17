@@ -18,13 +18,19 @@ Graph.prototype.clear = function() {
 Graph.prototype.addData = function(reading) {
   var lastReading = this.readings.slice(-1)[0]
   var hz;
-  if (lastReading != undefined && lastReading.time != undefined && lastReading.time.length > 0) {
-    var lastTimestamp = lastReading.time[0];
-    var msBetween = reading.time[0] - lastTimestamp;
-    hz = 1 / (1 - (msBetween / 1000));
-    hz = hz.toFixed(2);
-  }
-  this.sampleRate = hz + " Hz";
+
+  //debug commenting
+  // if (lastReading != undefined && lastReading.time != undefined && lastReading.time.length > 0) {
+  //   var lastTimestamp = lastReading.time[0];
+  //   var msBetween = reading.time[0] - lastTimestamp;
+  //   hz = 1 / (1 - (msBetween / 1000));
+  //   hz = hz.toFixed(2);
+  // }
+  // this.sampleRate = hz + " Hz";
+
+  this.sampleRate = " ";
+
+
   this.readings.push(reading);
   this.voltageData.push({voltage:reading.data[0],second:reading.time[0]});
 
@@ -90,7 +96,7 @@ Graph.prototype.drawGraph = function(component_type) {
   xAxis = d3.svg.axis()
       .scale(xRange)
       .tickSize(5)
-      .tickFormat(function(d) { return d + "s";}),
+      .tickFormat(function(d) { return d + "ms";}),
   yAxis = d3.svg.axis()
       .scale(yRange)
       .ticks(5)
